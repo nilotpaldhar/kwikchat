@@ -1,0 +1,15 @@
+.next
+.github
+.vscode
+next-env.d.ts
+node_modules
+yarn.lock
+package.json
+package-lock.json
+public
+dist
+LICENSE
+CHANGELOG.md
+CODE_OF_CONDUCT.md
+CONTRIBUTING.md
+README.md

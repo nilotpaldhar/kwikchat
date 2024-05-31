@@ -1,0 +1,70 @@
+{
+  "name": "kwikchat",
+  "version": "0.2.1",
+  "private": true,
+  "license": "GNU GENERAL PUBLIC LICENSE",
+  "author": "Nilotpal Dhar",
+  "scripts": {
+    "dev": "next dev",
+    "build": "prisma generate && next build",
+    "start": "next start",
+    "clean": "rimraf .next",
+    "lint:check": "next lint",
+    "lint:fix": "eslint . --ext ts --ext tsx --ext js --fix",
+    "format:check": "prettier --check .",
+    "format:fix": "prettier --write .",
+    "check:all": "yarn lint:check && yarn format:check  && yarn build",
+    "fix:all": "yarn lint:fix && yarn format:fix",
+    "prisma:migrate": "dotenv -e .env.development.local prisma migrate dev",
+    "prisma:push": "dotenv -e .env.development.local prisma db push",
+    "prisma:studio": "dotenv -e .env.development.local prisma studio",
+    "prepare": "husky"
+  },
+  "config": {
+    "commitizen": {
+      "path": "./node_modules/cz-conventional-changelog"
+    }
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/nilotpaldhar/storekeeper"
+  },
+  "bugs": {
+    "url": "https://github.com/nilotpaldhar/storekeeper/issues"
+  },
+  "dependencies": {
+    "@prisma/client": "^5.14.0",
+    "@radix-ui/react-slot": "^1.0.2",
+    "class-variance-authority": "^0.7.0",
+    "clsx": "^2.1.1",
+    "lucide-react": "^0.381.0",
+    "next": "14.2.3",
+    "next-themes": "^0.3.0",
+    "react": "^18",
+    "react-dom": "^18",
+    "tailwind-merge": "^2.3.0",
+    "tailwindcss": "^3.4.3",
+    "tailwindcss-animate": "^1.0.7"
+  },
+  "devDependencies": {
+    "@commitlint/cli": "^19.3.0",
+    "@commitlint/config-conventional": "^19.2.2",
+    "@types/node": "^20",
+    "@types/react": "^18",
+    "@types/react-dom": "^18",
+    "@typescript-eslint/eslint-plugin": "^7.11.0",
+    "@typescript-eslint/parser": "^7.11.0",
+    "commitizen": "^4.3.0",
+    "eslint": "^8",
+    "eslint-config-airbnb": "^19.0.4",
+    "eslint-config-airbnb-typescript": "^18.0.0",
+    "eslint-config-next": "14.2.3",
+    "eslint-config-prettier": "^9.1.0",
+    "husky": "^9.0.11",
+    "postcss": "^8",
+    "prettier": "^3.2.5",
+    "prisma": "^5.14.0",
+    "rimraf": "^5.0.7",
+    "typescript": "^5"
+  }
+}
