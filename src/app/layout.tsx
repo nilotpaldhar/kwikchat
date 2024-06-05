@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Raleway as FontSans } from "next/font/google";
 
-import ThemeProvider from "@/components/providers/ThemeProvider";
+import ThemeProvider from "@/components/providers/theme-provider";
 import { cn } from "@/utils/general/cn";
 
 import "@/styles/global.css";
