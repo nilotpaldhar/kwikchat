@@ -1,12 +1,11 @@
 "use client";
 
-import Link from "next/link";
 import { useState } from "react";
 
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { SigninSchema } from "@/schemas";
+import { ResetSchema } from "@/schemas";
 
 import {
 	Form,
@@ -15,24 +14,22 @@ import {
 	FormItem,
 	FormLabel,
 	FormMessage,
+	FormDescription,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 
 import { Loader2 } from "lucide-react";
 
-const SiginForm = () => {
+const ResetForm = () => {
 	const [pending, setPending] = useState(false);
 
-	const form = useForm<z.infer<typeof SigninSchema>>({
-		resolver: zodResolver(SigninSchema),
-		defaultValues: {
-			email: "",
-			password: "",
-		},
+	const form = useForm<z.infer<typeof ResetSchema>>({
+		resolver: zodResolver(ResetSchema),
+		defaultValues: { email: "" },
 	});
 
-	const onSubmit = (values: z.infer<typeof SigninSchema>) => {
+	const onSubmit = (values: z.infer<typeof ResetSchema>) => {
 		// eslint-disable-next-line no-console
 		console.log({ values });
 		setPending(true);
@@ -58,34 +55,13 @@ const SiginForm = () => {
 									/>
 								</FormControl>
 								<FormMessage />
+								<FormDescription>Enter the email with which you’ve registered</FormDescription>
 							</FormItem>
 						)}
 					/>
-					<FormField
-						control={form.control}
-						name="password"
-						render={({ field }) => (
-							<FormItem>
-								<FormLabel>Password</FormLabel>
-								<FormControl>
-									<Input type="password" placeholder="########" disabled={pending} {...field} />
-								</FormControl>
-								<FormMessage />
-							</FormItem>
-						)}
-					/>
-					<div className="flex justify-end items-center text-right">
-						<Button
-							className="p-0 h-max text-neutral-500 hover:text-primary-400 dark:text-neutral-300 dark:hover:text-primary-400"
-							variant="link"
-							asChild
-						>
-							<Link href="/reset">Forgot Password?</Link>
-						</Button>
-					</div>
 					<Button type="submit" className="w-full space-x-2" disabled={pending}>
 						{pending && <Loader2 size={18} className="animate-spin" />}
-						<span>{pending ? "Sign In..." : "Sign In"}</span>
+						<span>{pending ? "Reset Password..." : "Reset Password"}</span>
 					</Button>
 				</div>
 			</form>
@@ -93,4 +69,4 @@ const SiginForm = () => {
 	);
 };
 
-export default SiginForm;
+export default ResetForm;

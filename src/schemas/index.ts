@@ -20,3 +20,24 @@ export const SignupSchema = z.object({
 		message: "Please read and accept the terms and conditions",
 	}),
 });
+
+export const ResetSchema = z.object({
+	email: z.string().email({ message: "Please enter a valid email address" }),
+});
+
+export const NewPasswordSchema = z
+	.object({
+		password: z.string().refine((val) => /^(?=.*[A-Z])(?=.*\d).{8,}$/gm.test(val ?? ""), {
+			message: "Please enter a valid password",
+		}),
+		confirmPassword: z.string(),
+	})
+	.superRefine(({ confirmPassword, password }, ctx) => {
+		if (confirmPassword !== password) {
+			ctx.addIssue({
+				code: "custom",
+				message: "Please make sure your passwords match",
+				path: ["confirmPassword"],
+			});
+		}
+	});

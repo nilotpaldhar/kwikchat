@@ -6,7 +6,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { SigninSchema } from "@/schemas";
+import { NewPasswordSchema } from "@/schemas";
 
 import {
 	Form,
@@ -15,24 +15,25 @@ import {
 	FormItem,
 	FormLabel,
 	FormMessage,
+	FormDescription,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 
 import { Loader2 } from "lucide-react";
 
-const SiginForm = () => {
+const NewPasswordForm = () => {
 	const [pending, setPending] = useState(false);
 
-	const form = useForm<z.infer<typeof SigninSchema>>({
-		resolver: zodResolver(SigninSchema),
+	const form = useForm<z.infer<typeof NewPasswordSchema>>({
+		resolver: zodResolver(NewPasswordSchema),
 		defaultValues: {
-			email: "",
 			password: "",
+			confirmPassword: "",
 		},
 	});
 
-	const onSubmit = (values: z.infer<typeof SigninSchema>) => {
+	const onSubmit = (values: z.infer<typeof NewPasswordSchema>) => {
 		// eslint-disable-next-line no-console
 		console.log({ values });
 		setPending(true);
@@ -45,28 +46,26 @@ const SiginForm = () => {
 				<div className="flex flex-col space-y-4">
 					<FormField
 						control={form.control}
-						name="email"
+						name="password"
 						render={({ field }) => (
 							<FormItem>
-								<FormLabel>Email Address</FormLabel>
+								<FormLabel>New Password</FormLabel>
 								<FormControl>
-									<Input
-										type="email"
-										placeholder="hello@example.com"
-										disabled={pending}
-										{...field}
-									/>
+									<Input type="password" placeholder="########" disabled={pending} {...field} />
 								</FormControl>
 								<FormMessage />
+								<FormDescription>
+									Must contain 1 uppercase letter, 1 number, min 8 characters
+								</FormDescription>
 							</FormItem>
 						)}
 					/>
 					<FormField
 						control={form.control}
-						name="password"
+						name="confirmPassword"
 						render={({ field }) => (
 							<FormItem>
-								<FormLabel>Password</FormLabel>
+								<FormLabel>Confirm Password</FormLabel>
 								<FormControl>
 									<Input type="password" placeholder="########" disabled={pending} {...field} />
 								</FormControl>
@@ -74,23 +73,19 @@ const SiginForm = () => {
 							</FormItem>
 						)}
 					/>
-					<div className="flex justify-end items-center text-right">
-						<Button
-							className="p-0 h-max text-neutral-500 hover:text-primary-400 dark:text-neutral-300 dark:hover:text-primary-400"
-							variant="link"
-							asChild
-						>
-							<Link href="/reset">Forgot Password?</Link>
+					<div className="flex flex-row items-center space-x-4">
+						<Button type="submit" className="w-full space-x-2" disabled={pending}>
+							{pending && <Loader2 size={18} className="animate-spin" />}
+							<span>{pending ? "Saving..." : "Save"}</span>
+						</Button>
+						<Button className="w-full" variant="outline" asChild>
+							<Link href="/sign-in">Cancel</Link>
 						</Button>
 					</div>
-					<Button type="submit" className="w-full space-x-2" disabled={pending}>
-						{pending && <Loader2 size={18} className="animate-spin" />}
-						<span>{pending ? "Sign In..." : "Sign In"}</span>
-					</Button>
 				</div>
 			</form>
 		</Form>
 	);
 };
 
-export default SiginForm;
+export default NewPasswordForm;
