@@ -1,5 +1,5 @@
 import SiteLogo from "@/components/site-logo";
-import NavActions from "./actions";
+import { NavActions } from "./actions";
 
 const AuthNavbar = () => (
 	<nav className="px-5 pt-6 pb-5 md:px-10 md:pt-8">

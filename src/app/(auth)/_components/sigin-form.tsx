@@ -6,7 +6,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { LoginSchema } from "@/schemas";
+import { SigninSchema } from "@/schemas";
 
 import {
 	Form,
@@ -24,15 +24,15 @@ import { Loader2 } from "lucide-react";
 const SiginForm = () => {
 	const [pending, setPending] = useState(false);
 
-	const form = useForm<z.infer<typeof LoginSchema>>({
-		resolver: zodResolver(LoginSchema),
+	const form = useForm<z.infer<typeof SigninSchema>>({
+		resolver: zodResolver(SigninSchema),
 		defaultValues: {
 			email: "",
 			password: "",
 		},
 	});
 
-	const onSubmit = (values: z.infer<typeof LoginSchema>) => {
+	const onSubmit = (values: z.infer<typeof SigninSchema>) => {
 		// eslint-disable-next-line no-console
 		console.log({ values });
 		setPending(true);
@@ -68,7 +68,7 @@ const SiginForm = () => {
 							<FormItem>
 								<FormLabel>Password</FormLabel>
 								<FormControl>
-									<Input type="password" placeholder="############" disabled={pending} {...field} />
+									<Input type="password" placeholder="########" disabled={pending} {...field} />
 								</FormControl>
 								<FormMessage />
 							</FormItem>
@@ -85,7 +85,7 @@ const SiginForm = () => {
 					</div>
 					<Button type="submit" className="w-full space-x-2" disabled={pending}>
 						{pending && <Loader2 size={18} className="animate-spin" />}
-						<span>{pending ? "Signing In..." : "Sign In"}</span>
+						<span>{pending ? "Sign In..." : "Sign In"}</span>
 					</Button>
 				</div>
 			</form>

@@ -2,34 +2,35 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { Button } from "@/components/ui/button";
 
-import { buttonVariants } from "@/components/ui/button";
-import { cn } from "@/utils/general/cn";
+const SignupLink = () => (
+	<div className="flex items-center space-x-2">
+		<span className="text-muted font-medium">Need an account?</span>
+		<Button variant="link" className="p-0 h-max leading-none" asChild>
+			<Link href="/sign-up">Sign Up</Link>
+		</Button>
+	</div>
+);
+
+const SigninLink = () => (
+	<div className="flex items-center space-x-2">
+		<span className="text-muted font-medium">Already have an account?</span>
+		<Button variant="link" className="p-0 h-max leading-none" asChild>
+			<Link href="/sign-in">Sign In</Link>
+		</Button>
+	</div>
+);
 
 const NavActions: React.FC<{ className?: string }> = ({ className = "" }) => {
 	const pathname = usePathname();
 
 	return (
-		<div className={cn("flex items-center space-x-2", className)}>
-			{pathname === "/sign-in" && (
-				<>
-					<span className="text-muted font-medium">Need an account?</span>
-					<Link href="/sign-up" className={cn(buttonVariants({ variant: "link" }), "p-0 h-max")}>
-						Sign Up
-					</Link>
-				</>
-			)}
-
-			{pathname === "/sign-up" && (
-				<>
-					<span className="text-muted font-medium">Already have an account?</span>
-					<Link href="/sign-in" className={cn(buttonVariants({ variant: "link" }), "p-0 h-max")}>
-						Sign In
-					</Link>
-				</>
-			)}
+		<div className={className}>
+			{pathname === "/sign-in" && <SignupLink />}
+			{pathname === "/sign-up" && <SigninLink />}
 		</div>
 	);
 };
 
-export default NavActions;
+export { NavActions, SignupLink, SigninLink };
