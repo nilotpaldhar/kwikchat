@@ -1,12 +1,16 @@
 "use client";
 
-import Link from "next/link";
-import { useState } from "react";
+import { useState, useTransition } from "react";
 
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { SignupSchema } from "@/schemas";
+
+import signup from "@/actions/auth/signup";
+
+import Link from "next/link";
+import { Loader2, CheckCircle, XOctagon } from "lucide-react";
 
 import {
 	Form,
@@ -20,16 +24,16 @@ import {
 import { Input } from "@/components/ui/input";
 import Checkbox from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
-
-import { Loader2 } from "lucide-react";
+import { Alert, AlertTitle } from "@/components/ui/alert";
 
 const SigupForm = () => {
-	const [pending, setPending] = useState(false);
+	const [success, setSuccess] = useState<string | undefined>("");
+	const [error, setError] = useState<string | undefined>("");
+	const [pending, startTransition] = useTransition();
 
 	const form = useForm<z.infer<typeof SignupSchema>>({
 		resolver: zodResolver(SignupSchema),
 		defaultValues: {
-			fullName: "",
 			username: "",
 			email: "",
 			password: "",
@@ -38,29 +42,38 @@ const SigupForm = () => {
 	});
 
 	const onSubmit = (values: z.infer<typeof SignupSchema>) => {
-		// eslint-disable-next-line no-console
-		console.log({ values });
-		setPending(true);
-		setTimeout(() => setPending(false), 5000);
+		setError("");
+		setSuccess("");
+
+		startTransition(() => {
+			signup(values).then((data) => {
+				setError(data?.error);
+
+				if (data?.success) {
+					setSuccess(data.success);
+					form.reset();
+				}
+			});
+		});
 	};
 
 	return (
 		<Form {...form}>
 			<form onSubmit={form.handleSubmit(onSubmit)} noValidate>
 				<div className="flex flex-col space-y-5">
-					<FormField
-						control={form.control}
-						name="fullName"
-						render={({ field }) => (
-							<FormItem>
-								<FormLabel>Display Name</FormLabel>
-								<FormControl>
-									<Input type="text" placeholder="James Brown" disabled={pending} {...field} />
-								</FormControl>
-								<FormMessage />
-							</FormItem>
-						)}
-					/>
+					{error && (
+						<Alert variant="danger">
+							<XOctagon />
+							<AlertTitle>{error}</AlertTitle>
+						</Alert>
+					)}
+					{success && (
+						<Alert variant="success">
+							<CheckCircle />
+							<AlertTitle>{success}</AlertTitle>
+						</Alert>
+					)}
+
 					<FormField
 						control={form.control}
 						name="username"
@@ -115,7 +128,11 @@ const SigupForm = () => {
 						render={({ field }) => (
 							<FormItem className="flex flex-row items-start space-x-2 space-y-0">
 								<FormControl className="mt-0.5">
-									<Checkbox checked={field.value} onCheckedChange={field.onChange} />
+									<Checkbox
+										checked={field.value}
+										onCheckedChange={field.onChange}
+										disabled={pending}
+									/>
 								</FormControl>
 								<div className="space-y-1 leading-none">
 									<FormLabel className="flex items-center flex-wrap gap-1">

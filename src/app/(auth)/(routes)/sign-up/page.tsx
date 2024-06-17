@@ -15,7 +15,7 @@ const SignUpPage = () => (
 		>
 			<SigupForm />
 			<Divider>OR</Divider>
-			<SocialAuth callbackUrl="/" />
+			<SocialAuth />
 		</CardWrapper>
 		<div className="flex justify-center pt-8 md:hidden">
 			<SigninLink />

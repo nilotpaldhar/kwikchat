@@ -41,7 +41,7 @@ const NavActions: React.FC<{ className?: string }> = ({ className = "" }) => {
 
 	return (
 		<div className={className}>
-			{pathname === "/sign-in" && <SignupLink />}
+			{(pathname === "/sign-in" || pathname === "/verification") && <SignupLink />}
 			{pathname === "/sign-up" && <SigninLink />}
 			{(pathname === "/reset" || pathname === "/new-password") && (
 				<SigninLink message="Change your mind?" linkText="Back to Sign In" />

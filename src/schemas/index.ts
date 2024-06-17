@@ -8,7 +8,6 @@ export const SigninSchema = z.object({
 });
 
 export const SignupSchema = z.object({
-	fullName: z.string(),
 	username: z.string().refine((val) => /^[a-zA-Z0-9_]{3,16}$/gm.test(val ?? ""), {
 		message: "Please enter a valid username",
 	}),

@@ -1,3 +1,6 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
+import { TokenVerificationStatus } from "@/types";
+
 import { User } from "lucide-react";
 
 import CardWrapper from "@/app/(auth)/_components/card-wrapper";
@@ -15,7 +18,7 @@ const SignInPage = () => (
 		>
 			<SiginForm />
 			<Divider>OR</Divider>
-			<SocialAuth callbackUrl="/" />
+			<SocialAuth />
 		</CardWrapper>
 		<div className="flex justify-center pt-8 md:hidden">
 			<SignupLink />

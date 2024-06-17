@@ -1,16 +1,21 @@
 "use client";
 
+import { signIn } from "next-auth/react";
+
 import { Button } from "@/components/ui/button";
 import { Google, Facebook } from "@/components/icon";
 
+import { DEFAULT_LOGIN_REDIRECT } from "@/constants/routes";
+
 interface SocialAuthProps {
-	callbackUrl: string;
+	callbackUrl?: string;
 }
 
 const SocialAuth: React.FC<SocialAuthProps> = ({ callbackUrl }) => {
 	const onCLick = (provider: "google" | "facebook") => {
-		// eslint-disable-next-line no-console
-		console.log({ provider, callbackUrl });
+		signIn(provider, {
+			callbackUrl: callbackUrl ?? DEFAULT_LOGIN_REDIRECT,
+		});
 	};
 
 	return (

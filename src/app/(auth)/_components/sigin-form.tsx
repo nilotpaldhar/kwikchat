@@ -1,12 +1,16 @@
 "use client";
 
-import Link from "next/link";
-import { useState } from "react";
+import { useState, useTransition } from "react";
 
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { SigninSchema } from "@/schemas";
+
+import signin from "@/actions/auth/signin";
+
+import Link from "next/link";
+import { Loader2, CheckCircle, XOctagon } from "lucide-react";
 
 import {
 	Form,
@@ -18,11 +22,12 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-
-import { Loader2 } from "lucide-react";
+import { Alert, AlertTitle } from "@/components/ui/alert";
 
 const SiginForm = () => {
-	const [pending, setPending] = useState(false);
+	const [success, setSuccess] = useState<string | undefined>("");
+	const [error, setError] = useState<string | undefined>("");
+	const [pending, startTransition] = useTransition();
 
 	const form = useForm<z.infer<typeof SigninSchema>>({
 		resolver: zodResolver(SigninSchema),
@@ -33,16 +38,38 @@ const SiginForm = () => {
 	});
 
 	const onSubmit = (values: z.infer<typeof SigninSchema>) => {
-		// eslint-disable-next-line no-console
-		console.log({ values });
-		setPending(true);
-		setTimeout(() => setPending(false), 5000);
+		setError("");
+		setSuccess("");
+
+		startTransition(() => {
+			signin(values).then((data) => {
+				setError(data?.error);
+
+				if (data?.success) {
+					setSuccess(data.success);
+					form.reset();
+				}
+			});
+		});
 	};
 
 	return (
 		<Form {...form}>
 			<form onSubmit={form.handleSubmit(onSubmit)} noValidate>
 				<div className="flex flex-col space-y-4">
+					{error && (
+						<Alert variant="danger">
+							<XOctagon />
+							<AlertTitle>{error}</AlertTitle>
+						</Alert>
+					)}
+					{success && (
+						<Alert variant="success">
+							<CheckCircle />
+							<AlertTitle>{success}</AlertTitle>
+						</Alert>
+					)}
+
 					<FormField
 						control={form.control}
 						name="email"

@@ -16,18 +16,18 @@ enum ThemeOptions {
 model User {
   id            String    @id @default(cuid())
   name          String?
-  displayName   String?   @map("display_name")
+  displayName   String?
   email         String?   @unique
   username      String?   @unique
-  emailVerified DateTime? @map("email_verified")
+  emailVerified DateTime?
   password      String?
   image         String?
   avatar        String?
   banner_color  String?   @default("#27AE80")
   bio           String?   @db.Text
 
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt @map("updated_at")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   accounts     Account[]
   userSettings UserSettings?
@@ -37,7 +37,7 @@ model Account {
   id                String  @id @default(cuid())
   type              String
   provider          String
-  providerAccountId String  @map("provider_account_id")
+  providerAccountId String
   refresh_token     String? @db.Text
   access_token      String? @db.Text
   expires_at        Int?
@@ -46,21 +46,32 @@ model Account {
   id_token          String?
   session_state     String?
 
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt @map("updated_at")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   userId String
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
 }
 
 model UserSettings {
   id               String       @id @default(cuid())
-  colorTheme       ThemeOptions @default(light) @map("color_theme")
-  twoFactorEnabled Boolean      @default(false) @map("two_factor_enabled")
+  colorTheme       ThemeOptions @default(light)
+  twoFactorEnabled Boolean      @default(false)
 
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt @map("updated_at")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   userId String @unique
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  id      String   @id @default(cuid())
+  email   String
+  token   String   @unique
+  expires DateTime
+
+  @@unique([email, token])
 }
