@@ -12,5 +12,14 @@ async function sendVerificationEmail({ email, token }: { email: string; token: s
 	});
 }
 
-// eslint-disable-next-line import/prefer-default-export
-export { sendVerificationEmail };
+async function sendPasswordResetEmail({ email, token }: { email: string; token: string }) {
+	const resetLink = `${DOMAIN}/reset-password?token=${token}`;
+
+	await sendMail({
+		to: email,
+		subject: "Reset your password",
+		body: `<p>Click <a href="${resetLink}">here</a> to reset your password.</p>`,
+	});
+}
+
+export { sendVerificationEmail, sendPasswordResetEmail };

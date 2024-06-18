@@ -5,10 +5,10 @@ export enum AuthError {
 	Default = "Default",
 }
 
-export enum TokenVerificationStatus {
+export enum TokenValidationStatus {
 	InvalidToken = "InvalidToken",
 	TokenExpired = "TokenExpired",
 	InvalidTokenEmail = "InvalidTokenEmail",
-	VerificationFailed = "VerificationFailed",
+	ValidationFailed = "ValidationFailed",
 	Default = "Default",
 }

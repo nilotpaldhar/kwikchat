@@ -1,73 +1,20 @@
 import Link from "next/link";
 
-import { TokenVerificationStatus } from "@/types";
+import { TokenValidationStatus } from "@/types";
 
-import { prisma } from "@/lib/db";
-import { getUserByEmail } from "@/data/user";
-import { getVerificationTokenByToken } from "@/data/auth/verification-token";
+import { validateToken } from "@/lib/auth/tokens";
 
 import { CheckCircle, Info, XOctagon } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import VerificationFeedback from "@/app/(auth)/_components/verification-feedback";
+import ValidationFeedback from "@/app/(auth)/_components/validation-feedback";
 
 interface VerificationPageProps {
 	searchParams?: { [key: string]: string | string[] | undefined };
 }
 
-/** Validating the verification token */
-const validateToken = async (token: string) => {
-	const existingToken = await getVerificationTokenByToken(token);
-	if (!existingToken) {
-		return {
-			data: {},
-			status: TokenVerificationStatus.InvalidToken,
-		};
-	}
-
-	const hasExpired = new Date(existingToken.expires) < new Date();
-	if (hasExpired) {
-		return {
-			data: {},
-			status: TokenVerificationStatus.TokenExpired,
-		};
-	}
-
-	const existingUser = await getUserByEmail(existingToken.email);
-	if (!existingUser) {
-		return {
-			data: {},
-			status: TokenVerificationStatus.InvalidTokenEmail,
-		};
-	}
-
-	try {
-		await prisma.user.update({
-			where: { id: existingUser.id },
-			data: {
-				emailVerified: new Date(),
-				email: existingToken.email,
-			},
-		});
-
-		await prisma.verificationToken.delete({
-			where: { id: existingToken.id },
-		});
-
-		return {
-			data: { email: existingUser.email },
-			status: TokenVerificationStatus.Default,
-		};
-	} catch (error) {
-		return {
-			data: null,
-			status: TokenVerificationStatus.VerificationFailed,
-		};
-	}
-};
-
 const VerificationFeedbackInvalid = () => (
 	<div className="flex items-center h-full">
-		<VerificationFeedback icon={XOctagon} heading="Email Verification Failed">
+		<ValidationFeedback icon={XOctagon} heading="Email Verification Failed">
 			<p>
 				It seems that the email verification link is invalid. Don&apos;t worry! Simply request a new
 				link by signing in again.
@@ -75,7 +22,7 @@ const VerificationFeedbackInvalid = () => (
 			<Button className="w-full" asChild>
 				<Link href="/sign-in">Try Agian!</Link>
 			</Button>
-		</VerificationFeedback>
+		</ValidationFeedback>
 	</div>
 );
 
@@ -87,13 +34,13 @@ const VerificationPage = async ({ searchParams }: VerificationPageProps) => {
 		return <VerificationFeedbackInvalid />;
 	}
 
-	const { data, status } = await validateToken(token);
+	const { data, status } = await validateToken({ token, tokenType: "VerificationToken" });
 
 	/** Token verified */
-	if (status === TokenVerificationStatus.Default && data?.email) {
+	if (status === TokenValidationStatus.Default && data?.email) {
 		return (
 			<div className="flex items-center h-full">
-				<VerificationFeedback icon={CheckCircle} heading="Email Verified">
+				<ValidationFeedback icon={CheckCircle} heading="Email Verified">
 					<p>
 						Congratulations! Your email address <strong>{data.email}</strong>, has been successfully
 						verified.
@@ -101,16 +48,16 @@ const VerificationPage = async ({ searchParams }: VerificationPageProps) => {
 					<Button className="w-full" asChild>
 						<Link href="/sign-in">Sign In Now</Link>
 					</Button>
-				</VerificationFeedback>
+				</ValidationFeedback>
 			</div>
 		);
 	}
 
 	/** Token expired */
-	if (status === TokenVerificationStatus.TokenExpired) {
+	if (status === TokenValidationStatus.TokenExpired) {
 		return (
 			<div className="flex items-center h-full">
-				<VerificationFeedback icon={Info} heading="Verification Link Expired">
+				<ValidationFeedback icon={Info} heading="Verification Link Expired">
 					<p>
 						It seems that the email verification link has expired. No worries! Simply request a new
 						link by signing in again.
@@ -118,7 +65,7 @@ const VerificationPage = async ({ searchParams }: VerificationPageProps) => {
 					<Button className="w-full" asChild>
 						<Link href="/sign-in">Try Agian!</Link>
 					</Button>
-				</VerificationFeedback>
+				</ValidationFeedback>
 			</div>
 		);
 	}

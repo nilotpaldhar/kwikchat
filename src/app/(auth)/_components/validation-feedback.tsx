@@ -1,12 +1,12 @@
 import type { LucideIcon } from "lucide-react";
 
-interface VerificationFeedbackProps {
+interface ValidationFeedbackProps {
 	icon?: LucideIcon;
 	heading: React.ReactNode;
 	children?: React.ReactNode;
 }
 
-const VerificationFeedback: React.FC<VerificationFeedbackProps> = ({
+const ValidationFeedback: React.FC<ValidationFeedbackProps> = ({
 	icon: Icon,
 	heading,
 	children,
@@ -22,4 +22,4 @@ const VerificationFeedback: React.FC<VerificationFeedbackProps> = ({
 	</div>
 );
 
-export default VerificationFeedback;
+export default ValidationFeedback;

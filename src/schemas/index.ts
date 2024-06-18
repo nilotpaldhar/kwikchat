@@ -20,11 +20,11 @@ export const SignupSchema = z.object({
 	}),
 });
 
-export const ResetSchema = z.object({
+export const ForgotPasswordSchema = z.object({
 	email: z.string().email({ message: "Please enter a valid email address" }),
 });
 
-export const NewPasswordSchema = z
+export const ResetPasswordSchema = z
 	.object({
 		password: z.string().refine((val) => /^(?=.*[A-Z])(?=.*\d).{8,}$/gm.test(val ?? ""), {
 			message: "Please enter a valid password",

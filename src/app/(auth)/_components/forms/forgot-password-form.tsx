@@ -1,11 +1,15 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useTransition } from "react";
 
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { ResetSchema } from "@/schemas";
+import { ForgotPasswordSchema } from "@/schemas";
+
+import forgotPassword from "@/actions/auth/forgot-password";
+
+import { Loader2, CheckCircle, XOctagon } from "lucide-react";
 
 import {
 	Form,
@@ -18,28 +22,51 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { Alert, AlertTitle } from "@/components/ui/alert";
 
-import { Loader2 } from "lucide-react";
+const ForgotPasswordForm = () => {
+	const [success, setSuccess] = useState<string | undefined>("");
+	const [error, setError] = useState<string | undefined>("");
+	const [pending, startTransition] = useTransition();
 
-const ResetForm = () => {
-	const [pending, setPending] = useState(false);
-
-	const form = useForm<z.infer<typeof ResetSchema>>({
-		resolver: zodResolver(ResetSchema),
+	const form = useForm<z.infer<typeof ForgotPasswordSchema>>({
+		resolver: zodResolver(ForgotPasswordSchema),
 		defaultValues: { email: "" },
 	});
 
-	const onSubmit = (values: z.infer<typeof ResetSchema>) => {
-		// eslint-disable-next-line no-console
-		console.log({ values });
-		setPending(true);
-		setTimeout(() => setPending(false), 5000);
+	const onSubmit = (values: z.infer<typeof ForgotPasswordSchema>) => {
+		setError("");
+		setSuccess("");
+
+		startTransition(() => {
+			forgotPassword(values).then((data) => {
+				setError(data?.error);
+
+				if (data?.success) {
+					setSuccess(data.success);
+					form.reset();
+				}
+			});
+		});
 	};
 
 	return (
 		<Form {...form}>
 			<form onSubmit={form.handleSubmit(onSubmit)} noValidate>
 				<div className="flex flex-col space-y-4">
+					{error && (
+						<Alert variant="danger">
+							<XOctagon />
+							<AlertTitle>{error}</AlertTitle>
+						</Alert>
+					)}
+					{success && (
+						<Alert variant="success">
+							<CheckCircle />
+							<AlertTitle>{success}</AlertTitle>
+						</Alert>
+					)}
+
 					<FormField
 						control={form.control}
 						name="email"
@@ -69,4 +96,4 @@ const ResetForm = () => {
 	);
 };
 
-export default ResetForm;
+export default ForgotPasswordForm;

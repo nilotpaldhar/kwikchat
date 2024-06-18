@@ -107,7 +107,7 @@ const SiginForm = () => {
 							variant="link"
 							asChild
 						>
-							<Link href="/reset">Forgot Password?</Link>
+							<Link href="/forgot-password">Forgot Password?</Link>
 						</Button>
 					</div>
 					<Button type="submit" className="w-full space-x-2" disabled={pending}>

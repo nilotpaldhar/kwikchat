@@ -1,12 +1,16 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useState, useTransition } from "react";
 
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { NewPasswordSchema } from "@/schemas";
+import { ResetPasswordSchema } from "@/schemas";
+
+import resetPassword from "@/actions/auth/reset-password";
+
+import { Loader2, CheckCircle, XOctagon } from "lucide-react";
 
 import {
 	Form,
@@ -19,31 +23,54 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { Alert, AlertTitle } from "@/components/ui/alert";
 
-import { Loader2 } from "lucide-react";
+const ResetPasswordForm = ({ token, email }: { token: string; email: string }) => {
+	const [success, setSuccess] = useState<string | undefined>("");
+	const [error, setError] = useState<string | undefined>("");
+	const [pending, startTransition] = useTransition();
 
-const NewPasswordForm = () => {
-	const [pending, setPending] = useState(false);
-
-	const form = useForm<z.infer<typeof NewPasswordSchema>>({
-		resolver: zodResolver(NewPasswordSchema),
+	const form = useForm<z.infer<typeof ResetPasswordSchema>>({
+		resolver: zodResolver(ResetPasswordSchema),
 		defaultValues: {
 			password: "",
 			confirmPassword: "",
 		},
 	});
 
-	const onSubmit = (values: z.infer<typeof NewPasswordSchema>) => {
-		// eslint-disable-next-line no-console
-		console.log({ values });
-		setPending(true);
-		setTimeout(() => setPending(false), 5000);
+	const onSubmit = (values: z.infer<typeof ResetPasswordSchema>) => {
+		setError("");
+		setSuccess("");
+
+		startTransition(() => {
+			resetPassword({ values, token, email }).then((data) => {
+				setError(data?.error);
+
+				if (data?.success) {
+					setSuccess(data.success);
+					form.reset();
+				}
+			});
+		});
 	};
 
 	return (
 		<Form {...form}>
 			<form onSubmit={form.handleSubmit(onSubmit)} noValidate>
 				<div className="flex flex-col space-y-4">
+					{error && (
+						<Alert variant="danger">
+							<XOctagon />
+							<AlertTitle>{error}</AlertTitle>
+						</Alert>
+					)}
+					{success && (
+						<Alert variant="success">
+							<CheckCircle />
+							<AlertTitle>{success}</AlertTitle>
+						</Alert>
+					)}
+
 					<FormField
 						control={form.control}
 						name="password"
@@ -88,4 +115,4 @@ const NewPasswordForm = () => {
 	);
 };
 
-export default NewPasswordForm;
+export default ResetPasswordForm;

@@ -1,10 +1,7 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-import { TokenVerificationStatus } from "@/types";
-
 import { User } from "lucide-react";
 
 import CardWrapper from "@/app/(auth)/_components/card-wrapper";
-import SiginForm from "@/app/(auth)/_components/sigin-form";
+import SiginForm from "@/app/(auth)/_components/forms/sigin-form";
 import SocialAuth from "@/app/(auth)/_components/social-auth";
 import { SignupLink } from "@/app/(auth)/_components/navbar/actions";
 import { Divider } from "@/components/ui/divider";

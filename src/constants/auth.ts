@@ -30,3 +30,25 @@ export const SIGNUP_MESSAGE = {
 		verificationEmail: MESSAGE_VERIFICATION_EMAIL,
 	},
 } as const;
+
+export const FORGOT_PASSWORD_MESSAGE = {
+	error: {
+		invalidFields: MESSAGE_INVALID_FIELDS,
+		emailNoExist: "Email does not exist",
+		resetEmail: "Failed to send reset email",
+	},
+	success: {
+		resetEmail: "Reset email send",
+	},
+} as const;
+
+export const RESET_PASSWORD_MESSAGE = {
+	error: {
+		invalidFields: MESSAGE_INVALID_FIELDS,
+		emailNoExist: "Email does not exist",
+		resetPassword: "Failed to reset password",
+	},
+	success: {
+		resetPassword: "Password updated",
+	},
+} as const;
