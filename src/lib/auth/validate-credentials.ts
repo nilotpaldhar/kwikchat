@@ -9,7 +9,7 @@ export enum ValidationError {
 
 async function validateCredentials({ email, password }: { email: string; password: string }) {
 	try {
-		const user = await getUserByEmail(email);
+		const user = await getUserByEmail(email, true);
 		if (!user || !user.email || !user.password) {
 			return { user: null, error: ValidationError.UserNotFound };
 		}

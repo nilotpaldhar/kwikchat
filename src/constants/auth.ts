@@ -10,10 +10,15 @@ export const SIGNIN_MESSAGE = {
 		invalidCredentials: "The credentials you entered are incorrect",
 		verificationEmail:
 			"Due to an internal error, the verification email could not be sent. We are sorry for the inconvenience",
+		invalidTwoFactorAuthOtp: "Invalid OTP",
+		twoFactorAuthEmail:
+			"Due to an internal error, the 2FA email could not be sent. We are sorry for the inconvenience",
 		signingIn: "We apologize, but something went wrong while trying to log you into your account",
+		OAuthAccountNotLinked: "Email already in use with different provider!",
 	},
 	success: {
 		verificationEmail: MESSAGE_VERIFICATION_EMAIL,
+		twoFactorAuthEmail: "Your 2FA email has been successfully sent. Please check your inbox",
 		signingIn: "Welcome back! Sign-in successful",
 	},
 } as const;
@@ -49,6 +54,6 @@ export const RESET_PASSWORD_MESSAGE = {
 		resetPassword: "Failed to reset password",
 	},
 	success: {
-		resetPassword: "Password updated",
+		resetPassword: "Password updated. Sign In Now",
 	},
 } as const;

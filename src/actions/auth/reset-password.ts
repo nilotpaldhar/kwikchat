@@ -7,9 +7,7 @@ import { ResetPasswordSchema } from "@/schemas";
 
 import { prisma } from "@/lib/db";
 import { getUserByEmail } from "@/data/user";
-import { signIn as nextAuthSignIn } from "@/auth";
 
-import { DEFAULT_LOGIN_REDIRECT } from "@/constants/routes";
 import { RESET_PASSWORD_MESSAGE as MESSAGE } from "@/constants/auth";
 
 async function resetPassword({
@@ -44,17 +42,11 @@ async function resetPassword({
 		await prisma.passwordResetToken.delete({
 			where: { token },
 		});
+
+		return { success: MESSAGE.success.resetPassword };
 	} catch (error) {
 		return { error: MESSAGE.error.resetPassword };
 	}
-
-	await nextAuthSignIn("credentials", {
-		email,
-		password,
-		redirectTo: DEFAULT_LOGIN_REDIRECT,
-	});
-
-	return { success: MESSAGE.success.resetPassword };
 }
 
 export default resetPassword;

@@ -22,4 +22,12 @@ async function sendPasswordResetEmail({ email, token }: { email: string; token: 
 	});
 }
 
-export { sendVerificationEmail, sendPasswordResetEmail };
+async function sendTwoFactorTokenEmail({ email, otp }: { email: string; otp: string }) {
+	await sendMail({
+		to: email,
+		subject: "2FA Code",
+		body: `<p>Your 2FA code: ${otp}</p>`,
+	});
+}
+
+export { sendVerificationEmail, sendPasswordResetEmail, sendTwoFactorTokenEmail };

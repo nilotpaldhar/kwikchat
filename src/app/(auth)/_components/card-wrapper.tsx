@@ -11,7 +11,7 @@ import {
 interface CardWrapperProps {
 	icon: LucideIcon;
 	title: React.ReactNode;
-	description: React.ReactNode;
+	description?: React.ReactNode;
 	children: React.ReactNode;
 }
 
@@ -21,7 +21,7 @@ const CardWrapper: React.FC<CardWrapperProps> = ({ icon, title, description, chi
 			<CardIcon icon={icon} />
 			<div>
 				<CardTitle>{title}</CardTitle>
-				<CardDescription>{description}</CardDescription>
+				{description && <CardDescription>{description}</CardDescription>}
 			</div>
 		</CardHeader>
 		<CardContent>{children}</CardContent>
