@@ -19,7 +19,7 @@ async function forgotPassword(values: z.infer<typeof ForgotPasswordSchema>) {
 	const existingUser = await getUserByEmail(email);
 
 	if (!existingUser || !existingUser.email) {
-		return { error: MESSAGE.error.emailNoExist };
+		return { error: MESSAGE.error.emailNotExist };
 	}
 
 	if (!existingUser.password) {

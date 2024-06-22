@@ -28,7 +28,7 @@ async function resetPassword({
 
 	const existingUser = await getUserByEmail(email);
 	if (!existingUser) {
-		return { error: MESSAGE.error.emailNoExist };
+		return { error: MESSAGE.error.emailNotExist };
 	}
 
 	const hashedPassword = await bcrypt.hash(password, 10);

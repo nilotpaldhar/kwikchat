@@ -189,7 +189,6 @@ const SiginForm = ({ on2FAConfirmation }: SiginFormProps) => {
 												/>
 											</InputOTP>
 										</FormControl>
-										<FormMessage />
 									</FormItem>
 								)}
 							/>

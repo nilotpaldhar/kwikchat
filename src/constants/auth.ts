@@ -2,6 +2,7 @@ const MESSAGE_NOT_KNOWN = "We apologize, but an error has occurred with the serv
 const MESSAGE_INVALID_FIELDS = "Invalid input detected" as string;
 const MESSAGE_VERIFICATION_EMAIL =
 	"Your verification email has been successfully sent. Please check your inbox" as string;
+const EMAIL_NOT_EXIST = "Email address not found. Please check and try again";
 
 export const SIGNIN_MESSAGE = {
 	error: {
@@ -10,7 +11,7 @@ export const SIGNIN_MESSAGE = {
 		invalidCredentials: "The credentials you entered are incorrect",
 		verificationEmail:
 			"Due to an internal error, the verification email could not be sent. We are sorry for the inconvenience",
-		invalidTwoFactorAuthOtp: "Invalid OTP",
+		invalidTwoFactorAuthOtp: "The 2FA OTP entered is invalid. Please check and try again",
 		twoFactorAuthEmail:
 			"Due to an internal error, the 2FA email could not be sent. We are sorry for the inconvenience",
 		signingIn: "We apologize, but something went wrong while trying to log you into your account",
@@ -18,8 +19,9 @@ export const SIGNIN_MESSAGE = {
 	},
 	success: {
 		verificationEmail: MESSAGE_VERIFICATION_EMAIL,
-		twoFactorAuthEmail: "Your 2FA email has been successfully sent. Please check your inbox",
-		signingIn: "Welcome back! Sign-in successful",
+		twoFactorAuthEmail:
+			"Your 2FA email has been successfully sent. Please check your inbox to complete the process",
+		signingIn: "Welcome back! You have signed in successfully",
 	},
 } as const;
 
@@ -39,21 +41,22 @@ export const SIGNUP_MESSAGE = {
 export const FORGOT_PASSWORD_MESSAGE = {
 	error: {
 		invalidFields: MESSAGE_INVALID_FIELDS,
-		emailNoExist: "Email does not exist",
-		resetEmail: "Failed to send reset email",
+		emailNotExist: EMAIL_NOT_EXIST,
+		resetEmail: "Unable to send reset email. Please try again later",
 	},
 	success: {
-		resetEmail: "Reset email send",
+		resetEmail:
+			"A password reset email has been sent to your inbox. Please check your email to proceed",
 	},
 } as const;
 
 export const RESET_PASSWORD_MESSAGE = {
 	error: {
 		invalidFields: MESSAGE_INVALID_FIELDS,
-		emailNoExist: "Email does not exist",
-		resetPassword: "Failed to reset password",
+		emailNotExist: EMAIL_NOT_EXIST,
+		resetPassword: "Password reset unsuccessful. Please try again",
 	},
 	success: {
-		resetPassword: "Password updated. Sign In Now",
+		resetPassword: "Password updated successfully. Please sign in now",
 	},
 } as const;

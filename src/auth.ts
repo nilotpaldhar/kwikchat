@@ -17,6 +17,7 @@ export const {
 } = NextAuth({
 	pages: {
 		signIn: "/sign-in",
+		error: "/sign-in/error",
 	},
 	callbacks: {
 		async signIn({ user, account }) {

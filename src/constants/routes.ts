@@ -6,9 +6,15 @@ export const PUBLIC_ROUTES = ["/", "/verification"];
 
 /**
  * An array of routes that are used for authentication
- * These routes will redirect logged in users to /dashboard
+ * These routes will redirect logged in users to /messenger
  */
-export const AUTH_ROUTES = ["/sign-in", "/sign-up", "/forgot-password", "/reset-password"];
+export const AUTH_ROUTES = [
+	"/sign-in",
+	"/sign-up",
+	"/forgot-password",
+	"/reset-password",
+	"/sign-in/error",
+];
 
 /**
  * The prefix for api authentication routes
