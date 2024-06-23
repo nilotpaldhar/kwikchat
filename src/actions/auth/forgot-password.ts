@@ -23,12 +23,16 @@ async function forgotPassword(values: z.infer<typeof ForgotPasswordSchema>) {
 	}
 
 	if (!existingUser.password) {
-		return { error: "Oauth does not support password reset" };
+		return { error: "Password reset is not supported for OAuth accounts" };
 	}
 
 	try {
 		const passwordResetToken = await generatePasswordResetToken(existingUser.email);
-		await sendPasswordResetEmail({ email, token: passwordResetToken.token });
+		await sendPasswordResetEmail({
+			email,
+			username: existingUser.username as string,
+			token: passwordResetToken.token,
+		});
 
 		return { success: MESSAGE.success.resetEmail };
 	} catch (error) {

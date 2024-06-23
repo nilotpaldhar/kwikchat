@@ -28,10 +28,18 @@ async function validateToken({
 		};
 	}
 
-	if (tokenType === "VerificationToken") {
-		existingToken = await getVerificationTokenByToken(token);
-	} else if (tokenType === "PasswordResetToken") {
-		existingToken = await getResetTokenByToken(token);
+	switch (tokenType) {
+		case "VerificationToken":
+			existingToken = await getVerificationTokenByToken(token);
+			break;
+		case "PasswordResetToken":
+			existingToken = await getResetTokenByToken(token);
+			break;
+		default:
+			return {
+				data: {},
+				status: TokenValidationStatus.InvalidToken,
+			};
 	}
 
 	if (!existingToken) {
@@ -41,8 +49,7 @@ async function validateToken({
 		};
 	}
 
-	const hasExpired = new Date(existingToken.expires) < new Date();
-	if (hasExpired) {
+	if (new Date(existingToken.expires) < new Date()) {
 		return {
 			data: {},
 			status: TokenValidationStatus.TokenExpired,
@@ -85,8 +92,10 @@ async function validateToken({
 }
 
 async function generateVerificationToken(email: string) {
+	const EXPIRATION_DURATION_MS = 3600 * 1000; // 60 minutes
+
 	const token = nanoid();
-	const expires = new Date(new Date().getTime() + 3600 * 1000);
+	const expires = new Date(new Date().getTime() + EXPIRATION_DURATION_MS); // 60 minutes from now
 
 	const existingToken = await getVerificationTokenByEmail(email);
 
@@ -112,8 +121,10 @@ async function generateVerificationToken(email: string) {
 }
 
 async function generatePasswordResetToken(email: string) {
+	const EXPIRATION_DURATION_MS = 3600 * 1000; // 60 minutes
+
 	const token = nanoid();
-	const expires = new Date(new Date().getTime() + 3600 * 1000);
+	const expires = new Date(new Date().getTime() + EXPIRATION_DURATION_MS); // 60 minutes from now
 
 	const existingToken = await getResetTokenByEmail(email);
 
@@ -139,8 +150,11 @@ async function generatePasswordResetToken(email: string) {
 }
 
 async function generateTwoFactorToken(email: string) {
-	const otp = crypto.randomInt(1000, 10000).toString();
-	const expires = new Date(new Date().getTime() + 3600 * 1000);
+	const OTP_LENGTH = 4;
+	const EXPIRATION_DURATION_MS = 10 * 60 * 1000; // 10 minutes
+
+	const otp = crypto.randomInt(10 ** (OTP_LENGTH - 1), 10 ** OTP_LENGTH).toString();
+	const expires = new Date(Date.now() + EXPIRATION_DURATION_MS); // 10 minutes from now
 
 	const existingToken = await getTwoFactorTokenByEmail(email);
 

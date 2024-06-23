@@ -48,7 +48,7 @@ async function signup(values: z.infer<typeof SignupSchema>) {
 		});
 
 		const verificationToken = await generateVerificationToken(email);
-		await sendVerificationEmail({ email, token: verificationToken.token });
+		await sendVerificationEmail({ email, username, token: verificationToken.token });
 
 		return { success: MESSAGE.success.verificationEmail };
 	} catch (error) {

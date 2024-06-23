@@ -31,7 +31,11 @@ async function signin(values: z.infer<typeof SigninSchema>) {
 	if (!existingUser.emailVerified) {
 		try {
 			const verificationToken = await generateVerificationToken(email);
-			await sendVerificationEmail({ email, token: verificationToken.token });
+			await sendVerificationEmail({
+				email,
+				username: existingUser.username as string,
+				token: verificationToken.token,
+			});
 			return { success: MESSAGE.success.verificationEmail };
 		} catch (error) {
 			return { error: MESSAGE.error.verificationEmail };
@@ -80,6 +84,7 @@ async function signin(values: z.infer<typeof SigninSchema>) {
 				const twoFactorToken = await generateTwoFactorToken(existingUser.email);
 				await sendTwoFactorTokenEmail({
 					email: twoFactorToken.email,
+					username: existingUser.username as string,
 					otp: twoFactorToken.otp,
 				});
 			} catch (error) {

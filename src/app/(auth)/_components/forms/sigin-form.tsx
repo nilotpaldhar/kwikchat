@@ -81,10 +81,11 @@ const SiginForm = ({ on2FAConfirmation }: SiginFormProps) => {
 		setError("");
 		setSuccess("");
 
-		const userEmail = form.getValues("email");
-
 		startResendTransition(() => {
-			resend2FAToken(userEmail).then((data) => {
+			resend2FAToken({
+				email: form.getValues("email"),
+				password: form.getValues("password"),
+			}).then((data) => {
 				setError(data?.error);
 				setSuccess(data?.success);
 			});

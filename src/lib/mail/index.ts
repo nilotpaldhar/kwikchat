@@ -1,32 +1,65 @@
+import { render } from "@react-email/render";
 import sendMail from "@/lib/mail/send-mail";
+
+import VerificationEmail from "@/email-templates/verification-email";
+import PasswordResetEmail from "@/email-templates/password-reset-email";
+import TwoFactorTokenEmail from "@/email-templates/two-factor-token-email";
 
 const DOMAIN = process.env.NEXT_PUBLIC_APP_URL;
 
-async function sendVerificationEmail({ email, token }: { email: string; token: string }) {
+async function sendVerificationEmail({
+	email,
+	username,
+	token,
+}: {
+	email: string;
+	username: string;
+	token: string;
+}) {
 	const confirmLink = `${DOMAIN}/verification?token=${token}`;
+	const body = render(VerificationEmail({ url: confirmLink, username }));
 
 	await sendMail({
 		to: email,
-		subject: "Confirm your email",
-		body: `<p>Click <a href="${confirmLink}">here</a> to confirm email.</p>`,
+		subject: "Please Confirm Your Email Address",
+		body,
 	});
 }
 
-async function sendPasswordResetEmail({ email, token }: { email: string; token: string }) {
+async function sendPasswordResetEmail({
+	email,
+	username,
+	token,
+}: {
+	email: string;
+	username: string;
+	token: string;
+}) {
 	const resetLink = `${DOMAIN}/reset-password?token=${token}`;
+	const body = render(PasswordResetEmail({ url: resetLink, username }));
 
 	await sendMail({
 		to: email,
-		subject: "Reset your password",
-		body: `<p>Click <a href="${resetLink}">here</a> to reset your password.</p>`,
+		subject: "We Received a Password Reset Request",
+		body,
 	});
 }
 
-async function sendTwoFactorTokenEmail({ email, otp }: { email: string; otp: string }) {
+async function sendTwoFactorTokenEmail({
+	email,
+	username,
+	otp,
+}: {
+	email: string;
+	username: string;
+	otp: string;
+}) {
+	const body = render(TwoFactorTokenEmail({ username, otp }));
+
 	await sendMail({
 		to: email,
-		subject: "2FA Code",
-		body: `<p>Your 2FA code: ${otp}</p>`,
+		subject: "Two-Factor Authentication Code",
+		body,
 	});
 }
 
