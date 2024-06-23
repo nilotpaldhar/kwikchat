@@ -7,6 +7,8 @@
 		"react/jsx-uses-react": "off",
 		"react/react-in-jsx-scope": "off",
 		"react/jsx-props-no-spreading": "off",
+		"react/prop-types": "off",
+		"react/function-component-definition": "off",
 		"camelcase": [1],
 		"no-trailing-spaces": [1],
 		"spaced-comment": [0],

@@ -1,7 +1,10 @@
+import { SessionProvider } from "next-auth/react";
+import { auth } from "@/auth";
+
 import type { Metadata } from "next";
 import { Raleway as FontSans } from "next/font/google";
 
-import ThemeProvider from "@/components/providers/ThemeProvider";
+import ThemeProvider from "@/components/providers/theme-provider";
 import { cn } from "@/utils/general/cn";
 
 import "@/styles/global.css";
@@ -16,29 +19,33 @@ export const metadata: Metadata = {
 	description: "Messenger App",
 };
 
-function RootLayout({
+async function RootLayout({
 	children,
 }: Readonly<{
 	children: React.ReactNode;
 }>) {
+	const session = await auth();
+
 	return (
-		<html lang="en" suppressHydrationWarning>
-			<body
-				className={cn(
-					"min-h-screen font-sans antialiased bg-surface-light-100 text-neutral-900 dark:bg-surface-dark-600 dark:text-neutral-200",
-					fontSans.variable
-				)}
-			>
-				<ThemeProvider
-					attribute="class"
-					defaultTheme="light"
-					enableSystem
-					storageKey="KwikChat-theme"
+		<SessionProvider session={session}>
+			<html lang="en" suppressHydrationWarning>
+				<body
+					className={cn(
+						"min-h-screen font-sans antialiased bg-surface-light-100 text-neutral-900 dark:bg-surface-dark-600 dark:text-neutral-200",
+						fontSans.variable
+					)}
 				>
-					{children}
-				</ThemeProvider>
-			</body>
-		</html>
+					<ThemeProvider
+						attribute="class"
+						defaultTheme="light"
+						enableSystem
+						storageKey="KwikChat-theme"
+					>
+						{children}
+					</ThemeProvider>
+				</body>
+			</html>
+		</SessionProvider>
 	);
 }
 

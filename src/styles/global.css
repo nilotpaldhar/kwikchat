@@ -1,3 +1,57 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+body {
+	@apply text-sm leading-6;
+}
+
+@layer utilities {
+	.heading-1 {
+		@apply scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-5xl;
+	}
+
+	.heading-2 {
+		@apply scroll-m-20 text-3xl font-semibold tracking-tight first:mt-0;
+	}
+
+	.heading-3 {
+		@apply scroll-m-20 text-2xl font-semibold tracking-tight;
+	}
+
+	.heading-4 {
+		@apply scroll-m-20 text-xl font-semibold tracking-tight;
+	}
+
+	.paragraph {
+		@apply text-base leading-7;
+	}
+
+	.lead {
+		@apply text-xl leading-7 text-neutral-500 dark:text-neutral-400;
+	}
+
+	.text-large {
+		@apply text-lg font-semibold leading-7;
+	}
+
+	.text-small {
+		@apply text-sm font-medium leading-none;
+	}
+
+	.text-muted {
+		@apply text-sm leading-none text-neutral-500 dark:text-neutral-400;
+	}
+
+	.inline-code {
+		@apply relative rounded bg-surface-light-300 px-[0.3rem] py-[0.2rem] font-mono text-sm font-semibold dark:bg-surface-dark-400;
+	}
+
+	.list {
+		@apply my-6 ml-6 list-disc [&>li]:mt-2;
+	}
+
+	.blockquote {
+		@apply mt-6 border-l-2 border-neutral-300 pl-6 italic text-neutral-500 dark:border-neutral-700 dark:text-neutral-400;
+	}
+}
