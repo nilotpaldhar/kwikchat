@@ -41,3 +41,25 @@ export const ResetPasswordSchema = z
 			});
 		}
 	});
+
+export const UpdatePasswordSchema = z
+	.object({
+		currentPassword: z.string().min(1, { message: "Please enter your current password" }),
+		newPassword: z.string().refine((val) => /^(?=.*[A-Z])(?=.*\d).{8,}$/gm.test(val ?? ""), {
+			message: "Please enter a valid password",
+		}),
+		confirmNewPassword: z.string(),
+	})
+	.superRefine(({ confirmNewPassword, newPassword }, ctx) => {
+		if (confirmNewPassword !== newPassword) {
+			ctx.addIssue({
+				code: "custom",
+				message: "Please make sure your passwords match",
+				path: ["confirmNewPassword"],
+			});
+		}
+	});
+
+export const Toggle2FASchema = z.object({
+	password: z.string().min(1, { message: "Please enter a valid password" }),
+});

@@ -1,6 +1,3 @@
-import { SessionProvider } from "next-auth/react";
-import { auth } from "@/auth";
-
 import type { Metadata } from "next";
 import { Raleway as FontSans } from "next/font/google";
 
@@ -24,28 +21,24 @@ async function RootLayout({
 }: Readonly<{
 	children: React.ReactNode;
 }>) {
-	const session = await auth();
-
 	return (
-		<SessionProvider session={session}>
-			<html lang="en" suppressHydrationWarning>
-				<body
-					className={cn(
-						"min-h-screen font-sans antialiased bg-surface-light-100 text-neutral-900 dark:bg-surface-dark-600 dark:text-neutral-200",
-						fontSans.variable
-					)}
+		<html lang="en" suppressHydrationWarning>
+			<body
+				className={cn(
+					"min-h-screen font-sans antialiased bg-surface-light-100 text-neutral-900 dark:bg-surface-dark-600 dark:text-neutral-200",
+					fontSans.variable
+				)}
+			>
+				<ThemeProvider
+					attribute="class"
+					defaultTheme="light"
+					enableSystem
+					storageKey="KwikChat-theme"
 				>
-					<ThemeProvider
-						attribute="class"
-						defaultTheme="light"
-						enableSystem
-						storageKey="KwikChat-theme"
-					>
-						{children}
-					</ThemeProvider>
-				</body>
-			</html>
-		</SessionProvider>
+					{children}
+				</ThemeProvider>
+			</body>
+		</html>
 	);
 }
 

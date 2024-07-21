@@ -1,3 +1,5 @@
+import "server-only";
+
 import { prisma } from "@/lib/db";
 
 async function getTwoFactorTokenByOTP(otp: string) {

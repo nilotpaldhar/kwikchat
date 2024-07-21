@@ -3,8 +3,8 @@
 import Link from "next/link";
 import { LogOut } from "lucide-react";
 import { Divider } from "@/components/ui/divider";
+import LogoutConfirm from "@/components/auth/logout-confirm";
 
-import logout from "@/actions/auth/logout";
 import useSettingsLinks from "@/hooks/use-settings-links";
 import { cn } from "@/utils/general/cn";
 
@@ -33,12 +33,12 @@ const SettingsNav = () => {
 			<Divider type="solid" className="before:border-neutral-300 dark:before:border-neutral-800" />
 			<ul>
 				<li>
-					<form action={logout}>
+					<LogoutConfirm>
 						<button type="submit" className={linkClassName}>
 							<span>Log Out</span>
 							<LogOut size={16} />
 						</button>
-					</form>
+					</LogoutConfirm>
 				</li>
 			</ul>
 		</nav>
