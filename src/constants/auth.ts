@@ -1,9 +1,11 @@
-const MESSAGE_NOT_KNOWN = "We apologize, but an error has occurred with the server" as string;
+const MESSAGE_NOT_KNOWN = "We apologize, but an error has occurred with the server";
 const MESSAGE_INVALID_FIELDS = "Invalid input detected" as string;
-const MESSAGE_INVALID_CREDENTIALS = "The credentials you entered are incorrect" as string;
+const MESSAGE_INVALID_CREDENTIALS = "The credentials you entered are incorrect";
 const MESSAGE_VERIFICATION_EMAIL =
-	"Your verification email has been successfully sent. Please check your inbox" as string;
+	"Your verification email has been successfully sent. Please check your inbox";
 const EMAIL_NOT_EXIST = "Email address not found. Please check and try again";
+const USERNAME_TAKEN =
+	"This username is currently in use by another account. Please try a different one";
 
 export const SIGNIN_MESSAGE = {
 	error: {
@@ -31,8 +33,7 @@ export const SIGNUP_MESSAGE = {
 		notKnown: MESSAGE_NOT_KNOWN,
 		invalidFields: MESSAGE_INVALID_FIELDS,
 		emailTaken: "The email you entered is already associated with an account",
-		usernameTaken:
-			"This username is currently in use by another account. Please try a different one",
+		usernameTaken: USERNAME_TAKEN,
 	},
 	success: {
 		verificationEmail: MESSAGE_VERIFICATION_EMAIL,
@@ -86,5 +87,18 @@ export const TOGGLE_2FA_MESSAGE = {
 	success: {
 		enabled: "Two-factor authentication (2FA) has been enabled for your account",
 		disabled: "Two-factor authentication (2FA) has been disabled for your account",
+	},
+} as const;
+
+export const UPDATE_USERNAME_MESSAGE = {
+	error: {
+		invalidFields: MESSAGE_INVALID_FIELDS,
+		unauthorized: "Unauthorized",
+		invalidCredentials: MESSAGE_INVALID_CREDENTIALS,
+		usernameTaken: USERNAME_TAKEN,
+		updateUsername: "Username update unsuccessful. Please try again",
+	},
+	success: {
+		updateUsername: "Username updated successfully",
 	},
 } as const;

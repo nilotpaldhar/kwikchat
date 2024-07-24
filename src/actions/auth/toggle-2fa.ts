@@ -1,6 +1,6 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
+import { revalidatePath, revalidateTag } from "next/cache";
 
 import * as z from "zod";
 import { Toggle2FASchema } from "@/schemas";
@@ -47,6 +47,7 @@ async function toggle2FA(values: z.infer<typeof Toggle2FASchema>) {
 			},
 		});
 
+		revalidateTag("get-user-by-id");
 		revalidatePath("/account-security");
 
 		return {

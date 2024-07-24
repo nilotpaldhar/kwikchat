@@ -1,6 +1,6 @@
 import { create } from "zustand";
 
-export type ModalType = "UPDATE_PASSWORD" | "TOGGLE_TWO_FACTOR_AUTHENTICATION";
+export type ModalType = "UPDATE_PASSWORD" | "TOGGLE_TWO_FACTOR_AUTHENTICATION" | "UPDATE_USERNAME";
 
 interface DialogData {}
 

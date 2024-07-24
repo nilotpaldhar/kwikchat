@@ -63,3 +63,10 @@ export const UpdatePasswordSchema = z
 export const Toggle2FASchema = z.object({
 	password: z.string().min(1, { message: "Please enter a valid password" }),
 });
+
+export const UpdateUsernameSchema = z.object({
+	newUsername: z.string().refine((val) => /^[a-zA-Z0-9_]{3,16}$/gm.test(val ?? ""), {
+		message: "Please enter a valid username",
+	}),
+	currentPassword: z.string().min(1, { message: "Please enter your current password" }),
+});

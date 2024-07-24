@@ -1,7 +1,7 @@
 import "server-only";
 
 import { auth } from "@/auth";
-import { getUserById } from "../user";
+import { getUserById } from "@/data/user";
 
 async function getSession() {
 	const session = await auth();

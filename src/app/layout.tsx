@@ -34,6 +34,7 @@ async function RootLayout({
 					defaultTheme="light"
 					enableSystem
 					storageKey="KwikChat-theme"
+					disableTransitionOnChange
 				>
 					{children}
 				</ThemeProvider>
