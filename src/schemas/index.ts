@@ -70,3 +70,10 @@ export const UpdateUsernameSchema = z.object({
 	}),
 	currentPassword: z.string().min(1, { message: "Please enter your current password" }),
 });
+
+export const ProfileSchema = z.object({
+	displayName: z.string().nullable().optional(),
+	bannerColor: z.string().nullable().optional(),
+	bio: z.string().max(190, "Bio must be 190 characters or fewer").nullable().optional(),
+	avatar: z.string().nullable().optional(),
+});

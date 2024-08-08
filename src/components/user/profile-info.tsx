@@ -2,6 +2,7 @@
 
 import { Button } from "@/components/ui/button";
 import { Divider } from "@/components/ui/divider";
+import ProfileBio from "@/components/user/profile-bio";
 import LogoutConfirm from "@/components/auth/logout-confirm";
 import { Block, BlockTitle, BlockDescription } from "@/components/ui/block";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
@@ -43,7 +44,9 @@ const ProfileInfo = ({
 		<div className={cn("flex flex-col space-y-4", className)}>
 			<div className="flex items-start justify-between">
 				<Block>
-					<BlockTitle className="text-base font-semibold leading-7 capitalize">{name}</BlockTitle>
+					<BlockTitle className="text-base font-semibold leading-7 capitalize">
+						<span className="block max-w-52 truncate">{name}</span>
+					</BlockTitle>
 					<BlockDescription className="text-xs font-medium leading-3">
 						&#64;{username}
 					</BlockDescription>
@@ -79,7 +82,9 @@ const ProfileInfo = ({
 				{about && (
 					<Block className="space-y-0.5">
 						<BlockTitle>About Me</BlockTitle>
-						<BlockDescription className="text-xs leading-4">{about}</BlockDescription>
+						<BlockDescription className="text-xs leading-4">
+							<ProfileBio bio={about} />
+						</BlockDescription>
 					</Block>
 				)}
 				<Block className="space-y-0.5">

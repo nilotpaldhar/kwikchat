@@ -62,7 +62,7 @@ const ProfileDetails = ({ user, isOAuth, className }: ProfileDetailsProps) => {
 							<Button
 								variant="secondary"
 								className="px-3 py-1 h-8"
-								onClick={() => onOpen("UPDATE_USERNAME", {})}
+								onClick={() => onOpen("UPDATE_USERNAME")}
 								disabled={isOAuth}
 							>
 								Edit

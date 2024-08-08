@@ -2,21 +2,17 @@ import { create } from "zustand";
 
 export type ModalType = "UPDATE_PASSWORD" | "TOGGLE_TWO_FACTOR_AUTHENTICATION" | "UPDATE_USERNAME";
 
-interface DialogData {}
-
 interface SettingsDialogStore {
 	type: ModalType | null;
-	data: DialogData;
 	isOpen: boolean;
-	onOpen: (type: ModalType, data?: DialogData) => void;
+	onOpen: (type: ModalType) => void;
 	onClose: () => void;
 }
 
 const useSettingsDialogStore = create<SettingsDialogStore>((set) => ({
 	type: null,
-	data: {},
 	isOpen: false,
-	onOpen: (type, data = {}) => set({ isOpen: true, type, data }),
+	onOpen: (type) => set({ isOpen: true, type }),
 	onClose: () => set({ isOpen: false }),
 }));
 

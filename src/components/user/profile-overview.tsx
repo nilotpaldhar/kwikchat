@@ -1,6 +1,6 @@
 "use client";
 
-import type { User } from "@prisma/client";
+import type { UserProfile } from "@/types";
 
 import {
 	Profile,
@@ -11,8 +11,10 @@ import {
 } from "@/components/user/profile";
 import ProfileInfo from "@/components/user/profile-info";
 
+import formatJoining from "@/utils/user/format-joining";
+
 interface ProfileOverviewProps {
-	user: User;
+	user: UserProfile;
 	copyableUsername?: boolean;
 	showLogout?: boolean;
 	className?: string;
@@ -24,15 +26,6 @@ const ProfileOverview = ({
 	showLogout,
 	className,
 }: ProfileOverviewProps) => {
-	const formatDate = (date: Date) => {
-		if (!date) return "Unknown";
-		return date.toLocaleDateString("en-US", {
-			year: "numeric",
-			month: "short",
-			day: "numeric",
-		});
-	};
-
 	const fallback = user.name ? user.name.charAt(0) : user.username?.charAt(0);
 
 	return (
@@ -51,7 +44,7 @@ const ProfileOverview = ({
 					username={user.username as string}
 					email={user.email as string}
 					about={user.bio}
-					joiningDate={formatDate(new Date(user.createdAt))}
+					joiningDate={formatJoining(new Date(user.createdAt))}
 					copyableUsername={copyableUsername}
 					showLogout={showLogout}
 				/>

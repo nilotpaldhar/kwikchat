@@ -27,7 +27,7 @@ const ToggleTwoFactorAuth = ({
 				<Button
 					disabled={disabled}
 					variant={twoFactorAuthEnabled ? "danger" : "primary"}
-					onClick={() => onOpen("TOGGLE_TWO_FACTOR_AUTHENTICATION", {})}
+					onClick={() => onOpen("TOGGLE_TWO_FACTOR_AUTHENTICATION")}
 				>
 					{twoFactorAuthEnabled
 						? "Disable Two Factor Authentication"

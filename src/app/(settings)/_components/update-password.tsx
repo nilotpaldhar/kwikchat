@@ -16,7 +16,7 @@ const UpdatePassword = ({ disabled = false }: UpdatePasswordProps) => {
 		<Block className="space-y-3">
 			<BlockTitle>Password & Authetication</BlockTitle>
 			<BlockContent>
-				<Button disabled={disabled} onClick={() => onOpen("UPDATE_PASSWORD", {})}>
+				<Button disabled={disabled} onClick={() => onOpen("UPDATE_PASSWORD")}>
 					Change Password
 				</Button>
 			</BlockContent>
