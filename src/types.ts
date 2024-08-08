@@ -1,3 +1,5 @@
+import type { User } from "@prisma/client";
+
 export enum AuthError {
 	Configuration = "Configuration",
 	AccessDenied = "AccessDenied",
@@ -12,3 +14,5 @@ export enum TokenValidationStatus {
 	ValidationFailed = "ValidationFailed",
 	Default = "Default",
 }
+
+export interface UserProfile extends Omit<User, "password" | "image"> {}

@@ -57,6 +57,9 @@ const config = {
 					600: "#060606",
 				},
 			},
+			boxShadow: {
+				header: "0 4px 12px rgba(0, 0, 0, 0.06)",
+			},
 			fontFamily: {
 				sans: ["var(--font-sans)", ...fontFamily.sans],
 			},

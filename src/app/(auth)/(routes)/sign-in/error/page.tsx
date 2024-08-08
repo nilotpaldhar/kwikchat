@@ -1,6 +1,3 @@
-"use client";
-
-import { useSearchParams } from "next/navigation";
 import { AuthError } from "@/types";
 
 import { XOctagon } from "lucide-react";
@@ -9,9 +6,12 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import ValidationFeedback from "@/app/(auth)/_components/validation-feedback";
 
-const SignInErrorPage = () => {
-	const search = useSearchParams();
-	const error = search.get("error") as AuthError;
+interface SignInErrorPageProps {
+	searchParams?: { [key: string]: string | string[] | undefined };
+}
+
+const SignInErrorPage = ({ searchParams }: SignInErrorPageProps) => {
+	const error = searchParams?.error as AuthError;
 
 	if (error === AuthError.Configuration) {
 		return (

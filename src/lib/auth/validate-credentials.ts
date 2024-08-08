@@ -1,3 +1,5 @@
+import "server-only";
+
 import bcrypt from "bcryptjs";
 import { getUserByEmail } from "@/data/user";
 

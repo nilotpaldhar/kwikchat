@@ -1,3 +1,6 @@
+import "server-only";
+
+import { unstable_cache as cache } from "next/cache";
 import { prisma } from "@/lib/db";
 
 async function getUserById(id: string, withSettings: boolean = false) {
@@ -36,4 +39,6 @@ async function getUserByUsername(username: string, withSettings: boolean = false
 	}
 }
 
-export { getUserById, getUserByEmail, getUserByUsername };
+const getCachedUserById = cache(async (id: string) => getUserById(id, true), ["get-user-by-id"]);
+
+export { getUserById, getUserByEmail, getUserByUsername, getCachedUserById };

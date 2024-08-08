@@ -1,5 +1,7 @@
 /* eslint-disable import/prefer-default-export */
 
+import "server-only";
+
 import { PrismaClient } from "@prisma/client";
 
 /**
