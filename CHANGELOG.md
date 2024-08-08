@@ -1,4 +1,16 @@
-# 0.3.0 (2024-06-23)
+# [0.4.0](https://github.com/nilotpaldhar/storekeeper/compare/v0.3.0...v0.4.0) (2024-08-08)
+
+
+### Features
+
+* **settings:** add account screen ([50ea1af](https://github.com/nilotpaldhar/storekeeper/commit/50ea1afba00eccf74a0879f1fa9143c4f24481c4))
+* **settings:** add account-profile screen to manage User profile updates ([f7dc8fb](https://github.com/nilotpaldhar/storekeeper/commit/f7dc8fb8e8a6082c7f31654156cd9eb51cc7caaf))
+* **settings:** add account-security screen ([7a02776](https://github.com/nilotpaldhar/storekeeper/commit/7a02776fac185052ff1e76ae78845ace803cbb32))
+* **settings:** add settings layout ([816465d](https://github.com/nilotpaldhar/storekeeper/commit/816465de17f6e7a41e0c27b7793d1385be848e89))
+
+
+
+# [0.3.0](https://github.com/nilotpaldhar/storekeeper/compare/ce34d88f6367c0f16a1842019e1b4e445be01ee2...v0.3.0) (2024-06-23)
 
 
 ### Features
