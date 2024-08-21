@@ -24,7 +24,7 @@ const UserAvatar = ({
 }: UserAvatarProps) => (
 	<div
 		className={cn(
-			"relative flex justify-center items-center size-11 rounded-full bg-neutral-100 dark:bg-neutral-900",
+			"relative flex size-11 items-center justify-center rounded-full bg-neutral-100 dark:bg-neutral-900",
 			wrapperClassName
 		)}
 	>
@@ -34,8 +34,8 @@ const UserAvatar = ({
 		</Avatar>
 		<span
 			className={cn(
-				"absolute bottom-1 right-1 flex justify-center items-center size-2 rounded-full opacity-0 scale-0 transition-all duration-1000 bg-primary-400 ring-2 ring-surface-light-100 ring-offset-surface-light-100 dark:ring-surface-dark-600 dark:ring-offset-surface-dark-600",
-				status === "online" && "opacity-100 scale-100",
+				"absolute bottom-1 right-1 flex size-2 scale-0 items-center justify-center rounded-full bg-primary-400 opacity-0 ring-2 ring-surface-light-100 ring-offset-surface-light-100 transition-all duration-1000 dark:ring-surface-dark-600 dark:ring-offset-surface-dark-600",
+				status === "online" && "scale-100 opacity-100",
 				indicatorClassName
 			)}
 		>

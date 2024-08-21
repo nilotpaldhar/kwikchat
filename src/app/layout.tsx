@@ -25,7 +25,7 @@ async function RootLayout({
 		<html lang="en" suppressHydrationWarning>
 			<body
 				className={cn(
-					"min-h-screen font-sans antialiased bg-surface-light-100 text-neutral-900 dark:bg-surface-dark-600 dark:text-neutral-200",
+					"min-h-screen bg-surface-light-100 font-sans text-neutral-900 antialiased dark:bg-surface-dark-600 dark:text-neutral-200",
 					fontSans.variable
 				)}
 			>

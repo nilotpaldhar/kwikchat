@@ -57,7 +57,7 @@ const Alert = React.forwardRef<HTMLDivElement, AlertProps>(
 						type="button"
 						tabIndex={0}
 						onClick={toggle}
-						className="inline-flex items-center justify-center absolute top-4 right-3 !p-0 m-0 rounded-full ring-offset-white focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-current dark:ring-offset-surface-dark-600"
+						className="absolute right-3 top-4 m-0 inline-flex items-center justify-center rounded-full !p-0 ring-offset-white focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-current dark:ring-offset-surface-dark-600"
 					>
 						<span className="sr-only">Close Alert</span>
 						<XIcon size={16} />

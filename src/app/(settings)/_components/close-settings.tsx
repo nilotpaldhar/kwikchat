@@ -28,11 +28,11 @@ const CloseSettings = () => {
 	return (
 		<div className="fixed">
 			<Button
-				className="h-auto flex-col space-y-1.5 p-1 border-none text-neutral-500 hover:bg-surface-light-100 dark:text-neutral-400 dark:hover:bg-surface-dark-600"
+				className="h-auto flex-col space-y-1.5 border-none p-1 text-neutral-500 hover:bg-surface-light-100 dark:text-neutral-400 dark:hover:bg-surface-dark-600"
 				variant="outline"
 				onClick={handleCloseSettings}
 			>
-				<span className="flex items-center justify-center size-10 border border-neutral-300 rounded-full dark:border-neutral-700">
+				<span className="flex size-10 items-center justify-center rounded-full border border-neutral-300 dark:border-neutral-700">
 					<XIcon size={24} />
 				</span>
 				<span className="font-bold">ESC</span>

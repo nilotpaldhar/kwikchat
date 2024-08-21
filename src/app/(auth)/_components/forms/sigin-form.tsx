@@ -154,9 +154,9 @@ const SiginForm = ({ on2FAConfirmation }: SiginFormProps) => {
 										</FormItem>
 									)}
 								/>
-								<div className="flex justify-end items-center text-right">
+								<div className="flex items-center justify-end text-right">
 									<Button
-										className="p-0 h-max text-neutral-500 hover:text-primary-400 dark:text-neutral-300 dark:hover:text-primary-400"
+										className="h-max p-0 text-neutral-500 hover:text-primary-400 dark:text-neutral-300 dark:hover:text-primary-400"
 										variant="link"
 										asChild
 									>
@@ -174,19 +174,19 @@ const SiginForm = ({ on2FAConfirmation }: SiginFormProps) => {
 											<InputOTP maxLength={4} {...field} disabled={signinPending || resendPending}>
 												<InputOTPSlot
 													index={0}
-													className="flex-1 w-full h-16 text-2xl font-semibold"
+													className="h-16 w-full flex-1 text-2xl font-semibold"
 												/>
 												<InputOTPSlot
 													index={1}
-													className="flex-1 w-full h-16 text-2xl font-semibold"
+													className="h-16 w-full flex-1 text-2xl font-semibold"
 												/>
 												<InputOTPSlot
 													index={2}
-													className="flex-1 w-full h-16 text-2xl font-semibold"
+													className="h-16 w-full flex-1 text-2xl font-semibold"
 												/>
 												<InputOTPSlot
 													index={3}
-													className="flex-1 w-full h-16 text-2xl font-semibold"
+													className="h-16 w-full flex-1 text-2xl font-semibold"
 												/>
 											</InputOTP>
 										</FormControl>
@@ -218,12 +218,12 @@ const SiginForm = ({ on2FAConfirmation }: SiginFormProps) => {
 			{showOtp && (
 				<div className="flex justify-center">
 					<div className="flex flex-col space-y-4">
-						<span className="text-muted font-medium text-center">
+						<span className="text-muted text-center font-medium">
 							Experiencing issues receiving the code?
 						</span>
 						<Button
 							variant="link"
-							className="p-0 h-max leading-none"
+							className="h-max p-0 leading-none"
 							onClick={onResend}
 							disabled={signinPending || resendPending}
 						>

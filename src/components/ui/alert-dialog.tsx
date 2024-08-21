@@ -18,7 +18,7 @@ const AlertDialogOverlay = React.forwardRef<
 >(({ className, ...props }, ref) => (
 	<AlertDialogPrimitive.Overlay
 		className={cn(
-			"fixed inset-0 z-50 bg-black/50  data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0",
+			"fixed inset-0 z-50 bg-black/50 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0",
 			className
 		)}
 		{...props}
@@ -36,7 +36,7 @@ const AlertDialogContent = React.forwardRef<
 		<AlertDialogPrimitive.Content
 			ref={ref}
 			className={cn(
-				"fixed left-[50%] top-[50%] z-50 grid w-full max-w-72 sm:max-w-sm lg:max-w-md translate-x-[-50%] translate-y-[-50%] gap-4 border border-neutral-200 bg-surface-light-100 shadow-lg duration-200 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[state=closed]:slide-out-to-left-1/2 data-[state=closed]:slide-out-to-top-[48%] data-[state=open]:slide-in-from-left-1/2 data-[state=open]:slide-in-from-top-[48%] rounded-md dark:border-neutral-800 dark:bg-surface-dark-400",
+				"fixed left-[50%] top-[50%] z-50 grid w-full max-w-72 translate-x-[-50%] translate-y-[-50%] gap-4 rounded-md border border-neutral-200 bg-surface-light-100 shadow-lg duration-200 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[state=closed]:slide-out-to-left-1/2 data-[state=closed]:slide-out-to-top-[48%] data-[state=open]:slide-in-from-left-1/2 data-[state=open]:slide-in-from-top-[48%] dark:border-neutral-800 dark:bg-surface-dark-400 sm:max-w-sm lg:max-w-md",
 				className
 			)}
 			{...props}
@@ -47,7 +47,7 @@ AlertDialogContent.displayName = AlertDialogPrimitive.Content.displayName;
 
 const AlertDialogHeader = ({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) => (
 	<div
-		className={cn("flex flex-col space-y-2 text-center sm:text-left px-5 pt-5 lg:px-6", className)}
+		className={cn("flex flex-col space-y-2 px-5 pt-5 text-center sm:text-left lg:px-6", className)}
 		{...props}
 	/>
 );
@@ -56,7 +56,7 @@ AlertDialogHeader.displayName = "AlertDialogHeader";
 const AlertDialogFooter = ({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) => (
 	<div
 		className={cn(
-			"flex px-5 py-3 bg-neutral-100  justify-end  space-x-2 lg:px-6 dark:bg-neutral-900",
+			"flex justify-end space-x-2 bg-neutral-100 px-5 py-3 dark:bg-neutral-900 lg:px-6",
 			className
 		)}
 		{...props}
@@ -112,7 +112,7 @@ const AlertDialogCancel = React.forwardRef<
 		ref={ref}
 		className={cn(
 			buttonVariants({ variant: "outline" }),
-			"border-none bg-transparent hover:bg-transparent dark:bg-transparent dark:hover:bg-transparent dark:ring-offset-surface-dark-400",
+			"border-none bg-transparent hover:bg-transparent dark:bg-transparent dark:ring-offset-surface-dark-400 dark:hover:bg-transparent",
 			className
 		)}
 		{...props}

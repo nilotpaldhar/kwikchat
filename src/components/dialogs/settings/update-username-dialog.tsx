@@ -131,7 +131,7 @@ const UpdateUsernameDialog = () => {
 								type="text"
 								placeholder="james_brown"
 								disabled={pending}
-								className="dark:bg-surface-dark-400 dark:border-neutral-700"
+								className="dark:border-neutral-700 dark:bg-surface-dark-400"
 								{...field}
 							/>
 						</FormControl>
@@ -151,7 +151,7 @@ const UpdateUsernameDialog = () => {
 								type="password"
 								placeholder="########"
 								disabled={pending}
-								className="dark:bg-surface-dark-400 dark:border-neutral-700"
+								className="dark:border-neutral-700 dark:bg-surface-dark-400"
 								{...field}
 							/>
 						</FormControl>

@@ -21,7 +21,7 @@ const SettingsNav = () => {
 							className={cn(
 								linkClassName,
 								link.active &&
-									`text-neutral-900 font-bold bg-neutral-200 hover:bg-neutral-200 dark:bg-surface-dark-300 dark:hover:bg-surface-dark-300`
+									`bg-neutral-200 font-bold text-neutral-900 hover:bg-neutral-200 dark:bg-surface-dark-300 dark:hover:bg-surface-dark-300`
 							)}
 							href={link.href}
 						>

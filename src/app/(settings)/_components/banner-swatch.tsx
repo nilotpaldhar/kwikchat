@@ -24,10 +24,10 @@ const BannerSwatch = ({
 			<PopoverTrigger asChild>
 				<Button
 					disabled={disabled}
-					className="relative w-20 h-14 border border-neutral-200 dark:border-neutral-700"
+					className="relative h-14 w-20 border border-neutral-200 dark:border-neutral-700"
 					style={{ backgroundColor: bannerColor }}
 				>
-					<span className="absolute top-2 right-2 mix-blend-difference">
+					<span className="absolute right-2 top-2 mix-blend-difference">
 						<Pencil size={12} />
 					</span>
 					<span className="sr-only">Change Banner Color</span>

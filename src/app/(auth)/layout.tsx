@@ -6,12 +6,12 @@ interface AuthLayoutProps {
 }
 
 const AuthLayout: React.FC<AuthLayoutProps> = ({ children }) => (
-	<div className="container p-0 flex flex-col min-h-screen">
+	<div className="container flex min-h-screen flex-col p-0">
 		<header>
 			<AuthNavbar />
 		</header>
-		<main className="flex-1 flex justify-center">
-			<div className="w-full max-w-sm py-16 px-5 lg:max-w-md overflow-hidden">{children}</div>
+		<main className="flex flex-1 justify-center">
+			<div className="w-full max-w-sm overflow-hidden px-5 py-16 lg:max-w-md">{children}</div>
 		</main>
 		<footer>
 			<AuthFooter />

@@ -55,7 +55,7 @@ DrawerContent.displayName = "DrawerContent";
 const DrawerHeader = ({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) => (
 	<div
 		className={cn(
-			"flex flex-col space-y-2 text-center px-4 pt-4 sm:px-5 sm:pt-5 lg:px-6",
+			"flex flex-col space-y-2 px-4 pt-4 text-center sm:px-5 sm:pt-5 lg:px-6",
 			className
 		)}
 		{...props}
@@ -71,7 +71,7 @@ DrawerBody.displayName = "DrawerBody";
 const DrawerFooter = ({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) => (
 	<div
 		className={cn(
-			"flex px-4 py-3 sm:px-5 bg-neutral-100  justify-end  space-x-2 lg:px-6 dark:bg-neutral-900",
+			"flex justify-end space-x-2 bg-neutral-100 px-4 py-3 dark:bg-neutral-900 sm:px-5 lg:px-6",
 			className
 		)}
 		{...props}

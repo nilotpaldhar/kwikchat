@@ -15,7 +15,7 @@ const MobileSidebar = () => (
 	<Sheet>
 		<SheetTrigger asChild>
 			<Button
-				className="border-none w-auto dark:hover:bg-surface-dark-600"
+				className="w-auto border-none dark:hover:bg-surface-dark-600"
 				variant="outline"
 				size="icon"
 			>
@@ -25,7 +25,7 @@ const MobileSidebar = () => (
 		</SheetTrigger>
 		<SheetContent
 			side="right"
-			className="bg-surface-light-200 dark:bg-surface-dark-400 px-5 py-4 sm:py-6"
+			className="bg-surface-light-200 px-5 py-4 dark:bg-surface-dark-400 sm:py-6"
 			closeClassName="hidden"
 		>
 			<SheetHeader className="sr-only">

@@ -13,7 +13,7 @@ interface VerificationPageProps {
 }
 
 const VerificationFeedbackInvalid = () => (
-	<div className="flex items-center h-full">
+	<div className="flex h-full items-center">
 		<ValidationFeedback icon={XOctagon} heading="Email Verification Failed">
 			<p>
 				It seems that the email verification link is invalid. Don&apos;t worry! Simply request a new
@@ -39,7 +39,7 @@ const VerificationPage = async ({ searchParams }: VerificationPageProps) => {
 	/** Token verified */
 	if (status === TokenValidationStatus.Default && data?.email) {
 		return (
-			<div className="flex items-center h-full">
+			<div className="flex h-full items-center">
 				<ValidationFeedback icon={CheckCircle} heading="Email Verified">
 					<p>
 						Congratulations! Your email address <strong>{data.email}</strong>, has been successfully
@@ -56,7 +56,7 @@ const VerificationPage = async ({ searchParams }: VerificationPageProps) => {
 	/** Token expired */
 	if (status === TokenValidationStatus.TokenExpired) {
 		return (
-			<div className="flex items-center h-full">
+			<div className="flex h-full items-center">
 				<ValidationFeedback icon={Info} heading="Verification Link Expired">
 					<p>
 						It seems that the email verification link has expired. No worries! Simply request a new

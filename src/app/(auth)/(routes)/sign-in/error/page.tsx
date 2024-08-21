@@ -15,12 +15,12 @@ const SignInErrorPage = ({ searchParams }: SignInErrorPageProps) => {
 
 	if (error === AuthError.Configuration) {
 		return (
-			<div className="flex items-center h-full">
+			<div className="flex h-full items-center">
 				<ValidationFeedback icon={XOctagon} heading="Server error!">
 					<p>
 						There was a problem when trying to authenticate. Please contact us if this error
 						persists. Unique error code:
-						<code className="text-xs p-1 ml-1 bg-surface-light-300 rounded-sm dark:bg-surface-dark-300">
+						<code className="ml-1 rounded-sm bg-surface-light-300 p-1 text-xs dark:bg-surface-dark-300">
 							Configuration
 						</code>
 					</p>
@@ -31,7 +31,7 @@ const SignInErrorPage = ({ searchParams }: SignInErrorPageProps) => {
 
 	if (error === AuthError.AccessDenied) {
 		return (
-			<div className="flex items-center h-full">
+			<div className="flex h-full items-center">
 				<ValidationFeedback icon={XOctagon} heading="Access Denied!">
 					<p>You do not have permission to login</p>
 					<Button className="w-full" asChild>
@@ -44,7 +44,7 @@ const SignInErrorPage = ({ searchParams }: SignInErrorPageProps) => {
 
 	if (error === AuthError.Verification) {
 		return (
-			<div className="flex items-center h-full">
+			<div className="flex h-full items-center">
 				<ValidationFeedback icon={XOctagon} heading="Unable to login!">
 					<p>
 						The sign in link is no longer valid. It may have been used already or it may have
@@ -59,7 +59,7 @@ const SignInErrorPage = ({ searchParams }: SignInErrorPageProps) => {
 	}
 
 	return (
-		<div className="flex items-center h-full">
+		<div className="flex h-full items-center">
 			<ValidationFeedback icon={XOctagon} heading="Something went wrong">
 				<p>Please contact us if this error persists</p>
 			</ValidationFeedback>

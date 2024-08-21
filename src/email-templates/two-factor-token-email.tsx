@@ -23,8 +23,8 @@ const TwoFactorTokenEmail = ({ otp, username, previewText }: TwoFactorTokenEmail
 		<Head />
 		{previewText && <Preview>{previewText}</Preview>}
 		<Tailwind>
-			<Body className="bg-white text-neutral-700 my-auto mx-auto font-sans px-2">
-				<Container className="max-w-[460px] rounded mx-auto my-10 p-6 border border-solid border-neutral-200">
+			<Body className="mx-auto my-auto bg-white px-2 font-sans text-neutral-700">
+				<Container className="mx-auto my-10 max-w-[460px] rounded border border-solid border-neutral-200 p-6">
 					<Section>
 						<Heading className="text-2xl font-bold">Two-Factor Authentication</Heading>
 					</Section>
@@ -33,8 +33,8 @@ const TwoFactorTokenEmail = ({ otp, username, previewText }: TwoFactorTokenEmail
 						<Text>Your one-time password (OTP) for logging in is:</Text>
 					</Section>
 
-					<Section className="bg-neutral-100 rounded my-4 mr-auto ml-0 max-w-[140px]">
-						<Text className="block text-neutral-900 text-xl font-medium leading-6 text-center tracking-[12px]">
+					<Section className="my-4 ml-0 mr-auto max-w-[140px] rounded bg-neutral-100">
+						<Text className="block text-center text-xl font-medium leading-6 tracking-[12px] text-neutral-900">
 							{otp}
 						</Text>
 					</Section>
@@ -49,8 +49,8 @@ const TwoFactorTokenEmail = ({ otp, username, previewText }: TwoFactorTokenEmail
 						</Text>
 					</Section>
 
-					<Hr className="border border-solid border-neutral-100 mx-0 w-full" />
-					<Text className="mt-4 text-center font-light text-xs text-neutral-500">
+					<Hr className="mx-0 w-full border border-solid border-neutral-100" />
+					<Text className="mt-4 text-center text-xs font-light text-neutral-500">
 						&copy; 2024 KwikChat. All rights reserved.
 					</Text>
 				</Container>

@@ -44,7 +44,7 @@ const ProfileInfo = ({
 		<div className={cn("flex flex-col space-y-4", className)}>
 			<div className="flex items-start justify-between">
 				<Block>
-					<BlockTitle className="text-base font-semibold leading-7 capitalize">
+					<BlockTitle className="text-base font-semibold capitalize leading-7">
 						<span className="block max-w-52 truncate">{name}</span>
 					</BlockTitle>
 					<BlockDescription className="text-xs font-medium leading-3">
@@ -59,7 +59,7 @@ const ProfileInfo = ({
 								<Button
 									variant="outline"
 									size="icon"
-									className="w-max h-max p-0 text-neutral-500 bg-transparent hover:bg-transparent dark:bg-transparent dark:hover:bg-transparent border-none"
+									className="h-max w-max border-none bg-transparent p-0 text-neutral-500 hover:bg-transparent dark:bg-transparent dark:hover:bg-transparent"
 									onClick={() => handleCopyUsername()}
 								>
 									<Copy size={18} />
@@ -102,10 +102,10 @@ const ProfileInfo = ({
 						<LogoutConfirm>
 							<Button
 								variant="outline"
-								className="w-full px-0 py-1 justify-start space-x-2 h-auto bg-transparent hover:bg-transparent dark:bg-transparent dark:hover:bg-transparent border-none"
+								className="h-auto w-full justify-start space-x-2 border-none bg-transparent px-0 py-1 hover:bg-transparent dark:bg-transparent dark:hover:bg-transparent"
 							>
 								<LogOut size={16} />
-								<span className="block flex-1 text-xs text-left font-semibold">Logout</span>
+								<span className="block flex-1 text-left text-xs font-semibold">Logout</span>
 								<ChevronRight size={16} />
 							</Button>
 						</LogoutConfirm>

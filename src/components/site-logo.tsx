@@ -22,7 +22,7 @@ const SiteLogo: React.FC<SiteLogoProps> = ({
 	<Link
 		href={href}
 		className={cn(
-			"rounded-sm ring-offset-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-8 focus-visible:ring-primary-300 dark:ring-offset-surface-dark-600",
+			"rounded-sm ring-offset-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-300 focus-visible:ring-offset-8 dark:ring-offset-surface-dark-600",
 			className
 		)}
 	>

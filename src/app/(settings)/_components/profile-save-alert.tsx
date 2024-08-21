@@ -24,9 +24,9 @@ const ProfileSaveAlert = ({ loading = false, onReset, onSave }: ProfileSaveAlert
 					exit={{ opacity: 0, y: 100 }}
 					transition={{ type: "spring" }}
 				>
-					<div className="flex flex-col items-start space-y-3 sm:flex-row sm:items-center sm:space-y-0 sm:justify-between px-4 py-3 sm:p-2 sm:pl-4 rounded-md border border-neutral-200 bg-surface-light-100 dark:border-transparent dark:bg-surface-dark-500">
-						<div className="text-sm leading-6 font-medium">Careful - you have unsaved changes!</div>
-						<div className="flex items-center w-full space-x-2 sm:w-auto">
+					<div className="flex flex-col items-start space-y-3 rounded-md border border-neutral-200 bg-surface-light-100 px-4 py-3 dark:border-transparent dark:bg-surface-dark-500 sm:flex-row sm:items-center sm:justify-between sm:space-y-0 sm:p-2 sm:pl-4">
+						<div className="text-sm font-medium leading-6">Careful - you have unsaved changes!</div>
+						<div className="flex w-full items-center space-x-2 sm:w-auto">
 							<Button
 								onClick={onReset}
 								variant="outline"
@@ -38,7 +38,7 @@ const ProfileSaveAlert = ({ loading = false, onReset, onSave }: ProfileSaveAlert
 
 							<Button
 								variant="success"
-								className="h-8 space-x-2 flex-1"
+								className="h-8 flex-1 space-x-2"
 								disabled={loading}
 								onClick={onSave}
 							>

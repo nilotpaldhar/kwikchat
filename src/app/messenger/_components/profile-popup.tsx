@@ -8,7 +8,19 @@ import { Pencil } from "lucide-react";
 import { getSession } from "@/data/auth/session";
 import { getCachedUserById } from "@/data/user";
 
-const ProfilePopup = async () => {
+interface ProfilePopupProps {
+	side?: "bottom" | "top" | "right" | "left";
+	sideOffset?: number;
+	align?: "center" | "end" | "start";
+	alignOffset?: number;
+}
+
+const ProfilePopup = async ({
+	side = "right",
+	sideOffset = 8,
+	align = "end",
+	alignOffset = 8,
+}: ProfilePopupProps) => {
 	const session = await getSession();
 	if (!session?.user.id) return null;
 
@@ -26,17 +38,22 @@ const ProfilePopup = async () => {
 				</Button>
 			</HoverCardTrigger>
 			<HoverCardContent
-				className="w-[340px] p-0 shadow-[0_8px_16px_rgba(0,0,0,0.1)] rounded-xl border-none overflow-hidden"
-				side="right"
-				sideOffset={8}
-				align="end"
-				alignOffset={8}
+				className="w-[340px] overflow-hidden rounded-xl border-none p-0 shadow-[0_8px_16px_rgba(0,0,0,0.1)]"
+				side={side}
+				sideOffset={sideOffset}
+				align={align}
+				alignOffset={alignOffset}
+
+				// side="bottom"
+				// sideOffset={8}
+				// align="end"
+				// alignOffset={0}
 			>
 				<div className="relative">
 					<ProfileOverview user={user} copyableUsername showLogout />
 					<Link
 						href="/account-profile"
-						className="absolute top-3 right-3 flex items-center justify-center size-7 rounded-full bg-black/20 text-white transition hover:bg-black/30"
+						className="absolute right-3 top-3 flex size-7 items-center justify-center rounded-full bg-black/20 text-white transition hover:bg-black/30"
 					>
 						<Pencil size={12} />
 						<span className="sr-only">Edit Profile</span>
