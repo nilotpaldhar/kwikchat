@@ -1,18 +1,24 @@
+// The Prisma Client generator config, which generates the client to interact with the database.
+
 generator client {
-  provider = "prisma-client-js"
+  provider        = "prisma-client-js"
+  previewFeatures = ["omitApi"]
 }
 
+// The datasource configuration, defining the database connection.
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
+// Enum to represent the theme options in user settings.
 enum ThemeOptions {
   light
   dark
   system
 }
 
+// The User model represents an application user.
 model User {
   id            String    @id @default(cuid())
   name          String?
@@ -29,11 +35,22 @@ model User {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  accounts              Account[]
-  userSettings          UserSettings?
+  // One-to-many relationship with the Account model.
+  accounts Account[]
+
+  // One-to-one relationship with the UserSettings model.
+  userSettings UserSettings?
+
+  // One-to-one relationship with the TwoFactorConfirmation model.
   twoFactorConfirmation TwoFactorConfirmation?
+
+  // One-to-many relationship for users that this user has blocked.
+  blocking  Block[] @relation("BlockingUser")
+  // One-to-many relationship for users that have blocked this user.
+  blockedBy Block[] @relation("BlockedUser")
 }
 
+// The Account model represents external accounts connected to a user.
 model Account {
   id                String  @id @default(cuid())
   type              String
@@ -50,12 +67,15 @@ model Account {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
+  // Foreign key to the User model.
   userId String
+  // Relation to the User model.
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([provider, providerAccountId])
 }
 
+// The UserSettings model represents settings associated with a user.
 model UserSettings {
   id               String       @id @default(cuid())
   colorTheme       ThemeOptions @default(light)
@@ -64,10 +84,13 @@ model UserSettings {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
+  // Foreign key to the User model, unique to each user.
   userId String @unique
+  // Relation to the User model.
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
+// The VerificationToken model represents tokens used for email verification.
 model VerificationToken {
   id      String   @id @default(cuid())
   email   String
@@ -77,6 +100,7 @@ model VerificationToken {
   @@unique([email, token])
 }
 
+// The PasswordResetToken model represents tokens used for password reset.
 model PasswordResetToken {
   id      String   @id @default(cuid())
   email   String
@@ -86,6 +110,7 @@ model PasswordResetToken {
   @@unique([email, token])
 }
 
+// The TwoFactorToken model represents tokens used for two-factor authentication.
 model TwoFactorToken {
   id      String   @id @default(cuid())
   email   String
@@ -95,11 +120,32 @@ model TwoFactorToken {
   @@unique([email, otp])
 }
 
+// The TwoFactorConfirmation model represents confirmation of two-factor authentication.
 model TwoFactorConfirmation {
   id String @id @default(cuid())
 
+  // Foreign key to the User model.
   userId String
+  // Relation to the User model.
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([userId])
+}
+
+// The Block model represents a block action between two users.
+model Block {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+
+  // Foreign key to the User model, representing the user who initiated the block.
+  blockerId String
+  // Relation to the blocking user.
+  blocker   User   @relation("BlockingUser", fields: [blockerId], references: [id], onDelete: Cascade)
+
+  // Foreign key to the User model, representing the user who is blocked.
+  blockedId String
+  // Relation to the blocked user.
+  blocked   User   @relation("BlockedUser", fields: [blockedId], references: [id], onDelete: Cascade)
+
+  @@unique([blockerId, blockedId])
 }
