@@ -1,5 +1,3 @@
-// The Prisma Client generator config, which generates the client to interact with the database.
-
 generator client {
   provider        = "prisma-client-js"
   previewFeatures = ["omitApi"]
@@ -16,6 +14,13 @@ enum ThemeOptions {
   light
   dark
   system
+}
+
+// Enum to represent the status of a friend request
+enum RequestStatus {
+  pending
+  accepted
+  rejected
 }
 
 // The User model represents an application user.
@@ -45,9 +50,16 @@ model User {
   twoFactorConfirmation TwoFactorConfirmation?
 
   // One-to-many relationship for users that this user has blocked.
-  blocking  Block[] @relation("BlockingUser")
+  blocking Block[] @relation("BlockingUser")
+
   // One-to-many relationship for users that have blocked this user.
   blockedBy Block[] @relation("BlockedUser")
+
+  // One-to-many relationship representing friend requests sent by this user.
+  sentRequests FriendRequest[] @relation("SentFriendRequests")
+
+  // One-to-many relationship representing friend requests received by this user.
+  receivedRequests FriendRequest[] @relation("ReceivedFriendRequests")
 }
 
 // The Account model represents external accounts connected to a user.
@@ -67,9 +79,8 @@ model Account {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  // Foreign key to the User model.
-  userId String
   // Relation to the User model.
+  userId String
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([provider, providerAccountId])
@@ -84,9 +95,8 @@ model UserSettings {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  // Foreign key to the User model, unique to each user.
-  userId String @unique
   // Relation to the User model.
+  userId String @unique
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
@@ -124,9 +134,8 @@ model TwoFactorToken {
 model TwoFactorConfirmation {
   id String @id @default(cuid())
 
-  // Foreign key to the User model.
-  userId String
   // Relation to the User model.
+  userId String
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([userId])
@@ -137,15 +146,31 @@ model Block {
   id        String   @id @default(cuid())
   createdAt DateTime @default(now())
 
-  // Foreign key to the User model, representing the user who initiated the block.
-  blockerId String
   // Relation to the blocking user.
+  blockerId String
   blocker   User   @relation("BlockingUser", fields: [blockerId], references: [id], onDelete: Cascade)
 
-  // Foreign key to the User model, representing the user who is blocked.
-  blockedId String
   // Relation to the blocked user.
+  blockedId String
   blocked   User   @relation("BlockedUser", fields: [blockedId], references: [id], onDelete: Cascade)
 
   @@unique([blockerId, blockedId])
+}
+
+// The FriendRequest model represents a friend request sent from one user to another.
+model FriendRequest {
+  id        String        @id @default(cuid())
+  createdAt DateTime      @default(now())
+  status    RequestStatus @default(pending)
+
+  // The relationship between the sender and the FriendRequest model.
+  senderId String
+  sender   User   @relation("SentFriendRequests", fields: [senderId], references: [id], onDelete: Cascade)
+
+  // The relationship between the receiver and the FriendRequest model.
+  receiverId String
+  receiver   User   @relation("ReceivedFriendRequests", fields: [receiverId], references: [id], onDelete: Cascade)
+
+  // Ensures that a user cannot send multiple friend requests to the same receiver.
+  @@unique([senderId, receiverId])
 }

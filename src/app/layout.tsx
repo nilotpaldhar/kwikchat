@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { Raleway as FontSans } from "next/font/google";
 
 import ThemeProvider from "@/components/providers/theme-provider";
+import TanstackQueryProvider from "@/components/providers/tanstack-query-provider";
+
 import { cn } from "@/utils/general/cn";
 
 import "@/styles/global.css";
@@ -29,15 +31,17 @@ async function RootLayout({
 					fontSans.variable
 				)}
 			>
-				<ThemeProvider
-					attribute="class"
-					defaultTheme="light"
-					enableSystem
-					storageKey="KwikChat-theme"
-					disableTransitionOnChange
-				>
-					{children}
-				</ThemeProvider>
+				<TanstackQueryProvider>
+					<ThemeProvider
+						attribute="class"
+						defaultTheme="light"
+						enableSystem
+						storageKey="KwikChat-theme"
+						disableTransitionOnChange
+					>
+						{children}
+					</ThemeProvider>
+				</TanstackQueryProvider>
 			</body>
 		</html>
 	);

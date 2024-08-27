@@ -1,3 +1,16 @@
-const FiriendsNewPage = () => <div>FiriendsNewPage</div>;
+import { Block, BlockTitle, BlockDescription, BlockContent } from "@/components/ui/block";
+import FriendsRequestForm from "@/app/messenger/(routes)/friends/_components/friends-request-form";
+
+const FiriendsNewPage = () => (
+	<Block className="space-y-1">
+		<BlockTitle className="text-base leading-7">Add Friend</BlockTitle>
+		<BlockDescription className="text-xs">
+			You can add friends with their KwikChat username.
+		</BlockDescription>
+		<BlockContent className="pt-4">
+			<FriendsRequestForm />
+		</BlockContent>
+	</Block>
+);
 
 export default FiriendsNewPage;

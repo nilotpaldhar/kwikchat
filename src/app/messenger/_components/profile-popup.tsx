@@ -1,12 +1,16 @@
+"use client";
+
 import Link from "next/link";
-import { Button } from "@/components/ui/button";
-import UserAvatar from "@/components/user/user-avatar";
-import ProfileOverview from "@/components/user/profile-overview";
-import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/hover-card";
 import { Pencil } from "lucide-react";
 
-import { getSession } from "@/data/auth/session";
-import { getCachedUserById } from "@/data/user";
+import { Button } from "@/components/ui/button";
+import Skeleton from "@/components/ui/skeleton";
+import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/hover-card";
+
+import UserAvatar from "@/components/user/user-avatar";
+import ProfileOverview from "@/components/user/profile-overview";
+
+import useCurrentUser from "@/hooks/use-current-user";
 
 interface ProfilePopupProps {
 	side?: "bottom" | "top" | "right" | "left";
@@ -15,17 +19,18 @@ interface ProfilePopupProps {
 	alignOffset?: number;
 }
 
-const ProfilePopup = async ({
+const ProfilePopup = ({
 	side = "right",
 	sideOffset = 8,
 	align = "end",
 	alignOffset = 8,
 }: ProfilePopupProps) => {
-	const session = await getSession();
-	if (!session?.user.id) return null;
+	const { data, isLoading, isError } = useCurrentUser();
+	const user = data?.data;
 
-	const user = await getCachedUserById(session?.user.id);
-	if (!user || !user?.username) return null;
+	if (isLoading) return <Skeleton className="size-11 rounded-full" />;
+
+	if (isError || !user || !user.username) return null;
 
 	const fallback = user.name ? user.name.charAt(0) : user.username.charAt(0);
 
@@ -43,11 +48,6 @@ const ProfilePopup = async ({
 				sideOffset={sideOffset}
 				align={align}
 				alignOffset={alignOffset}
-
-				// side="bottom"
-				// sideOffset={8}
-				// align="end"
-				// alignOffset={0}
 			>
 				<div className="relative">
 					<ProfileOverview user={user} copyableUsername showLogout />

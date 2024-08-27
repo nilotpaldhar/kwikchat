@@ -1,4 +1,4 @@
-import type { User } from "@prisma/client";
+import type { User, FriendRequest } from "@prisma/client";
 import { PaginationMetadata } from "@/utils/general/calculate-pagination";
 
 export interface UserProfile extends Omit<User, "password" | "image"> {}
@@ -33,4 +33,9 @@ export interface APIResponse<T> {
 export interface BlockedUser {
 	user: UserWithoutPassword;
 	blockedAt: Date;
+}
+
+export interface FriendRequestWithRelations extends FriendRequest {
+	sender: UserWithoutPassword;
+	receiver: UserWithoutPassword;
 }
