@@ -1,3 +1,3 @@
-const FiriendsRootPage = () => <div>FiriendsRootPage</div>;
+const FriendsRootPage = () => <div>Friends Root Page</div>;
 
-export default FiriendsRootPage;
+export default FriendsRootPage;

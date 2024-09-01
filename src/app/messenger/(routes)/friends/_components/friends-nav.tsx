@@ -3,7 +3,10 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { ChevronRight } from "lucide-react";
+import { AnimatePresence, motion } from "framer-motion";
+
 import { cn } from "@/utils/general/cn";
+import { usePendingFriendRequestsCountQuery } from "@/hooks/use-friend-request";
 
 type DisplayMode = "desktop" | "mobile";
 
@@ -74,10 +77,16 @@ const FriendsNavLink = ({
 
 interface FriendsNavprops extends React.HTMLAttributes<HTMLDivElement> {
 	displayMode?: DisplayMode;
+	overflowCount?: number;
 }
 
-const FriendsNav = ({ displayMode = "desktop", ...props }: FriendsNavprops) => {
+const FriendsNav = ({ displayMode = "desktop", overflowCount = 99, ...props }: FriendsNavprops) => {
 	const pathname = usePathname();
+	const { data } = usePendingFriendRequestsCountQuery();
+
+	const totalPending = data?.data?.pending ?? 0;
+	const isOverflowing = totalPending > overflowCount;
+	const singleDigit = !isOverflowing && totalPending < 10;
 
 	return (
 		<nav {...props}>
@@ -94,10 +103,30 @@ const FriendsNav = ({ displayMode = "desktop", ...props }: FriendsNavprops) => {
 							{id === "friends:pending" ? (
 								<div className="flex items-center">
 									{label}
-									{id === "friends:pending" && (
-										<span className="ml-1.5 flex size-4 items-center justify-center rounded-full bg-red-600 text-[10px] font-bold leading-none text-white">
-											5
-										</span>
+									{id === "friends:pending" && totalPending > 0 && (
+										<AnimatePresence>
+											<motion.div
+												className={cn(
+													"ml-1.5 flex h-4 min-w-4 items-center justify-center overflow-hidden rounded-full bg-red-600 text-[10px] font-bold leading-none text-white",
+													!singleDigit && "px-1"
+												)}
+												initial={{ opacity: 0, scale: 0 }}
+												animate={{ opacity: 1, scale: 1 }}
+												exit={{ opacity: 0, scale: 0 }}
+												transition={{ type: "spring" }}
+											>
+												<motion.div
+													initial={{ opacity: 0, y: 100 }}
+													animate={{ opacity: 1, y: 0 }}
+													exit={{ opacity: 0, y: 100 }}
+													transition={{ type: "spring" }}
+													className="flex items-center"
+												>
+													<span>{isOverflowing ? overflowCount : totalPending}</span>
+													{isOverflowing && <span className="text-base leading-none">+</span>}
+												</motion.div>
+											</motion.div>
+										</AnimatePresence>
 									)}
 								</div>
 							) : (

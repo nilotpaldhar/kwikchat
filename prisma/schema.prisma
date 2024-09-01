@@ -60,6 +60,12 @@ model User {
 
   // One-to-many relationship representing friend requests received by this user.
   receivedRequests FriendRequest[] @relation("ReceivedFriendRequests")
+
+  // Many-to-many relationship representing the user's friends.
+  friends Friendship[] @relation("UserFriends")
+
+  // Many-to-many relationship representing users who have this user as a friend.
+  friendOf Friendship[] @relation("FriendUsers")
 }
 
 // The Account model represents external accounts connected to a user.
@@ -173,4 +179,21 @@ model FriendRequest {
 
   // Ensures that a user cannot send multiple friend requests to the same receiver.
   @@unique([senderId, receiverId])
+}
+
+// The Friendship model represents a friendship connection between two users.
+model Friendship {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+
+  // The reference to the User model, representing the user who is part of the friendship.
+  userId String
+  user   User   @relation("UserFriends", fields: [userId], references: [id], onDelete: Cascade)
+
+  // The reference to the User model, representing the friend in the friendship.
+  friendId String
+  friend   User   @relation("FriendUsers", fields: [friendId], references: [id], onDelete: Cascade)
+
+  // Ensures that a friendship between the same two users can only exist once.
+  @@unique([userId, friendId])
 }

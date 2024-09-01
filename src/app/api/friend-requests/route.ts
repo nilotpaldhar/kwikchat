@@ -1,10 +1,43 @@
-/* eslint-disable import/prefer-default-export */
-
 import { type NextRequest, NextResponse } from "next/server";
 
 import { getUserByUsername } from "@/data/user";
 import { getCurrentUser } from "@/data/auth/session";
-import { FriendRequestError, sendFriendRequest } from "@/lib/friend-request";
+import { getFriendRequests } from "@/data/friend-request";
+import { SendFriendRequestError, sendFriendRequest } from "@/lib/friend-request";
+
+/**
+ * Handler function for retrieving friend requests for the current user.
+ *
+ * @returns A JSON response containing the status, message, and data of friend requests.
+ */
+export async function GET(req: NextRequest) {
+	const searchParams = req.nextUrl.searchParams;
+	const currentUser = await getCurrentUser();
+
+	// Parse pagination parameters from the query string
+	const page = searchParams.get("page");
+	const pageSize = searchParams.get("page_size");
+
+	// Check if the current user is authenticated. If not, respond with an unauthorized status.
+	if (!currentUser) {
+		return NextResponse.json(
+			{ success: false, message: "Unauthorized! Access denied" },
+			{ status: 401 }
+		);
+	}
+
+	const data = await getFriendRequests({
+		userId: currentUser.id,
+		page: page ? parseInt(page, 10) : undefined,
+		pageSize: pageSize ? parseInt(pageSize, 10) : undefined,
+	});
+
+	return NextResponse.json({
+		success: true,
+		message: "List of all friend requests",
+		data,
+	});
+}
 
 /**
  * Handler function to send a friend request.
@@ -62,28 +95,28 @@ export async function POST(req: NextRequest) {
 	// Handle potential errors based on the returned error type
 	if (error) {
 		switch (error) {
-			case FriendRequestError.AlreadyFriends: {
+			case SendFriendRequestError.AlreadyFriends: {
 				return NextResponse.json(
 					{ success: false, message: "You are already friends with this user" },
 					{ status: 422 }
 				);
 			}
 
-			case FriendRequestError.PendingIncomingRequest: {
+			case SendFriendRequestError.PendingIncomingRequest: {
 				return NextResponse.json(
 					{ success: false, message: "You already have a pending friend request from this user" },
 					{ status: 422 }
 				);
 			}
 
-			case FriendRequestError.RequestAlreadySent: {
+			case SendFriendRequestError.RequestAlreadySent: {
 				return NextResponse.json(
 					{ success: false, message: "You have already sent a friend request to this user" },
 					{ status: 422 }
 				);
 			}
 
-			case FriendRequestError.RequestWasRejected: {
+			case SendFriendRequestError.RequestWasRejected: {
 				return NextResponse.json(
 					{
 						success: false,
@@ -94,7 +127,7 @@ export async function POST(req: NextRequest) {
 				);
 			}
 
-			case FriendRequestError.SenderIsBlocked: {
+			case SendFriendRequestError.SenderIsBlocked: {
 				return NextResponse.json(
 					{
 						success: false,

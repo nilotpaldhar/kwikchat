@@ -7,8 +7,9 @@ import {
 	WrapperFooter,
 } from "@/app/messenger/_components/wrapper";
 import MobileNav from "@/app/messenger/_components/mobile-nav";
-import MobileHeader from "@/app/messenger/(routes)/friends/_components/mobile-header";
 import FriendsNav from "@/app/messenger/(routes)/friends/_components/friends-nav";
+import MobileHeader from "@/app/messenger/(routes)/friends/_components/mobile-header";
+import FriendsSidePanel from "@/app/messenger/(routes)/friends/_components/friends-side-panel";
 
 interface MessengerLayoutProps {
 	children: React.ReactNode;
@@ -16,9 +17,11 @@ interface MessengerLayoutProps {
 
 const FriendsLayout = ({ children }: MessengerLayoutProps) => (
 	<Wrapper>
-		<WrapperSidePanel>Friends Side Panel</WrapperSidePanel>
+		<WrapperSidePanel>
+			<FriendsSidePanel />
+		</WrapperSidePanel>
 		<WrapperContentZone>
-			<WrapperHeader className="px-4 sm:px-8 md:px-5">
+			<WrapperHeader className="border-b border-neutral-200 px-4 dark:border-neutral-900 sm:px-8 md:px-5">
 				<div className="h-full md:hidden">
 					<MobileHeader />
 				</div>
@@ -26,7 +29,7 @@ const FriendsLayout = ({ children }: MessengerLayoutProps) => (
 					<FriendsNav />
 				</div>
 			</WrapperHeader>
-			<WrapperContent>
+			<WrapperContent className="md:mb-0">
 				<div className="p-4 sm:p-8 md:px-5 md:py-8">{children}</div>
 			</WrapperContent>
 			<WrapperFooter className="px-4 sm:px-8 md:hidden">

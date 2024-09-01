@@ -22,7 +22,7 @@ export async function GET(req: NextRequest) {
 	// Check if the current user is authenticated. If not, respond with an unauthorized status.
 	if (!currentUser) {
 		return NextResponse.json(
-			{ success: false, message: "Unauthorized! Access denied", data: null },
+			{ success: false, message: "Unauthorized! Access denied" },
 			{ status: 401 }
 		);
 	}

@@ -1,13 +1,14 @@
 import "server-only";
 
-import type { FriendRequestWithRelations } from "@/types";
+import type { FriendRequestWithRelations, FriendRequestWithRequestType } from "@/types";
 
 import { subYears, isBefore } from "date-fns";
 
 import { prisma } from "@/lib/db";
 import { isBlocked } from "@/lib/block";
+import { areUsersFriends } from "@/lib/friendship";
 
-export enum FriendRequestError {
+export enum SendFriendRequestError {
 	SenderIsBlocked = "SenderIsBlocked",
 	AlreadyFriends = "AlreadyFriends",
 	PendingIncomingRequest = "PendingIncomingRequest",
@@ -16,10 +17,31 @@ export enum FriendRequestError {
 	UnknownError = "UnknownError",
 }
 
-export interface SendFriendRequestResponse {
-	friendRequest: FriendRequestWithRelations | null;
-	error: FriendRequestError | null;
+export interface FriendRequestResponse<T> {
+	friendRequest: FriendRequestWithRequestType | null;
+	error: T | null;
 }
+
+/**
+ * Classifies a friend request as either 'outgoing' or 'incoming' based on the user's ID.
+ * It also selectively includes the sender or receiver information depending on the request type.
+ */
+const classifyFriendRequest = ({
+	userId,
+	friendRequest,
+}: {
+	userId: string;
+	friendRequest: FriendRequestWithRelations;
+}): FriendRequestWithRequestType => {
+	const requestType = friendRequest.senderId === userId ? "outgoing" : "incoming";
+	const { sender, receiver, ...rest } = friendRequest;
+	return {
+		...rest,
+		requestType,
+		sender: requestType === "incoming" ? sender : undefined,
+		receiver: requestType === "outgoing" ? receiver : undefined,
+	};
+};
 
 /**
  * Check if a friend request was sent 1 year ago or more
@@ -39,18 +61,18 @@ const sendFriendRequest = async ({
 }: {
 	senderId: string;
 	receiverId: string;
-}): Promise<SendFriendRequestResponse> => {
+}): Promise<FriendRequestResponse<SendFriendRequestError>> => {
 	try {
 		// Check if sender is blocked by receiver
 		const isSenderBlocked = await isBlocked({ blockerId: receiverId, blockedId: senderId });
 		if (isSenderBlocked) {
-			return { friendRequest: null, error: FriendRequestError.SenderIsBlocked };
+			return { friendRequest: null, error: SendFriendRequestError.SenderIsBlocked };
 		}
 
-		// TODO: Create function to check if sender and receiver is already friend
-		const isFriend = false;
+		// Check if sender and receiver is already friend
+		const isFriend = await areUsersFriends({ senderId, receiverId });
 		if (isFriend) {
-			return { friendRequest: null, error: FriendRequestError.AlreadyFriends };
+			return { friendRequest: null, error: SendFriendRequestError.AlreadyFriends };
 		}
 
 		// Check if receiver already send a friend request
@@ -60,7 +82,7 @@ const sendFriendRequest = async ({
 			},
 		});
 		if (receiverFriendRequest && receiverFriendRequest.status === "pending") {
-			return { friendRequest: null, error: FriendRequestError.PendingIncomingRequest };
+			return { friendRequest: null, error: SendFriendRequestError.PendingIncomingRequest };
 		}
 
 		// Check if sender already send a friend request to the same receiver
@@ -68,7 +90,7 @@ const sendFriendRequest = async ({
 			where: { senderId_receiverId: { senderId, receiverId } },
 		});
 		if (existingFriendRequest && existingFriendRequest.status === "pending") {
-			return { friendRequest: null, error: FriendRequestError.RequestAlreadySent };
+			return { friendRequest: null, error: SendFriendRequestError.RequestAlreadySent };
 		}
 
 		if (existingFriendRequest) {
@@ -77,7 +99,7 @@ const sendFriendRequest = async ({
 				existingFriendRequest.status === "rejected" &&
 				!wasFriendRequestSentLongAgo(existingFriendRequest.createdAt)
 			) {
-				return { friendRequest: null, error: FriendRequestError.RequestWasRejected };
+				return { friendRequest: null, error: SendFriendRequestError.RequestWasRejected };
 			}
 
 			// If friend request is rejected and its been 1 year than update the request status
@@ -91,7 +113,13 @@ const sendFriendRequest = async ({
 					include: { sender: { omit: { password: true } }, receiver: { omit: { password: true } } },
 				});
 
-				return { friendRequest: updatedFriendRequest, error: null };
+				return {
+					friendRequest: classifyFriendRequest({
+						userId: senderId,
+						friendRequest: updatedFriendRequest,
+					}),
+					error: null,
+				};
 			}
 		}
 
@@ -101,10 +129,16 @@ const sendFriendRequest = async ({
 			include: { sender: { omit: { password: true } }, receiver: { omit: { password: true } } },
 		});
 
-		return { friendRequest, error: null };
+		return {
+			friendRequest: classifyFriendRequest({
+				userId: senderId,
+				friendRequest: friendRequest,
+			}),
+			error: null,
+		};
 	} catch (error) {
-		return { friendRequest: null, error: FriendRequestError.UnknownError };
+		return { friendRequest: null, error: SendFriendRequestError.UnknownError };
 	}
 };
 
-export { sendFriendRequest, wasFriendRequestSentLongAgo };
+export { sendFriendRequest, wasFriendRequestSentLongAgo, classifyFriendRequest };

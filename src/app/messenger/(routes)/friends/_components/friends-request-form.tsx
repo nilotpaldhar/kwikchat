@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useSendFriendRequest } from "@/hooks/use-friend-requests";
+import { useSendFriendRequest } from "@/hooks/use-friend-request";
 
 import { ArrowRight, UserPlus } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -13,7 +13,7 @@ const FriendsRequestForm = () => {
 	const [receiverUsername, setReceiverUsername] = useState("");
 	const { mutate, isSuccess, isError, isPending, data, error } = useSendFriendRequest();
 
-	const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+	const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
 		e.preventDefault();
 		mutate(receiverUsername, {
 			onSuccess: () => {
