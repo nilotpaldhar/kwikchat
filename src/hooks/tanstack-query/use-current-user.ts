@@ -2,6 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import axios, { handleAxiosError } from "@/lib/axios";
 
 import type { APIResponse, UserProfile } from "@/types";
+import { userKeys } from "@/constants/tanstack-query";
 
 const getCurrentUser = async () => {
 	try {
@@ -15,7 +16,7 @@ const getCurrentUser = async () => {
 
 const useCurrentUser = () =>
 	useQuery({
-		queryKey: ["CURRENT_USER"],
+		queryKey: userKeys.current,
 		queryFn: getCurrentUser,
 	});
 

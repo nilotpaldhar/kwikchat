@@ -1,4 +1,4 @@
-import type { User, FriendRequest } from "@prisma/client";
+import type { User, FriendRequest, Friendship } from "@prisma/client";
 import { PaginationMetadata } from "@/utils/general/calculate-pagination";
 
 export interface UserProfile extends Omit<User, "password" | "image"> {}
@@ -18,6 +18,8 @@ export enum TokenValidationStatus {
 	ValidationFailed = "ValidationFailed",
 	Default = "Default",
 }
+
+export type FriendsFilterType = "all" | "online" | "new";
 
 export interface PaginatedResponse<T> {
 	pagination: PaginationMetadata;
@@ -44,4 +46,8 @@ export interface FriendRequestWithRequestType extends FriendRequest {
 	requestType: "outgoing" | "incoming";
 	sender?: UserWithoutPassword;
 	receiver?: UserWithoutPassword;
+}
+
+export interface FriendWithFriendship extends UserWithoutPassword {
+	friendship: Friendship;
 }

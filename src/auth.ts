@@ -5,9 +5,10 @@ import { PrismaAdapter } from "@auth/prisma-adapter";
 
 import { prisma } from "@/lib/db";
 import authConfig from "@/auth.config";
+import { setUserOnlineStatus } from "@/lib/user";
 import { getUserById } from "@/data/user";
 import generateUniqueUsername from "@/utils/general/generate-unique-username";
-import { getTwoFactorConfirmationByUserId } from "./data/auth/two-factor-confirmation";
+import { getTwoFactorConfirmationByUserId } from "@/data/auth/two-factor-confirmation";
 
 export const {
 	handlers: { GET, POST },
@@ -83,6 +84,10 @@ export const {
 					userSettings: { create: {} },
 				},
 			});
+		},
+		async signIn({ user }) {
+			if (!user || !user.id) return;
+			await setUserOnlineStatus({ userId: user.id, isOnline: true });
 		},
 	},
 	adapter: PrismaAdapter(prisma),

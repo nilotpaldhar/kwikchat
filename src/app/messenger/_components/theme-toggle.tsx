@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { useTheme } from "next-themes";
 
+import Skeleton from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 import { Popover, PopoverTrigger, PopoverContent } from "@/components/ui/popover";
 
@@ -29,9 +30,7 @@ const ThemeToggle = ({
 	}, []);
 
 	if (!mounted) {
-		return (
-			<div className="size-8 rounded-full bg-surface-light-300 dark:bg-surface-dark-500 md:size-10" />
-		);
+		return <Skeleton className="size-11 rounded-full" />;
 	}
 
 	return (

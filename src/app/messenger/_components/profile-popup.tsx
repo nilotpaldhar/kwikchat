@@ -10,7 +10,7 @@ import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/h
 import UserAvatar from "@/components/user/user-avatar";
 import ProfileOverview from "@/components/user/profile-overview";
 
-import useCurrentUser from "@/hooks/use-current-user";
+import useCurrentUser from "@/hooks/tanstack-query/use-current-user";
 
 interface ProfilePopupProps {
 	side?: "bottom" | "top" | "right" | "left";
@@ -38,7 +38,11 @@ const ProfilePopup = ({
 		<HoverCard>
 			<HoverCardTrigger asChild>
 				<Button size="icon" className="h-12 w-12 bg-transparent hover:bg-transparent">
-					<UserAvatar src={user.avatar} fallback={fallback.toUpperCase()} status="online" />
+					<UserAvatar
+						src={user.avatar}
+						fallback={fallback.toUpperCase()}
+						status={user.isOnline ? "online" : "offline"}
+					/>
 					<span className="sr-only">Open Profile</span>
 				</Button>
 			</HoverCardTrigger>

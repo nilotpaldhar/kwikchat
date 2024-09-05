@@ -1,7 +1,6 @@
 "use client";
 
-import { useState, useTransition } from "react";
-import logout from "@/actions/auth/logout";
+import { useState } from "react";
 
 import {
 	AlertDialog,
@@ -14,40 +13,43 @@ import {
 	AlertDialogDescription,
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
-import { Loader2 } from "lucide-react";
 
-const LogoutConfirm = ({ children }: { children: React.ReactNode }) => {
+interface BlockConfirmProps {
+	username: string;
+	children: React.ReactNode;
+	onBlock?: () => void;
+}
+
+const BlockConfirm = ({ username, children, onBlock = () => {} }: BlockConfirmProps) => {
 	const [open, setOpen] = useState(false);
-	const [pending, startTransition] = useTransition();
 
-	const onLogout = () => {
-		startTransition(() => {
-			logout().then(() => {
-				setOpen(false);
-			});
-		});
+	const handleSubmit = (evt: React.FormEvent) => {
+		evt.preventDefault();
+		setOpen(false);
+		onBlock();
 	};
 
 	return (
 		<AlertDialog open={open} onOpenChange={setOpen}>
 			<AlertDialogTrigger asChild>{children}</AlertDialogTrigger>
 			<AlertDialogContent>
-				<form action={onLogout}>
+				<form onSubmit={handleSubmit}>
 					<div className="flex flex-col space-y-5">
 						<AlertDialogHeader>
-							<AlertDialogTitle>Log Out</AlertDialogTitle>
-							<AlertDialogDescription>Are you sure you want to logout?</AlertDialogDescription>
+							<AlertDialogTitle>Block {username}</AlertDialogTitle>
+							<AlertDialogDescription>
+								Are you sure you want to block <strong>{username}</strong>? Blocking this user will
+								also remove them from your friend list.
+							</AlertDialogDescription>
 						</AlertDialogHeader>
 						<AlertDialogFooter>
-							<AlertDialogCancel disabled={pending}>Cancel</AlertDialogCancel>
+							<AlertDialogCancel>Cancel</AlertDialogCancel>
 							<Button
 								className="space-x-2 dark:ring-offset-surface-dark-400"
 								type="submit"
 								variant="danger"
-								disabled={pending}
 							>
-								{pending && <Loader2 size={18} className="animate-spin" />}
-								<span>{pending ? "Log Out..." : "Log Out"}</span>
+								Block
 							</Button>
 						</AlertDialogFooter>
 					</div>
@@ -57,4 +59,4 @@ const LogoutConfirm = ({ children }: { children: React.ReactNode }) => {
 	);
 };
 
-export default LogoutConfirm;
+export default BlockConfirm;

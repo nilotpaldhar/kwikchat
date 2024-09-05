@@ -8,6 +8,15 @@ import { users } from "@/lib/seeder/data";
 
 const prisma = new PrismaClient();
 
+function getRandomDateInLastYear(): Date {
+	const now = new Date();
+	const currentTime = now.getTime();
+	const oneYearAgo = new Date(now.getFullYear() - 1, now.getMonth(), now.getDate()).getTime();
+	const randomTime = new Date(oneYearAgo + Math.random() * (currentTime - oneYearAgo));
+	return randomTime;
+}
+
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const seed = async () => {
 	console.log(chalk.blue("🌱 Seeding process started..."));
 
@@ -21,7 +30,12 @@ const seed = async () => {
 		await Promise.all(
 			users.map((user) =>
 				prisma.user.create({
-					data: { ...user, userSettings: { create: {} } },
+					data: {
+						...user,
+						createdAt: getRandomDateInLastYear().toISOString(),
+						updatedAt: getRandomDateInLastYear().toISOString(),
+						userSettings: { create: {} },
+					},
 				})
 			)
 		);

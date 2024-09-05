@@ -6,7 +6,7 @@ import { ChevronRight } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
 
 import { cn } from "@/utils/general/cn";
-import { usePendingFriendRequestsCountQuery } from "@/hooks/use-friend-request";
+import { usePendingFriendRequestsCountQuery } from "@/hooks/tanstack-query/use-friend-request";
 
 type DisplayMode = "desktop" | "mobile";
 

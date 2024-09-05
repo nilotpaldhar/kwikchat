@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useSendFriendRequest } from "@/hooks/use-friend-request";
+import { useSendFriendRequest } from "@/hooks/tanstack-query/use-friend-request";
 
 import { ArrowRight, UserPlus } from "lucide-react";
 import { Button } from "@/components/ui/button";

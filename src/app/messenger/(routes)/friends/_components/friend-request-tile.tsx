@@ -1,29 +1,33 @@
 import type { FriendRequestWithRequestType } from "@/types";
 
-import { Minus } from "lucide-react";
+import { Minus, Check, XIcon } from "lucide-react";
 
 import UserAvatar from "@/components/user/user-avatar";
-import {
-	RemoveFriendRequest,
-	AcceptFriendRequest,
-	RejectFriendRequest,
-} from "@/app/messenger/(routes)/friends/_components/friend-request-actions";
+import { ActionButtonWithTooltip } from "@/app/messenger/(routes)/friends/_components/action-button";
 
 import { cn } from "@/utils/general/cn";
+import {
+	useRemoveFriendRequest,
+	useAcceptFriendRequest,
+	useRejectFriendRequest,
+} from "@/hooks/tanstack-query/use-friend-request";
 
-interface FriendRequestProps extends FriendRequestWithRequestType {
+interface FriendRequestTileProps extends FriendRequestWithRequestType {
 	showUsername?: boolean;
 	className?: string;
 }
 
-const FriendRequest = ({
-	id,
-	requestType,
-	receiver,
-	sender,
+const FriendRequestTile = ({
 	showUsername = true,
 	className,
-}: FriendRequestProps) => {
+	...friendRequest
+}: FriendRequestTileProps) => {
+	const { id, requestType, receiver, sender } = friendRequest;
+
+	const removeFriendRequestMutation = useRemoveFriendRequest();
+	const acceptFriendRequestMutation = useAcceptFriendRequest();
+	const rejectFriendRequestMutation = useRejectFriendRequest();
+
 	const isOutgoingRequest = requestType === "outgoing";
 	const senderOrReceiver = isOutgoingRequest ? receiver : sender;
 
@@ -63,11 +67,29 @@ const FriendRequest = ({
 			</div>
 			<div className="flex items-center space-x-2">
 				{isOutgoingRequest ? (
-					<RemoveFriendRequest friendRequestId={id} />
+					<ActionButtonWithTooltip
+						icon={XIcon}
+						tooltipText="Cancel"
+						srText="Remove Friend Request"
+						className="text-red-600 dark:text-red-600"
+						onClick={() => removeFriendRequestMutation.mutate(id)}
+					/>
 				) : (
 					<>
-						<AcceptFriendRequest friendRequestId={id} />
-						<RejectFriendRequest friendRequestId={id} />
+						<ActionButtonWithTooltip
+							icon={Check}
+							tooltipText="Accept"
+							srText="Accept Friend Request"
+							className="text-green-600 dark:text-green-600"
+							onClick={() => acceptFriendRequestMutation.mutate(friendRequest)}
+						/>
+						<ActionButtonWithTooltip
+							icon={XIcon}
+							tooltipText="Reject"
+							srText="Reject Friend Request"
+							className="text-red-600 dark:text-red-600"
+							onClick={() => rejectFriendRequestMutation.mutate(id)}
+						/>
 					</>
 				)}
 			</div>
@@ -75,4 +97,4 @@ const FriendRequest = ({
 	);
 };
 
-export default FriendRequest;
+export default FriendRequestTile;

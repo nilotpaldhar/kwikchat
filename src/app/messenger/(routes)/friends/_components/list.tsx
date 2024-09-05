@@ -1,46 +1,23 @@
-import type { FriendRequestWithRequestType } from "@/types";
-
 import Skeleton from "@/components/ui/skeleton";
-import FriendRequest from "@/app/messenger/(routes)/friends/_components/friend-request";
 
 import { cn } from "@/utils/general/cn";
 
-interface FriendRequestListProps {
-	collection: FriendRequestWithRequestType[];
-	showUsername?: boolean;
+interface ListProps {
+	children: React.ReactNode;
 	className?: string;
-	itemClassName?: string;
 }
 
-interface FriendRequestListSkeletonProps {
+interface ListSkeletonProps {
 	count?: number;
 	className?: string;
 	wrapperClassName?: string;
 }
 
-const FriendRequestList = ({
-	collection,
-	showUsername,
-	className,
-	itemClassName,
-}: FriendRequestListProps) => (
-	<div className={cn("flex flex-col space-y-3", className)}>
-		{collection.map((item) => (
-			<FriendRequest
-				key={item.id}
-				{...item}
-				className={itemClassName}
-				showUsername={showUsername}
-			/>
-		))}
-	</div>
+const List = ({ children, className }: ListProps) => (
+	<ul className={cn("flex flex-col space-y-3", className)}>{children}</ul>
 );
 
-const FriendRequestListSkeleton = ({
-	count = 10,
-	className,
-	wrapperClassName,
-}: FriendRequestListSkeletonProps) => {
+const ListSkeleton = ({ count = 10, wrapperClassName, className }: ListSkeletonProps) => {
 	const items = Array.from({ length: count }, (_, index) => index + 1);
 
 	return (
@@ -64,4 +41,4 @@ const FriendRequestListSkeleton = ({
 	);
 };
 
-export { FriendRequestList, FriendRequestListSkeleton };
+export { List, ListSkeleton };

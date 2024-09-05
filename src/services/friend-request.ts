@@ -7,12 +7,21 @@ import axios, { handleAxiosError } from "@/lib/axios";
 /**
  * Fetches a paginated list of friend requests.
  */
-const fetchFriendRequests = async ({ page, limit }: { page: number; limit?: number }) => {
+const fetchFriendRequests = async ({
+	page,
+	limit,
+	query = "",
+}: {
+	page: number;
+	limit?: number;
+	query?: string;
+}) => {
 	try {
 		// Construct query parameters for pagination.
 		const params = new URLSearchParams();
 		params.append("page", `${page}`);
 		if (limit) params.append("page_size", `${limit}`);
+		if (query) params.append("query", `${query}`);
 
 		// Build the request URL with the query parameters.
 		const url = `/friend-requests?${params.toString()}`;
@@ -69,10 +78,10 @@ const removeFriendRequest = async (friendReqId: string) => {
 /**
  * Accepts a friend request by its ID.
  */
-const acceptFriendRequest = async (friendReqId: string) => {
+const acceptFriendRequest = async (friendRequest: FriendRequestWithRequestType) => {
 	try {
 		const res = await axios.post<APIResponse<FriendRequestWithRequestType>>(
-			`/friend-requests/${friendReqId}/accept`
+			`/friend-requests/${friendRequest.id}/accept`
 		);
 		return res.data;
 	} catch (error) {

@@ -14,9 +14,10 @@ export async function GET(req: NextRequest) {
 	const searchParams = req.nextUrl.searchParams;
 	const currentUser = await getCurrentUser();
 
-	// Parse pagination parameters from the query string
+	// Extract query parameters with default values
 	const page = searchParams.get("page");
 	const pageSize = searchParams.get("page_size");
+	const query = searchParams.get("query") ?? "";
 
 	// Check if the current user is authenticated. If not, respond with an unauthorized status.
 	if (!currentUser) {
@@ -30,6 +31,7 @@ export async function GET(req: NextRequest) {
 		userId: currentUser.id,
 		page: page ? parseInt(page, 10) : undefined,
 		pageSize: pageSize ? parseInt(pageSize, 10) : undefined,
+		query,
 	});
 
 	return NextResponse.json({

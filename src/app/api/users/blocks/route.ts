@@ -5,6 +5,7 @@ import { isBlocked } from "@/lib/block";
 
 import { getBlockedUsers } from "@/data/block";
 import { getCurrentUser } from "@/data/auth/session";
+import { deleteFriendship } from "@/lib/friendship";
 
 /**
  * Handler function to list all blocked users.
@@ -15,9 +16,10 @@ export async function GET(req: NextRequest) {
 	const searchParams = req.nextUrl.searchParams;
 	const currentUser = await getCurrentUser();
 
-	// Parse pagination parameters from the query string
+	// Extract query parameters with default values
 	const page = searchParams.get("page");
 	const pageSize = searchParams.get("page_size");
+	const query = searchParams.get("query") ?? "";
 
 	// Check if the current user is authenticated. If not, respond with an unauthorized status.
 	if (!currentUser) {
@@ -32,6 +34,7 @@ export async function GET(req: NextRequest) {
 		blockerId: currentUser.id,
 		page: page ? parseInt(page, 10) : undefined,
 		pageSize: pageSize ? parseInt(pageSize, 10) : undefined,
+		query,
 	});
 
 	return NextResponse.json({
@@ -91,18 +94,33 @@ export async function POST(req: NextRequest) {
 			);
 		}
 
+		// Remove any existing friendship between blocker and blocked user
+		const deletedFriendship = await deleteFriendship({ userId: blockerId, friendId: blockedId });
+		if (!deletedFriendship) {
+			return NextResponse.json(
+				{ success: false, message: "Unable to block the user. Please try again later." },
+				{ status: 400 }
+			);
+		}
+
 		// Create a new block entry in the database with the blocker and blocked user IDs.
 		const block = await prisma.block.create({
 			data: { blockerId, blockedId },
+			include: { blocked: { omit: { password: true } } },
 		});
 
+		const data = {
+			user: block.blocked,
+			blockedAt: block.createdAt,
+		};
+
 		return NextResponse.json(
-			{ success: true, message: "User has been blocked successfully", data: block },
+			{ success: true, message: "User has been blocked successfully", data },
 			{ status: 201 }
 		);
 	} catch (error) {
 		return NextResponse.json(
-			{ success: false, message: "Unable to block the user" },
+			{ success: false, message: "Unable to block the user. Please try again later." },
 			{ status: 500 }
 		);
 	}

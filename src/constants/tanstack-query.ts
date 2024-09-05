@@ -1,0 +1,43 @@
+/**
+ * User query keys
+ *
+ * Contains keys used to uniquely identify queries related to user data.
+ */
+export const userKeys = {
+	current: ["current_user"] as const,
+};
+
+/**
+ * Friend query keys
+ *
+ * Contains keys used to uniquely identify queries related to friend data.
+ */
+export const friendKeys = {
+	all: ["friends"] as const,
+	online: () => [...friendKeys.all, "online_friends"] as const,
+	searchAll: (query: string) => [...friendKeys.all, query] as const,
+	searchOnline: (query: string) => [...friendKeys.online(), query] as const,
+	filtered: (filters: string) => [...friendKeys.all, "filtered_friends", filters] as const,
+};
+
+/**
+ * Friend request query keys
+ *
+ * Contains keys used to uniquely identify queries related to friend request data.
+ */
+export const friendRequestKeys = {
+	all: ["friend_requests"] as const,
+	recent: () => [...friendRequestKeys.all, "recent_friend_requests"] as const,
+	search: (query: string) => [...friendRequestKeys.all, query] as const,
+	pendingCount: () => [...friendRequestKeys.all, "pending_friend_request_count"] as const,
+};
+
+/**
+ * Blocked user query keys
+ *
+ * Contains keys used to uniquely identify queries related to blocked user data.
+ */
+export const blockedUserKeys = {
+	all: ["blocked_users"] as const,
+	search: (query: string) => [...blockedUserKeys.all, query] as const,
+};

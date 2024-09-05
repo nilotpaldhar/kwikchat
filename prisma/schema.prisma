@@ -36,9 +36,11 @@ model User {
   avatar        String?
   banner_color  String?   @default("#27AE80")
   bio           String?   @db.Text
+  isOnline      Boolean   @default(false)
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  lastSeen  DateTime?
 
   // One-to-many relationship with the Account model.
   accounts Account[]
