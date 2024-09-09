@@ -20,7 +20,7 @@ interface FriendTileProps extends FriendWithFriendship {
 }
 
 const FriendTile = ({ className, ...friend }: FriendTileProps) => {
-	const { avatar, displayName, username, isOnline } = friend;
+	const { avatar, displayName, username } = friend;
 
 	const blockMutation = useBlock();
 	const unfriendMutation = useUnfriend();
@@ -35,11 +35,7 @@ const FriendTile = ({ className, ...friend }: FriendTileProps) => {
 			)}
 		>
 			<div>
-				<UserAvatar
-					src={avatar}
-					fallback={fallback as string}
-					status={isOnline ? "online" : "offline"}
-				/>
+				<UserAvatar src={avatar} fallback={fallback as string} />
 			</div>
 			<div className="flex-1">
 				<div className="text-sm font-medium leading-6">

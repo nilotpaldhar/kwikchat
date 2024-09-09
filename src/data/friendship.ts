@@ -22,6 +22,37 @@ interface Params {
 	isRecent?: boolean;
 }
 
+const getFriendsOfUser = async ({ userId, isOnline }: { userId: string; isOnline?: boolean }) => {
+	try {
+		const friendships = await prisma.friendship.findMany({
+			where: {
+				OR: [
+					{ userId, friend: { isOnline: isOnline || undefined } },
+					{ friendId: userId, user: { isOnline: isOnline || undefined } },
+				],
+			},
+			include: {
+				user: { omit: { password: true } },
+				friend: { omit: { password: true } },
+			},
+		});
+
+		// Process the results to include the other user in each friendship
+		const friendList = friendships.map((friendship) => {
+			const { friend, user, ...friendshipDetails } = friendship;
+			const otherUser = friendship.userId === userId ? friend : user;
+			return { ...otherUser, friendship: { ...friendshipDetails } };
+		});
+
+		// Remove duplicate friends from the list
+		const uniqueFriendList = removeDuplicateFriends(friendList);
+
+		return uniqueFriendList;
+	} catch (error) {
+		return [];
+	}
+};
+
 /**
  * Retrieves friends from the database with pagination.
  */
@@ -135,4 +166,4 @@ const getFriends = async ({
 	};
 };
 
-export { getFriendsFromDB, getFriends };
+export { getFriendsOfUser, getFriendsFromDB, getFriends };

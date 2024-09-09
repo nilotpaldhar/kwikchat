@@ -41,3 +41,8 @@ export const blockedUserKeys = {
 	all: ["blocked_users"] as const,
 	search: (query: string) => [...blockedUserKeys.all, query] as const,
 };
+
+/**
+ * Refetch interval for polling online friends data in milliseconds (30 seconds).
+ */
+export const ONLINE_FRIENDS_REFETCH_INTERVAL = 30000; // 3 seconds

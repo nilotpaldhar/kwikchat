@@ -42,8 +42,9 @@ export interface FriendRequestWithRelations extends FriendRequest {
 	receiver: UserWithoutPassword;
 }
 
+export type FriendRequestType = "outgoing" | "incoming";
 export interface FriendRequestWithRequestType extends FriendRequest {
-	requestType: "outgoing" | "incoming";
+	requestType: FriendRequestType;
 	sender?: UserWithoutPassword;
 	receiver?: UserWithoutPassword;
 }

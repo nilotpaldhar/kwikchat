@@ -1,5 +1,13 @@
+import type { FriendRequestWithRequestType } from "@/types";
+
 import { useQuery, useInfiniteQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useCallback } from "react";
+import usePusher from "@/hooks/use-pusher";
+import useCurrentUser from "@/hooks/tanstack-query/use-current-user";
+
 import { friendRequestKeys } from "@/constants/tanstack-query";
+import { friendRequestEvents } from "@/constants/pusher-events";
+
 import {
 	fetchFriendRequests,
 	fetchPendingFriendRequestsCount,
@@ -8,6 +16,7 @@ import {
 	acceptFriendRequest,
 	rejectFriendRequest,
 } from "@/services/friend-request";
+
 import {
 	optimisticSendRequest,
 	optimisticRemoveRequest,
@@ -16,6 +25,13 @@ import {
 	optimisticAcceptRequestError,
 	refetchOptimisticRequests,
 } from "@/utils/optimistic-updates/friend-request";
+import {
+	prependFriendRequest,
+	removeFriendRequest as removeFriendRequestFromCache,
+	prependRecentFriendRequest,
+	removeRecentFriendRequest,
+	syncFriendRequestCount,
+} from "@/utils/tanstack-query-cache/friend-request";
 
 /**
  * Custom hook to fetch a paginated list of friend requests.
@@ -24,12 +40,33 @@ import {
  * infinite scrolling for the friend requests list.
  */
 const useFriendRequestsQuery = (searchQuery?: string) => {
+	const queryClient = useQueryClient();
+	const { data } = useCurrentUser();
+
 	const query = useInfiniteQuery({
 		queryKey: friendRequestKeys.search(searchQuery || ""),
 		queryFn: ({ pageParam }) => fetchFriendRequests({ page: pageParam, query: searchQuery }),
 		initialPageParam: 1,
 		getNextPageParam: (lastPage) => lastPage.data?.pagination.nextPage,
 	});
+
+	// Set up Pusher listeners for real-time friend request events
+	usePusher<FriendRequestWithRequestType>(
+		data?.data?.id,
+		friendRequestEvents.incoming,
+		(friendRequest) => prependFriendRequest({ friendRequest, queryClient })
+	);
+	usePusher<FriendRequestWithRequestType>(
+		data?.data?.id,
+		friendRequestEvents.accept,
+		(friendRequest) => removeFriendRequestFromCache({ friendReqId: friendRequest?.id, queryClient })
+	);
+	usePusher<string>(data?.data?.id, friendRequestEvents.delete, (friendReqId) =>
+		removeFriendRequestFromCache({ friendReqId, queryClient })
+	);
+	usePusher<string>(data?.data?.id, friendRequestEvents.reject, (friendReqId) =>
+		removeFriendRequestFromCache({ friendReqId, queryClient })
+	);
 
 	return query;
 };
@@ -40,10 +77,31 @@ const useFriendRequestsQuery = (searchQuery?: string) => {
  * Uses react-query's `useQuery` to get the latest friend requests with a single fetch.
  */
 const useRecentFriendRequestsQuery = () => {
+	const queryClient = useQueryClient();
+	const { data } = useCurrentUser();
+
 	const query = useQuery({
 		queryKey: friendRequestKeys.recent(),
 		queryFn: () => fetchFriendRequests({ page: 1 }),
 	});
+
+	// Set up Pusher listeners for real-time updates
+	usePusher<FriendRequestWithRequestType>(
+		data?.data?.id,
+		friendRequestEvents.incoming,
+		(friendRequest) => prependRecentFriendRequest({ friendRequest, queryClient })
+	);
+	usePusher<FriendRequestWithRequestType>(
+		data?.data?.id,
+		friendRequestEvents.accept,
+		(friendRequest) => removeRecentFriendRequest({ friendReqId: friendRequest?.id, queryClient })
+	);
+	usePusher<string>(data?.data?.id, friendRequestEvents.delete, (friendReqId) =>
+		removeRecentFriendRequest({ friendReqId, queryClient })
+	);
+	usePusher<string>(data?.data?.id, friendRequestEvents.reject, (friendReqId) =>
+		removeRecentFriendRequest({ friendReqId, queryClient })
+	);
 
 	return query;
 };
@@ -54,10 +112,32 @@ const useRecentFriendRequestsQuery = () => {
  * Uses react-query's `useQuery` to retrieve the total count of pending friend requests.
  */
 const usePendingFriendRequestsCountQuery = () => {
+	const queryClient = useQueryClient();
+	const { data } = useCurrentUser();
+
 	const query = useQuery({
 		queryKey: friendRequestKeys.pendingCount(),
 		queryFn: () => fetchPendingFriendRequestsCount(),
 	});
+
+	const handleSyncRequestCount = useCallback(
+		() => syncFriendRequestCount({ queryClient }),
+		[queryClient]
+	);
+
+	// Set up Pusher listeners for real-time updates on request count
+	usePusher<FriendRequestWithRequestType>(
+		data?.data?.id,
+		friendRequestEvents.incoming,
+		handleSyncRequestCount
+	);
+	usePusher<FriendRequestWithRequestType>(
+		data?.data?.id,
+		friendRequestEvents.accept,
+		handleSyncRequestCount
+	);
+	usePusher<string>(data?.data?.id, friendRequestEvents.delete, handleSyncRequestCount);
+	usePusher<string>(data?.data?.id, friendRequestEvents.reject, handleSyncRequestCount);
 
 	return query;
 };

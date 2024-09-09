@@ -2,6 +2,9 @@ import { type NextRequest, NextResponse } from "next/server";
 
 import { prisma } from "@/lib/db";
 import { isBlocked } from "@/lib/block";
+import { pusherServer } from "@/lib/pusher/server";
+
+import { friendEvents } from "@/constants/pusher-events";
 
 import { getBlockedUsers } from "@/data/block";
 import { getCurrentUser } from "@/data/auth/session";
@@ -113,6 +116,9 @@ export async function POST(req: NextRequest) {
 			user: block.blocked,
 			blockedAt: block.createdAt,
 		};
+
+		// Trigger a Pusher event to remove the friend from the friend list.
+		pusherServer.trigger(blockedId, friendEvents.block, blockerId);
 
 		return NextResponse.json(
 			{ success: true, message: "User has been blocked successfully", data },

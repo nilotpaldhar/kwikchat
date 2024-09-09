@@ -2,11 +2,11 @@ import type { InfiniteData, QueryClient } from "@tanstack/react-query";
 import type { APIResponse, PaginatedResponse, FriendWithFriendship } from "@/types";
 
 import { friendKeys } from "@/constants/tanstack-query";
+import { getInfiniteQueryData } from "@/utils/tanstack-query-cache/helpers";
 import {
-	getInfiniteQueryData,
-	updateInfinitePaginatedData,
-} from "@/utils/optimistic-updates/helpers";
-import isRecentFriendship from "@/utils/friend/is-recent-friendship";
+	removeFromFriendsList,
+	removeFromFilteredFriendsList,
+} from "@/utils/tanstack-query-cache/friend";
 
 /**
  * Handles the optimistic update when unfriending a user.
@@ -43,74 +43,11 @@ const optimisticUnfriend = async ({
 		queryClient,
 	});
 
-	// Optimistically remove from the friends list
-	queryClient.setQueryData<InfiniteData<APIResponse<PaginatedResponse<FriendWithFriendship>>>>(
-		friendKeys.searchAll(""),
-		(existingData) =>
-			updateInfinitePaginatedData<FriendWithFriendship>({
-				existingData,
-				updateFn: (data, pagination) => ({
-					pagination: { ...pagination, totalItems: pagination.totalItems - 1 },
-					items: (data?.items ?? []).filter((item) => item.id !== friend.id),
-				}),
-			})
-	);
+	// Optimistically remove from the all friends list
+	removeFromFriendsList({ friendId: friend.id, queryClient });
 
-	// Optimistically remove from the filtered 'all friends' list
-	queryClient.setQueryData<InfiniteData<APIResponse<PaginatedResponse<FriendWithFriendship>>>>(
-		friendKeys.filtered("all"),
-		(existingData) =>
-			updateInfinitePaginatedData<FriendWithFriendship>({
-				existingData,
-				updateFn: (data, pagination) => ({
-					pagination: { ...pagination, totalItems: pagination.totalItems - 1 },
-					items: (data?.items ?? []).filter((item) => item.id !== friend.id),
-				}),
-			})
-	);
-
-	// If the friend is online, remove from the 'online friends' list
-	if (friend.isOnline) {
-		queryClient.setQueryData<InfiniteData<APIResponse<PaginatedResponse<FriendWithFriendship>>>>(
-			friendKeys.searchOnline(""),
-			(existingData) =>
-				updateInfinitePaginatedData<FriendWithFriendship>({
-					existingData,
-					updateFn: (data, pagination) => ({
-						pagination: { ...pagination, totalItems: pagination.totalItems - 1 },
-						items: (data?.items ?? []).filter((item) => item.id !== friend.id),
-					}),
-				})
-		);
-
-		// Also remove from the filtered 'online friends' list
-		queryClient.setQueryData<InfiniteData<APIResponse<PaginatedResponse<FriendWithFriendship>>>>(
-			friendKeys.filtered("online"),
-			(existingData) =>
-				updateInfinitePaginatedData<FriendWithFriendship>({
-					existingData,
-					updateFn: (data, pagination) => ({
-						pagination: { ...pagination, totalItems: pagination.totalItems - 1 },
-						items: (data?.items ?? []).filter((item) => item.id !== friend.id),
-					}),
-				})
-		);
-	}
-
-	// If the friendship is recent, remove the friend from the 'new friends' list
-	if (isRecentFriendship(friend.friendship.createdAt)) {
-		queryClient.setQueryData<InfiniteData<APIResponse<PaginatedResponse<FriendWithFriendship>>>>(
-			friendKeys.filtered("new"),
-			(existingData) =>
-				updateInfinitePaginatedData<FriendWithFriendship>({
-					existingData,
-					updateFn: (data, pagination) => ({
-						pagination: { ...pagination, totalItems: pagination.totalItems - 1 },
-						items: (data?.items ?? []).filter((item) => item.id !== friend.id),
-					}),
-				})
-		);
-	}
+	// Optimistically remove from the filtered friends list
+	removeFromFilteredFriendsList({ friendId: friend.id, queryClient });
 
 	return { friendsData, onlineFriendsData, newFriendsData };
 };

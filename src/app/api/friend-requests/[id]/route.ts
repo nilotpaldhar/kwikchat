@@ -3,6 +3,8 @@
 import { type NextRequest, NextResponse } from "next/server";
 
 import { prisma } from "@/lib/db";
+import { pusherServer } from "@/lib/pusher/server";
+import { friendRequestEvents } from "@/constants/pusher-events";
 import { getCurrentUser } from "@/data/auth/session";
 
 /**
@@ -51,6 +53,9 @@ export async function DELETE(
 		await prisma.friendRequest.delete({
 			where: { id: friendRequest.id },
 		});
+
+		// Trigger a Pusher event to notify the receiver about the deletion of a friend request
+		pusherServer.trigger(friendRequest.receiverId, friendRequestEvents.delete, friendRequest.id);
 
 		return NextResponse.json({
 			success: true,

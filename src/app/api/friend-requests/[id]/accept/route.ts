@@ -3,6 +3,8 @@
 import { type NextRequest, NextResponse } from "next/server";
 
 import { prisma } from "@/lib/db";
+import { pusherServer } from "@/lib/pusher/server";
+import { friendRequestEvents } from "@/constants/pusher-events";
 import { getCurrentUser } from "@/data/auth/session";
 import { classifyFriendRequest } from "@/lib/friend-request";
 
@@ -65,6 +67,17 @@ export async function POST(
 				],
 			});
 		}
+
+		// Trigger a Pusher event to notify the sender about an accepted friend request with updated information
+		pusherServer.trigger(
+			friendRequest.senderId,
+			friendRequestEvents.accept,
+			classifyFriendRequest({
+				userId: currentUser.id,
+				friendRequest: updatedFriendRequest,
+				invert: true,
+			})
+		);
 
 		return NextResponse.json({
 			success: true,

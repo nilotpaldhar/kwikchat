@@ -3,12 +3,18 @@ import { type UserSettings } from "@prisma/client";
 import NextAuth from "next-auth";
 import { PrismaAdapter } from "@auth/prisma-adapter";
 
-import { prisma } from "@/lib/db";
 import authConfig from "@/auth.config";
+
+import { prisma } from "@/lib/db";
 import { setUserOnlineStatus } from "@/lib/user";
+import { pusherServer } from "@/lib/pusher/server";
+
 import { getUserById } from "@/data/user";
-import generateUniqueUsername from "@/utils/general/generate-unique-username";
+import { getFriendsOfUser } from "@/data/friendship";
 import { getTwoFactorConfirmationByUserId } from "@/data/auth/two-factor-confirmation";
+
+import { friendEvents } from "@/constants/pusher-events";
+import generateUniqueUsername from "@/utils/general/generate-unique-username";
 
 export const {
 	handlers: { GET, POST },
@@ -86,8 +92,18 @@ export const {
 			});
 		},
 		async signIn({ user }) {
+			// Check if the user object exists and has a valid user ID
 			if (!user || !user.id) return;
+
+			// Set the user's online status to true in the system
 			await setUserOnlineStatus({ userId: user.id, isOnline: true });
+
+			// Get the list of friends who are online and map their IDs
+			const friends = await getFriendsOfUser({ userId: user.id, isOnline: true });
+			const friendIds = friends.map((friend) => friend.id);
+
+			// Trigger a Pusher event to notify the user's friends that the user is now online
+			pusherServer.trigger(friendIds, friendEvents.online, user.id);
 		},
 	},
 	adapter: PrismaAdapter(prisma),

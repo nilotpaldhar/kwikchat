@@ -3,6 +3,8 @@
 import { type NextRequest, NextResponse } from "next/server";
 
 import { prisma } from "@/lib/db";
+import { pusherServer } from "@/lib/pusher/server";
+import { friendRequestEvents } from "@/constants/pusher-events";
 import { getCurrentUser } from "@/data/auth/session";
 import { classifyFriendRequest } from "@/lib/friend-request";
 
@@ -53,6 +55,9 @@ export async function POST(
 			data: { status: "rejected" },
 			include: { sender: true, receiver: true },
 		});
+
+		// Trigger a Pusher event to notify the sender about a rejected friend request
+		pusherServer.trigger(friendRequest.senderId, friendRequestEvents.reject, friendRequest.id);
 
 		return NextResponse.json({
 			success: true,

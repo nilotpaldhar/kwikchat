@@ -48,6 +48,18 @@ const fetchPendingFriendRequestsCount = async () => {
 };
 
 /**
+ * Get the total count of pending friend requests.
+ */
+const getPendingFriendRequestsCount = async () => {
+	try {
+		const res = await fetchPendingFriendRequestsCount();
+		return res.data?.pending ?? 0;
+	} catch (error) {
+		return 0;
+	}
+};
+
+/**
  * Sends a friend request to the specified user.
  */
 const sendFriendRequest = async (receiverUsername: string) => {
@@ -108,6 +120,7 @@ const rejectFriendRequest = async (friendReqId: string) => {
 export {
 	fetchFriendRequests,
 	fetchPendingFriendRequestsCount,
+	getPendingFriendRequestsCount,
 	sendFriendRequest,
 	removeFriendRequest,
 	acceptFriendRequest,

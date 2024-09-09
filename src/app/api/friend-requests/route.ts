@@ -1,5 +1,8 @@
 import { type NextRequest, NextResponse } from "next/server";
 
+import { pusherServer } from "@/lib/pusher/server";
+import { friendRequestEvents } from "@/constants/pusher-events";
+
 import { getUserByUsername } from "@/data/user";
 import { getCurrentUser } from "@/data/auth/session";
 import { getFriendRequests } from "@/data/friend-request";
@@ -92,7 +95,10 @@ export async function POST(req: NextRequest) {
 	}
 
 	// Attempt to send a friend request
-	const { friendRequest, error } = await sendFriendRequest({ senderId, receiverId: receiver.id });
+	const { friendRequest, invertedFriendRequest, error } = await sendFriendRequest({
+		senderId,
+		receiverId: receiver.id,
+	});
 
 	// Handle potential errors based on the returned error type
 	if (error) {
@@ -148,6 +154,9 @@ export async function POST(req: NextRequest) {
 			}
 		}
 	}
+
+	// Trigger a Pusher event to notify the receiver about an incoming friend request
+	pusherServer.trigger(receiver.id, friendRequestEvents.incoming, invertedFriendRequest);
 
 	// If no error, return a success response with the created friend request details
 	return NextResponse.json(

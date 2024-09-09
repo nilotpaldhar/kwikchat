@@ -8,43 +8,35 @@ import type {
 	PaginatedResponse,
 } from "@/types";
 
-import { DEFAULT_PAGE_SIZE } from "@/constants/pagination";
 import { friendKeys, friendRequestKeys } from "@/constants/tanstack-query";
+
 import {
-	getQueryData,
-	getInfiniteQueryData,
-	updatePaginatedData,
-	updateInfinitePaginatedData,
-} from "@/utils/optimistic-updates/helpers";
+	prependFriendRequest,
+	prependRecentFriendRequest,
+	increaseFriendRequestCount,
+	removeFriendRequest,
+	removeRecentFriendRequest,
+	decreaseFriendRequestCount,
+} from "@/utils/tanstack-query-cache/friend-request";
+import { prependAllFriend, prependFilteredFriend } from "@/utils/tanstack-query-cache/friend";
+import { getQueryData, getInfiniteQueryData } from "@/utils/tanstack-query-cache/helpers";
 
-/**
- * Adds a new friend to the list of friends.
- *
- * This function creates a new `FriendWithFriendship` object from a `FriendRequestWithRequestType`
- * and adds it to the current list of friends.
- */
-const addFriendToList = ({
-	friendRequest,
-	currentFriends,
-}: {
-	friendRequest: FriendRequestWithRequestType;
-	currentFriends?: FriendWithFriendship[] | null;
-}) => {
+const createFriendFromRequest = (friendRequest: FriendRequestWithRequestType) => {
 	const { receiverId, senderId, sender } = friendRequest;
-	const newFriend: FriendWithFriendship | undefined = sender
-		? {
-				...sender,
-				friendship: {
-					id: nanoid(),
-					createdAt: new Date(),
-					friendId: senderId,
-					userId: receiverId,
-				},
-			}
-		: undefined;
 
-	// Add the new friend to the beginning of the list if valid, otherwise return the current list
-	return newFriend ? [newFriend, ...(currentFriends ?? [])] : [...(currentFriends ?? [])];
+	if (!sender) return undefined;
+
+	const newFriend: FriendWithFriendship = {
+		...sender,
+		friendship: {
+			id: nanoid(),
+			createdAt: new Date(),
+			friendId: senderId,
+			userId: receiverId,
+		},
+	};
+
+	return newFriend;
 };
 
 /**
@@ -61,52 +53,13 @@ const optimisticSendRequest = async ({
 	queryClient: QueryClient;
 }) => {
 	// Update the list of friend requests in the cache
-	queryClient.setQueryData<
-		InfiniteData<APIResponse<PaginatedResponse<FriendRequestWithRequestType>>>
-	>(friendRequestKeys.search(""), (existingData) =>
-		updateInfinitePaginatedData<FriendRequestWithRequestType>({
-			existingData,
-			updateFn: (data, pagination) => ({
-				pagination: { ...pagination, totalItems: pagination.totalItems + 1 },
-				items: friendRequest ? [friendRequest, ...(data?.items ?? [])] : [...(data?.items ?? [])],
-			}),
-		})
-	);
+	prependFriendRequest({ friendRequest, queryClient });
 
 	// Update the recent friend requests list in the cache
-	queryClient.setQueryData<APIResponse<PaginatedResponse<FriendRequestWithRequestType>>>(
-		friendRequestKeys.recent(),
-		(existingData) =>
-			updatePaginatedData<FriendRequestWithRequestType>({
-				existingData,
-				updateFn: (data, pagination) => {
-					const currentRequests = data?.items ?? [];
-					const updatedRequests = friendRequest
-						? [friendRequest, ...currentRequests]
-						: currentRequests;
-					if (updatedRequests.length > DEFAULT_PAGE_SIZE) updatedRequests.pop();
-
-					return {
-						pagination: { ...pagination, totalItems: pagination.totalItems + 1 },
-						items: updatedRequests,
-					};
-				},
-			})
-	);
+	prependRecentFriendRequest({ friendRequest, queryClient });
 
 	// Update the count of pending friend requests in the cache
-	queryClient.setQueryData<APIResponse<{ pending: number }>>(
-		friendRequestKeys.pendingCount(),
-		(existingData) => {
-			if (!existingData) return existingData;
-
-			const { data, status, message } = existingData;
-			let pendingCount = data?.pending ?? 0;
-			if (friendRequest) pendingCount += 1;
-
-			return { status, message, data: { pending: pendingCount } };
-		}
-	);
+	increaseFriendRequestCount({ friendRequest, queryClient });
 };
 
 /**
@@ -141,44 +94,13 @@ const optimisticRemoveRequest = async ({
 	]);
 
 	// Remove the friend request from the all friend request list
-	queryClient.setQueryData<
-		InfiniteData<APIResponse<PaginatedResponse<FriendRequestWithRequestType>>>
-	>(friendRequestKeys.search(""), (existingData) =>
-		updateInfinitePaginatedData({
-			existingData,
-			updateFn: (data, pagination) => ({
-				pagination: { ...pagination, totalItems: pagination.totalItems - 1 },
-				items: (data?.items ?? []).filter((item) => item.id !== friendReqId),
-			}),
-		})
-	);
+	removeFriendRequest({ friendReqId, queryClient });
 
 	// Remove the friend request from the recent friend request list
-	queryClient.setQueryData<APIResponse<PaginatedResponse<FriendRequestWithRequestType>>>(
-		friendRequestKeys.recent(),
-		(existingData) =>
-			updatePaginatedData({
-				existingData,
-				updateFn: (data, pagination) => ({
-					pagination: { ...pagination, totalItems: pagination.totalItems - 1 },
-					items: (data?.items ?? []).filter((item) => item.id !== friendReqId),
-				}),
-			})
-	);
+	removeRecentFriendRequest({ friendReqId, queryClient });
 
 	// Decrement the pending friend request count
-	queryClient.setQueryData<APIResponse<{ pending: number }>>(
-		friendRequestKeys.pendingCount(),
-		(existingData) => {
-			if (!existingData) return existingData;
-
-			const { data, status, message } = existingData;
-			let pendingCount = data?.pending ?? 0;
-			if (pendingCount > 0) pendingCount -= 1;
-
-			return { status, message, data: { pending: pendingCount } };
-		}
-	);
+	decreaseFriendRequestCount({ friendReqId, queryClient });
 
 	return { friendRequestsData, recentFriendRequestData, pendingFriendRequestCountData };
 };
@@ -218,11 +140,12 @@ const optimisticAcceptRequest = async ({
 	friendRequest: FriendRequestWithRequestType;
 	queryClient: QueryClient;
 }) => {
+	const friend = createFriendFromRequest(friendRequest);
+
 	// Cancel ongoing queries related to friends to ensure cache consistency
 	await queryClient.cancelQueries({ queryKey: friendKeys.searchAll("") });
 	await queryClient.cancelQueries({ queryKey: friendKeys.searchOnline("") });
 	await queryClient.cancelQueries({ queryKey: friendKeys.filtered("all") });
-	await queryClient.cancelQueries({ queryKey: friendKeys.filtered("online") });
 	await queryClient.cancelQueries({ queryKey: friendKeys.filtered("new") });
 
 	// Retrieve the current data from the cache for all friends, online friends, and new friends
@@ -240,68 +163,10 @@ const optimisticAcceptRequest = async ({
 	});
 
 	// Add the new friend to the lists in the cache
-	queryClient.setQueryData<InfiniteData<APIResponse<PaginatedResponse<FriendWithFriendship>>>>(
-		friendKeys.searchAll(""),
-		(existingData) =>
-			updateInfinitePaginatedData<FriendWithFriendship>({
-				existingData,
-				updateFn: (data, pagination) => ({
-					pagination: { ...pagination, totalItems: pagination.totalItems + 1 },
-					items: addFriendToList({ friendRequest, currentFriends: data?.items }),
-				}),
-			})
-	);
+	prependAllFriend({ friend, queryClient });
 
 	// Update filtered lists: all friends and new friends
-	queryClient.setQueryData<InfiniteData<APIResponse<PaginatedResponse<FriendWithFriendship>>>>(
-		friendKeys.filtered("all"),
-		(existingData) =>
-			updateInfinitePaginatedData<FriendWithFriendship>({
-				existingData,
-				updateFn: (data, pagination) => ({
-					pagination: { ...pagination, totalItems: pagination.totalItems + 1 },
-					items: addFriendToList({ friendRequest, currentFriends: data?.items }),
-				}),
-			})
-	);
-
-	queryClient.setQueryData<InfiniteData<APIResponse<PaginatedResponse<FriendWithFriendship>>>>(
-		friendKeys.filtered("new"),
-		(existingData) =>
-			updateInfinitePaginatedData<FriendWithFriendship>({
-				existingData,
-				updateFn: (data, pagination) => ({
-					pagination: { ...pagination, totalItems: pagination.totalItems + 1 },
-					items: addFriendToList({ friendRequest, currentFriends: data?.items }),
-				}),
-			})
-	);
-
-	// If the friend is online, add to the online friends list as well
-	if (friendRequest.sender?.isOnline) {
-		queryClient.setQueryData<InfiniteData<APIResponse<PaginatedResponse<FriendWithFriendship>>>>(
-			friendKeys.searchOnline(""),
-			(existingData) =>
-				updateInfinitePaginatedData<FriendWithFriendship>({
-					existingData,
-					updateFn: (data, pagination) => ({
-						pagination: { ...pagination, totalItems: pagination.totalItems + 1 },
-						items: addFriendToList({ friendRequest, currentFriends: data?.items }),
-					}),
-				})
-		);
-		queryClient.setQueryData<InfiniteData<APIResponse<PaginatedResponse<FriendWithFriendship>>>>(
-			friendKeys.filtered("online"),
-			(existingData) =>
-				updateInfinitePaginatedData<FriendWithFriendship>({
-					existingData,
-					updateFn: (data, pagination) => ({
-						pagination: { ...pagination, totalItems: pagination.totalItems + 1 },
-						items: addFriendToList({ friendRequest, currentFriends: data?.items }),
-					}),
-				})
-		);
-	}
+	prependFilteredFriend({ friend, queryClient });
 
 	// Remove the accepted friend request from the lists
 	const { friendRequestsData, pendingFriendRequestCountData, recentFriendRequestData } =

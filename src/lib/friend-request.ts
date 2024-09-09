@@ -1,6 +1,10 @@
 import "server-only";
 
-import type { FriendRequestWithRelations, FriendRequestWithRequestType } from "@/types";
+import type {
+	FriendRequestWithRelations,
+	FriendRequestType,
+	FriendRequestWithRequestType,
+} from "@/types";
 
 import { subYears, isBefore } from "date-fns";
 
@@ -19,6 +23,7 @@ export enum SendFriendRequestError {
 
 export interface FriendRequestResponse<T> {
 	friendRequest: FriendRequestWithRequestType | null;
+	invertedFriendRequest: FriendRequestWithRequestType | null;
 	error: T | null;
 }
 
@@ -29,11 +34,17 @@ export interface FriendRequestResponse<T> {
 const classifyFriendRequest = ({
 	userId,
 	friendRequest,
+	invert = false,
 }: {
 	userId: string;
 	friendRequest: FriendRequestWithRelations;
+	invert?: boolean;
 }): FriendRequestWithRequestType => {
-	const requestType = friendRequest.senderId === userId ? "outgoing" : "incoming";
+	let requestType: FriendRequestType = friendRequest.senderId === userId ? "outgoing" : "incoming";
+
+	// Invert the requestType if invert is true
+	if (invert) requestType = requestType === "outgoing" ? "incoming" : "outgoing";
+
 	const { sender, receiver, ...rest } = friendRequest;
 	return {
 		...rest,
@@ -66,13 +77,21 @@ const sendFriendRequest = async ({
 		// Check if sender is blocked by receiver
 		const isSenderBlocked = await isBlocked({ blockerId: receiverId, blockedId: senderId });
 		if (isSenderBlocked) {
-			return { friendRequest: null, error: SendFriendRequestError.SenderIsBlocked };
+			return {
+				friendRequest: null,
+				invertedFriendRequest: null,
+				error: SendFriendRequestError.SenderIsBlocked,
+			};
 		}
 
 		// Check if sender and receiver is already friend
 		const isFriend = await areUsersFriends({ senderId, receiverId });
 		if (isFriend) {
-			return { friendRequest: null, error: SendFriendRequestError.AlreadyFriends };
+			return {
+				friendRequest: null,
+				invertedFriendRequest: null,
+				error: SendFriendRequestError.AlreadyFriends,
+			};
 		}
 
 		// Check if receiver already send a friend request
@@ -82,7 +101,11 @@ const sendFriendRequest = async ({
 			},
 		});
 		if (receiverFriendRequest && receiverFriendRequest.status === "pending") {
-			return { friendRequest: null, error: SendFriendRequestError.PendingIncomingRequest };
+			return {
+				friendRequest: null,
+				invertedFriendRequest: null,
+				error: SendFriendRequestError.PendingIncomingRequest,
+			};
 		}
 
 		// Check if sender already send a friend request to the same receiver
@@ -90,7 +113,11 @@ const sendFriendRequest = async ({
 			where: { senderId_receiverId: { senderId, receiverId } },
 		});
 		if (existingFriendRequest && existingFriendRequest.status === "pending") {
-			return { friendRequest: null, error: SendFriendRequestError.RequestAlreadySent };
+			return {
+				friendRequest: null,
+				invertedFriendRequest: null,
+				error: SendFriendRequestError.RequestAlreadySent,
+			};
 		}
 
 		if (existingFriendRequest) {
@@ -99,7 +126,11 @@ const sendFriendRequest = async ({
 				existingFriendRequest.status === "rejected" &&
 				!wasFriendRequestSentLongAgo(existingFriendRequest.createdAt)
 			) {
-				return { friendRequest: null, error: SendFriendRequestError.RequestWasRejected };
+				return {
+					friendRequest: null,
+					invertedFriendRequest: null,
+					error: SendFriendRequestError.RequestWasRejected,
+				};
 			}
 
 			// If friend request is rejected and its been 1 year than update the request status
@@ -118,6 +149,11 @@ const sendFriendRequest = async ({
 						userId: senderId,
 						friendRequest: updatedFriendRequest,
 					}),
+					invertedFriendRequest: classifyFriendRequest({
+						userId: senderId,
+						friendRequest: updatedFriendRequest,
+						invert: true,
+					}),
 					error: null,
 				};
 			}
@@ -134,10 +170,19 @@ const sendFriendRequest = async ({
 				userId: senderId,
 				friendRequest: friendRequest,
 			}),
+			invertedFriendRequest: classifyFriendRequest({
+				userId: senderId,
+				friendRequest: friendRequest,
+				invert: true,
+			}),
 			error: null,
 		};
 	} catch (error) {
-		return { friendRequest: null, error: SendFriendRequestError.UnknownError };
+		return {
+			friendRequest: null,
+			invertedFriendRequest: null,
+			error: SendFriendRequestError.UnknownError,
+		};
 	}
 };
 
