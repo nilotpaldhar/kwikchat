@@ -10,6 +10,7 @@ import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/h
 import UserAvatar from "@/components/user/user-avatar";
 import ProfileOverview from "@/components/user/profile-overview";
 
+import useIsTouchDevice from "@/hooks/use-is-touch-device";
 import useCurrentUser from "@/hooks/tanstack-query/use-current-user";
 
 interface ProfilePopupProps {
@@ -25,24 +26,32 @@ const ProfilePopup = ({
 	align = "end",
 	alignOffset = 8,
 }: ProfilePopupProps) => {
+	const isTouchDevice = useIsTouchDevice();
+
 	const { data, isLoading, isError } = useCurrentUser();
 	const user = data?.data;
 
-	if (isLoading) return <Skeleton className="size-11 rounded-full" />;
+	if (isLoading) return <Skeleton className="size-12 rounded-full" />;
 
 	if (isError || !user || !user.username) return null;
 
 	const fallback = user.name ? user.name.charAt(0) : user.username.charAt(0);
 
+	if (isTouchDevice)
+		return (
+			<Button asChild size="icon" className="h-12 w-12 bg-transparent hover:bg-transparent">
+				<Link href="/account-profile">
+					<UserAvatar src={user.avatar} fallback={fallback.toUpperCase()} />
+					<span className="sr-only">Open Profile</span>
+				</Link>
+			</Button>
+		);
+
 	return (
 		<HoverCard>
 			<HoverCardTrigger asChild>
 				<Button size="icon" className="h-12 w-12 bg-transparent hover:bg-transparent">
-					<UserAvatar
-						src={user.avatar}
-						fallback={fallback.toUpperCase()}
-						status={user.isOnline ? "online" : "offline"}
-					/>
+					<UserAvatar src={user.avatar} fallback={fallback.toUpperCase()} />
 					<span className="sr-only">Open Profile</span>
 				</Button>
 			</HoverCardTrigger>

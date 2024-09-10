@@ -16,7 +16,6 @@ function getRandomDateInLastYear(): Date {
 	return randomTime;
 }
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const seed = async () => {
 	console.log(chalk.blue("🌱 Seeding process started..."));
 
