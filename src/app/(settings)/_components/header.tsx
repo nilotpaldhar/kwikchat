@@ -10,11 +10,11 @@ interface HeaderProps {
 
 const Header = ({ children }: HeaderProps) => (
 	<div>
-		<header className="fixed inset-0 z-10 h-16 w-full shadow-header bg-surface-light-100 lg:static lg:h-auto lg:shadow-none dark:bg-surface-dark-600 dark:shadow-none dark:border-b dark:border-neutral-900 dark:lg:border-none">
-			<div className="h-full flex items-center space-x-3 px-4 md:px-8 lg:px-0 lg:space-x-0">
+		<header className="fixed inset-0 z-10 h-16 w-full bg-surface-light-100 shadow-header dark:border-b dark:border-neutral-900 dark:bg-surface-dark-600 dark:shadow-none lg:static lg:h-auto lg:shadow-none dark:lg:border-none">
+			<div className="flex h-full items-center space-x-3 px-4 md:px-8 lg:space-x-0 lg:px-0">
 				<div className="lg:hidden">
 					<Button
-						className="border-none w-auto dark:hover:bg-surface-dark-600"
+						className="w-auto border-none dark:hover:bg-surface-dark-600"
 						variant="outline"
 						size="icon"
 						asChild

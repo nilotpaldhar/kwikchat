@@ -19,7 +19,9 @@
     "prisma:migrate": "dotenv -e .env prisma migrate dev",
     "prisma:push": "dotenv -e .env prisma db push",
     "prisma:studio": "dotenv -e .env prisma studio",
-    "prepare": "husky"
+    "db:seed": "tsx src/lib/seeder/seed.ts",
+    "prepare": "husky",
+    "commit": "git-cz"
   },
   "config": {
     "commitizen": {
@@ -50,11 +52,14 @@
     "@radix-ui/react-tooltip": "^1.1.2",
     "@react-email/components": "^0.0.19",
     "@react-email/render": "^0.0.15",
-    "@uiw/react-color": "^2.3.0",
+    "@tanstack/react-query": "^5.52.2",
+    "@tanstack/react-query-devtools": "^5.52.2",
+    "axios": "^1.7.5",
     "bcryptjs": "^2.4.3",
     "class-variance-authority": "^0.7.0",
     "client-only": "^0.0.1",
     "clsx": "^2.1.1",
+    "date-fns": "^3.6.0",
     "framer-motion": "^11.3.21",
     "imagekit": "^5.0.1",
     "input-otp": "^1.2.4",
@@ -65,12 +70,15 @@
     "next-auth": "^5.0.0-beta.19",
     "next-themes": "^0.3.0",
     "nodemailer": "^6.9.13",
+    "pusher": "^5.2.0",
+    "pusher-js": "^8.4.0-rc2",
     "react": "^18",
     "react-color-palette": "^7.2.2",
     "react-dom": "^18",
     "react-easy-crop": "^5.0.8",
     "react-email": "^2.1.4",
     "react-hook-form": "^7.51.5",
+    "react-spinners": "^0.14.1",
     "server-only": "^0.0.1",
     "tailwind-merge": "^2.3.0",
     "tailwindcss": "^3.4.3",
@@ -91,6 +99,7 @@
     "@types/uuid": "^9.0.8",
     "@typescript-eslint/eslint-plugin": "^7.11.0",
     "@typescript-eslint/parser": "^7.11.0",
+    "chalk": "^5.3.0",
     "commitizen": "^4.3.0",
     "eslint": "^8",
     "eslint-config-airbnb": "^19.0.4",
@@ -100,8 +109,10 @@
     "husky": "^9.0.11",
     "postcss": "^8",
     "prettier": "^3.2.5",
+    "prettier-plugin-tailwindcss": "^0.6.6",
     "prisma": "^5.17.0",
     "rimraf": "^5.0.7",
+    "tsx": "^4.18.0",
     "typescript": "^5"
   }
 }

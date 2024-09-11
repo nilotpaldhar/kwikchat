@@ -38,8 +38,8 @@ const ImageCropper = ({
 	onCropComplete = () => {},
 }: ImageCropperProps) => (
 	<div className={className}>
-		<div className="bg-black rounded-xl overflow-hidden">
-			<div className="relative w-full min-h-[200px] h-[300px] max-h-[400px]">
+		<div className="overflow-hidden rounded-xl bg-black">
+			<div className="relative h-[300px] max-h-[400px] min-h-[200px] w-full">
 				<EasyCropper
 					image={image}
 					aspect={aspect}
@@ -54,7 +54,7 @@ const ImageCropper = ({
 				/>
 			</div>
 		</div>
-		<div className="w-[90%] mx-auto mt-10 mb-5">
+		<div className="mx-auto mb-5 mt-10 w-[90%]">
 			<div className="flex items-center space-x-5">
 				<Button
 					variant="outline"

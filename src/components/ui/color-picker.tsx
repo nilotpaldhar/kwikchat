@@ -28,7 +28,7 @@ const ColorPicker = ({
 	};
 
 	return (
-		<div className="[&_.rcp-root]:bg-surface-light-200 [&_.rcp-root]:dark:bg-surface-dark-500 [&_.rcp-root]:rounded [&_.rcp-saturation]:rounded [&_.rcp-saturation]:rounded-b-none [&_.rcp-field-input]:bg-neutral-200 [&_.rcp-field-input]:dark:bg-neutral-950 [&_.rcp-field-input]:border-none [&_.rcp-field-input]:text-neutral-700 [&_.rcp-field-input]:dark:text-neutral-200 [&_.rcp-field-label]:font-semibold [&_.rcp-field-label]:text-neutral-500">
+		<div className="[&_.rcp-field-input]:border-none [&_.rcp-field-input]:bg-neutral-200 [&_.rcp-field-input]:text-neutral-700 [&_.rcp-field-input]:dark:bg-neutral-950 [&_.rcp-field-input]:dark:text-neutral-200 [&_.rcp-field-label]:font-semibold [&_.rcp-field-label]:text-neutral-500 [&_.rcp-root]:rounded [&_.rcp-root]:bg-surface-light-200 [&_.rcp-root]:dark:bg-surface-dark-500 [&_.rcp-saturation]:rounded [&_.rcp-saturation]:rounded-b-none">
 			<ReactColorPicker
 				color={chosenColor}
 				height={height}

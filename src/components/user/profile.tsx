@@ -22,13 +22,13 @@ interface ProfileBannerProps extends React.HTMLAttributes<HTMLDivElement> {
 	color?: string;
 }
 const ProfileBanner = ({ color = "#27ae80", className, ...props }: ProfileBannerProps) => (
-	<div className={cn("w-full h-24", className)} style={{ backgroundColor: color }} {...props} />
+	<div className={cn("h-24 w-full", className)} style={{ backgroundColor: color }} {...props} />
 );
 ProfileBanner.displayName = "ProfileBanner";
 
 interface ProfileAvatarProps extends UserAvatarProps {}
 const ProfileAvatar = ({ ...props }: ProfileAvatarProps) => (
-	<div className="absolute top-[56%] left-5">
+	<div className="absolute left-5 top-[56%]">
 		<UserAvatar
 			className="size-[68px]"
 			wrapperClassName="size-20 bg-white dark:bg-surface-dark-500"
@@ -45,7 +45,7 @@ const ProfileContent = ({
 	...props
 }: React.HTMLAttributes<HTMLDivElement>) => (
 	<div className={cn("mt-[38px] p-5", className)} {...props}>
-		<div className="p-4 bg-surface-light-200 dark:bg-surface-dark-400 rounded-xl">{children}</div>
+		<div className="rounded-xl bg-surface-light-200 p-4 dark:bg-surface-dark-400">{children}</div>
 	</div>
 );
 ProfileContent.displayName = "ProfileContent";

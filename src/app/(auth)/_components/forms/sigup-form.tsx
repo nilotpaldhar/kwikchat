@@ -135,13 +135,13 @@ const SigupForm = () => {
 									/>
 								</FormControl>
 								<div className="space-y-1 leading-none">
-									<FormLabel className="flex items-center flex-wrap gap-1">
+									<FormLabel className="flex flex-wrap items-center gap-1">
 										<span>I agree to KwikChat&apos;s</span>
-										<Button variant="link" className="p-0 h-max" asChild>
+										<Button variant="link" className="h-max p-0" asChild>
 											<Link href="/terms-of-service">TOS</Link>
 										</Button>
 										<span>and</span>
-										<Button variant="link" className="p-0 h-max" asChild>
+										<Button variant="link" className="h-max p-0" asChild>
 											<Link href="/privacy-policy">Privacy Policy</Link>
 										</Button>
 									</FormLabel>

@@ -14,7 +14,7 @@ interface SigninLinkProps {
 const SignupLink = () => (
 	<div className="flex items-center space-x-2">
 		<span className="text-muted font-medium">Need an account?</span>
-		<Button variant="link" className="p-0 h-max leading-none" asChild>
+		<Button variant="link" className="h-max p-0 leading-none" asChild>
 			<Link href="/sign-up">Sign Up</Link>
 		</Button>
 	</div>
@@ -27,7 +27,7 @@ const SigninLink = ({
 }: SigninLinkProps) => (
 	<div className="flex items-center space-x-2">
 		<span className="text-muted font-medium">{message}</span>
-		<Button variant="link" className="p-0 h-max leading-none space-x-1" asChild>
+		<Button variant="link" className="h-max space-x-1 p-0 leading-none" asChild>
 			<Link href="/sign-in">
 				{!hideIcon && <ArrowLeft size={14} />}
 				<span>{linkText}</span>

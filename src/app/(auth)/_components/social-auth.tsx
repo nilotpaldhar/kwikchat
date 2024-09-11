@@ -19,7 +19,7 @@ const SocialAuth: React.FC<SocialAuthProps> = ({ callbackUrl }) => {
 	};
 
 	return (
-		<div className="w-full flex flex-col space-y-3">
+		<div className="flex w-full flex-col space-y-3">
 			<Button variant="outline" className="w-full space-x-2" onClick={() => onCLick("google")}>
 				<Google size={18} />
 				<span>Continue with Google</span>

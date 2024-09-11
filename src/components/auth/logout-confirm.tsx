@@ -1,3 +1,5 @@
+"use client";
+
 import { useState, useTransition } from "react";
 import logout from "@/actions/auth/logout";
 

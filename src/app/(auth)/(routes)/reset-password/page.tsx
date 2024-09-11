@@ -16,7 +16,7 @@ interface ResetPasswordPageProps {
 }
 
 const ValidationFeedbackInvalid = () => (
-	<div className="flex items-center h-full">
+	<div className="flex h-full items-center">
 		<ValidationFeedback icon={XOctagon} heading="Email Reset Failed">
 			<p>It seems that the password reset link is invalid.</p>
 			<Button className="w-full" asChild>
@@ -53,7 +53,7 @@ const ResetPasswordPage = async ({ searchParams }: ResetPasswordPageProps) => {
 	/** Token expired */
 	if (status === TokenValidationStatus.TokenExpired) {
 		return (
-			<div className="flex items-center h-full">
+			<div className="flex h-full items-center">
 				<ValidationFeedback icon={Info} heading="Password reset link expired">
 					<p>It seems that the password link has expired.</p>
 					<Button className="w-full" asChild>

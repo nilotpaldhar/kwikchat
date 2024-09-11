@@ -10,8 +10,8 @@ const CardHeader: React.FC<React.HTMLAttributes<HTMLDivElement>> = ({ children, 
 );
 
 const CardIcon = ({ icon: Icon }: { icon: LucideIcon }) => (
-	<div className="flex justify-center items-center size-24 rounded-full bg-gradient-to-b from-primary-100/60 to-transparent dark:from-surface-dark-500/60">
-		<div className="flex justify-center items-center size-16 rounded-full border bg-surface-light-100 border-neutral-200 text-neutral-500 dark:bg-surface-dark-600 dark:border-neutral-900 dark:text-neutral-300">
+	<div className="flex size-24 items-center justify-center rounded-full bg-gradient-to-b from-primary-100/60 to-transparent dark:from-surface-dark-500/60">
+		<div className="flex size-16 items-center justify-center rounded-full border border-neutral-200 bg-surface-light-100 text-neutral-500 dark:border-neutral-900 dark:bg-surface-dark-600 dark:text-neutral-300">
 			<Icon size={32} />
 		</div>
 	</div>
@@ -25,7 +25,7 @@ const CardDescription: React.FC<React.HTMLAttributes<HTMLDivElement>> = ({
 	children,
 	className,
 }) => (
-	<p className={cn("paragraph text-center mt-2 text-neutral-700 dark:text-neutral-300", className)}>
+	<p className={cn("paragraph mt-2 text-center text-neutral-700 dark:text-neutral-300", className)}>
 		{children}
 	</p>
 );

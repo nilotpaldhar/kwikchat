@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { Raleway as FontSans } from "next/font/google";
 
 import ThemeProvider from "@/components/providers/theme-provider";
+import TanstackQueryProvider from "@/components/providers/tanstack-query-provider";
+
 import { cn } from "@/utils/general/cn";
 
 import "@/styles/global.css";
@@ -25,19 +27,21 @@ async function RootLayout({
 		<html lang="en" suppressHydrationWarning>
 			<body
 				className={cn(
-					"min-h-screen font-sans antialiased bg-surface-light-100 text-neutral-900 dark:bg-surface-dark-600 dark:text-neutral-200",
+					"min-h-screen bg-surface-light-100 font-sans text-neutral-900 antialiased dark:bg-surface-dark-600 dark:text-neutral-200",
 					fontSans.variable
 				)}
 			>
-				<ThemeProvider
-					attribute="class"
-					defaultTheme="light"
-					enableSystem
-					storageKey="KwikChat-theme"
-					disableTransitionOnChange
-				>
-					{children}
-				</ThemeProvider>
+				<TanstackQueryProvider>
+					<ThemeProvider
+						attribute="class"
+						defaultTheme="light"
+						enableSystem
+						storageKey="KwikChat-theme"
+						disableTransitionOnChange
+					>
+						{children}
+					</ThemeProvider>
+				</TanstackQueryProvider>
 			</body>
 		</html>
 	);

@@ -82,16 +82,16 @@ const ProfileManager = ({ user }: ProfileManagerProps) => {
 					<AlertTitle>{error}</AlertTitle>
 				</Alert>
 			)}
-			<div className="flex flex-col gap-y-8 sm:flex-row sm:space-y-0 sm:gap-x-5">
-				<div className="sm:flex-1 sm:order-2">
+			<div className="flex flex-col gap-y-8 sm:flex-row sm:gap-x-5 sm:space-y-0">
+				<div className="sm:order-2 sm:flex-1">
 					<ProfilePreview />
 				</div>
 				<Divider type="solid" className="sm:hidden" />
-				<div className="sm:flex-1 shrink-0">
+				<div className="shrink-0 sm:flex-1">
 					<ProfileInfoEditor loading={pending} />
 				</div>
 			</div>
-			<div ref={fixedDivRef} className="fixed top-1 sm:top-auto sm:bottom-4 z-20">
+			<div ref={fixedDivRef} className="fixed top-1 z-20 sm:bottom-4 sm:top-auto">
 				<ProfileSaveAlert onReset={() => reset(true)} onSave={handleSave} loading={pending} />
 			</div>
 		</div>

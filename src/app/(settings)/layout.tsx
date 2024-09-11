@@ -13,7 +13,7 @@ const SettingsLayout = ({ children }: SettingsLayoutProps) => (
 		<SettingsDialogProvider />
 		<div className="h-screen overflow-hidden">
 			<div className="grid grid-cols-12">
-				<aside className="hidden bg-surface-light-200 dark:bg-surface-dark-400 lg:block lg:col-span-3 xl:col-span-4">
+				<aside className="hidden bg-surface-light-200 dark:bg-surface-dark-400 lg:col-span-3 lg:block xl:col-span-4">
 					<ScrollArea className="h-screen">
 						<DesktopSidebar />
 					</ScrollArea>
@@ -21,7 +21,7 @@ const SettingsLayout = ({ children }: SettingsLayoutProps) => (
 				<main className="col-span-full lg:col-span-9 xl:col-span-8">
 					<ScrollArea className="h-screen">
 						<div className="flex">
-							<div className="flex-1 lg:px-10 lg:py-14 lg:max-w-2xl xl:max-w-3xl">{children}</div>
+							<div className="flex-1 lg:max-w-2xl lg:px-10 lg:py-14 xl:max-w-3xl">{children}</div>
 							<div className="hidden lg:block lg:pt-14">
 								<CloseSettings />
 							</div>

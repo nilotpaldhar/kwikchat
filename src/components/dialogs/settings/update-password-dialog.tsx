@@ -127,7 +127,7 @@ const UpdatePasswordDialog = () => {
 								type="password"
 								placeholder="########"
 								disabled={pending}
-								className="dark:bg-surface-dark-400 dark:border-neutral-700"
+								className="dark:border-neutral-700 dark:bg-surface-dark-400"
 								{...field}
 							/>
 						</FormControl>
@@ -146,7 +146,7 @@ const UpdatePasswordDialog = () => {
 								type="password"
 								placeholder="########"
 								disabled={pending}
-								className="dark:bg-surface-dark-400 dark:border-neutral-700"
+								className="dark:border-neutral-700 dark:bg-surface-dark-400"
 								{...field}
 							/>
 						</FormControl>
@@ -168,7 +168,7 @@ const UpdatePasswordDialog = () => {
 								type="password"
 								placeholder="########"
 								disabled={pending}
-								className="dark:bg-surface-dark-400 dark:border-neutral-700"
+								className="dark:border-neutral-700 dark:bg-surface-dark-400"
 								{...field}
 							/>
 						</FormControl>

@@ -49,7 +49,7 @@ const ProfileDetails = ({ user, isOAuth, className }: ProfileDetailsProps) => {
 								<BlockTitle>Display Name</BlockTitle>
 								<BlockDescription>{user.displayName}</BlockDescription>
 							</Block>
-							<Button variant="secondary" className="px-3 py-1 h-8">
+							<Button variant="secondary" className="h-8 px-3 py-1">
 								<Link href="/account-profile">Edit</Link>
 							</Button>
 						</div>
@@ -61,7 +61,7 @@ const ProfileDetails = ({ user, isOAuth, className }: ProfileDetailsProps) => {
 							</Block>
 							<Button
 								variant="secondary"
-								className="px-3 py-1 h-8"
+								className="h-8 px-3 py-1"
 								onClick={() => onOpen("UPDATE_USERNAME")}
 								disabled={isOAuth}
 							>
@@ -74,14 +74,14 @@ const ProfileDetails = ({ user, isOAuth, className }: ProfileDetailsProps) => {
 								<BlockTitle>Email</BlockTitle>
 								<BlockDescription>{user.email}</BlockDescription>
 							</Block>
-							<Button variant="secondary" className="px-3 py-1 h-8" disabled>
+							<Button variant="secondary" className="h-8 px-3 py-1" disabled>
 								Edit
 							</Button>
 						</div>
 					</div>
 				</ProfileContent>
 			</Profile>
-			<Button variant="secondary" className="absolute top-4 right-4" asChild>
+			<Button variant="secondary" className="absolute right-4 top-4" asChild>
 				<Link href="/account-profile">Edit User Profile</Link>
 			</Button>
 		</div>

@@ -18,7 +18,7 @@ const ToggleThemeButton = ({
 		type="button"
 		onClick={onClick}
 		className={cn(
-			"relative flex items-center justify-center size-14 rounded-full bg-slate-500 border border-transparent dark:border-neutral-700",
+			"relative flex size-14 items-center justify-center rounded-full border border-transparent bg-slate-500 dark:border-neutral-700",
 			variant === "light" && "bg-surface-light-100",
 			(variant === "dark" || variant === "system") && "bg-surface-dark-600",
 			active && "border-primary-400 dark:border-primary-400"
@@ -31,7 +31,7 @@ const ToggleThemeButton = ({
 		</span>
 		<span
 			className={cn(
-				"absolute -top-1 right-0 items-center justify-center size-5 bg-primary-400 rounded-full text-white hidden",
+				"absolute -top-1 right-0 hidden size-5 items-center justify-center rounded-full bg-primary-400 text-white",
 				active && "flex"
 			)}
 		>

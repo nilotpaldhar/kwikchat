@@ -24,7 +24,7 @@ const ProfileBio = ({ bio = "" }: { bio?: string }) => {
 			value={bio}
 			disabled
 			onChange={() => adjustHeight()}
-			className="w-full border-none overflow-hidden resize-none bg-transparent"
+			className="w-full resize-none overflow-hidden border-none bg-transparent"
 		/>
 	);
 };

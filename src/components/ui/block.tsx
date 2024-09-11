@@ -12,7 +12,7 @@ const BlockTitle = ({
 }: React.HTMLAttributes<HTMLHeadingElement>) => (
 	<h3
 		className={cn(
-			"text-xs font-semibold uppercase leading-5 select-none text-neutral-900 dark:text-neutral-200",
+			"select-none text-xs font-semibold uppercase leading-5 text-neutral-900 dark:text-neutral-200",
 			className
 		)}
 		{...props}
@@ -25,7 +25,7 @@ BlockTitle.displayName = "BlockTitle";
 const BlockDescription = ({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) => (
 	<div
 		className={cn(
-			"text-sm leading-5 select-none text-neutral-500 dark:text-neutral-400",
+			"select-none text-sm leading-5 text-neutral-500 dark:text-neutral-400",
 			className
 		)}
 		{...props}

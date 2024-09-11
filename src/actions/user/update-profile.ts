@@ -60,7 +60,7 @@ async function updateProfile(values: z.infer<typeof ProfileSchema>) {
 			data: {
 				displayName,
 				bio,
-				avatar: avatarUrl,
+				avatar: avatarUrl ?? currentUser.avatar,
 				banner_color: bannerColor,
 			},
 		});

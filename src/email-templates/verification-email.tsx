@@ -24,8 +24,8 @@ const VerificationEmail = ({ url, username, previewText }: VerificationEmailProp
 		<Head />
 		{previewText && <Preview>{previewText}</Preview>}
 		<Tailwind>
-			<Body className="bg-white text-neutral-700 my-auto mx-auto font-sans px-2">
-				<Container className="max-w-[460px] rounded mx-auto my-10 p-6 border border-solid border-neutral-200">
+			<Body className="mx-auto my-auto bg-white px-2 font-sans text-neutral-700">
+				<Container className="mx-auto my-10 max-w-[460px] rounded border border-solid border-neutral-200 p-6">
 					<Section>
 						<Heading className="text-2xl font-bold">Email Verification</Heading>
 					</Section>
@@ -37,14 +37,14 @@ const VerificationEmail = ({ url, username, previewText }: VerificationEmailProp
 						</Text>
 						<Button
 							href={url}
-							className="inline-block px-5 py-3 bg-[#27AE80] text-white rounded-md text-sm font-medium"
+							className="inline-block rounded-md bg-[#27AE80] px-5 py-3 text-sm font-medium text-white"
 						>
 							Verify Email
 						</Button>
 						<Text>If you did not create an account, no further action is required.</Text>
 					</Section>
-					<Hr className="border border-solid border-neutral-100 mx-0 w-full" />
-					<Text className="mt-4 text-center font-light text-xs text-neutral-500">
+					<Hr className="mx-0 w-full border border-solid border-neutral-100" />
+					<Text className="mt-4 text-center text-xs font-light text-neutral-500">
 						&copy; 2024 KwikChat. All rights reserved.
 					</Text>
 				</Container>
