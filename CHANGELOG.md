@@ -1,3 +1,23 @@
+# [0.5.0](https://github.com/nilotpaldhar/storekeeper/compare/v0.4.0...v0.5.0) (2024-09-11)
+
+
+### Bug Fixes
+
+* **pusher:** fix pusher client initialization error ([72646f4](https://github.com/nilotpaldhar/storekeeper/commit/72646f4aa8ce2afe171f5a2389c6eff2a11edede))
+
+
+### Features
+
+* **messenger-friends:** add empty state for friends list ([6cff16b](https://github.com/nilotpaldhar/storekeeper/commit/6cff16b5b7dfff8c3d0d23cff621288d9958fa04))
+* **messenger-friends:** add Friends, Online Friends, and Blocked Users pages ([ac21111](https://github.com/nilotpaldhar/storekeeper/commit/ac211111fad5f13f79c19458a60fc9e1446f14bc))
+* **messenger-friends:** add paginated pending friend requests page and related API routes ([d18032d](https://github.com/nilotpaldhar/storekeeper/commit/d18032d6379e127d5e3193254a6deec2e74cec72))
+* **messenger-friends:** add Pusher for real-time updates and subscribe to friend-related events ([409bc29](https://github.com/nilotpaldhar/storekeeper/commit/409bc2916188def1b77a762d7fa29a36b77fd988))
+* **messenger-friends:** add send friend request API endpoint and implement frontend request form ([a13955e](https://github.com/nilotpaldhar/storekeeper/commit/a13955ea211da0b3134b72bf77baa2429d4a81c5))
+* **messenger:** add API endpoints for listing, blocking, and unblocking users ([2813e9f](https://github.com/nilotpaldhar/storekeeper/commit/2813e9f76b2d368cc9354267941913a7b2b75683))
+* **messenger:** add messenger layout ([23d7d8c](https://github.com/nilotpaldhar/storekeeper/commit/23d7d8c469214c1929e3cafa97b471297286340c))
+
+
+
 # [0.4.0](https://github.com/nilotpaldhar/storekeeper/compare/v0.3.0...v0.4.0) (2024-08-08)
 
 
