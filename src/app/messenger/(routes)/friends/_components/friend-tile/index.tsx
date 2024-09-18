@@ -2,6 +2,8 @@
 
 import type { FriendWithFriendship } from "@/types";
 
+import { useRouter, usePathname } from "next/navigation";
+
 import { MessageCircle, MoreVertical } from "lucide-react";
 
 import UserAvatar from "@/components/user/user-avatar";
@@ -20,12 +22,25 @@ interface FriendTileProps extends FriendWithFriendship {
 }
 
 const FriendTile = ({ className, ...friend }: FriendTileProps) => {
+	const router = useRouter();
+	const pathname = usePathname();
+
 	const { avatar, displayName, username } = friend;
 
 	const blockMutation = useBlock();
 	const unfriendMutation = useUnfriend();
 
 	const fallback = displayName ? displayName.charAt(0) : username?.charAt(0);
+
+	const handleInitChat = () => {
+		const params = new URLSearchParams();
+
+		params.append("friend_id", friend.id);
+		params.append("fallback_path", pathname);
+		const url = `/messenger/open-chat?${params.toString()}`;
+
+		router.push(url);
+	};
 
 	return (
 		<div
@@ -50,6 +65,7 @@ const FriendTile = ({ className, ...friend }: FriendTileProps) => {
 					icon={MessageCircle}
 					tooltipText="Message"
 					srText={`Message ${username}`}
+					onClick={handleInitChat}
 				/>
 				<MoreActions
 					username={username as string}

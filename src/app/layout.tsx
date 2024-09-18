@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Raleway as FontSans } from "next/font/google";
 
 import ThemeProvider from "@/components/providers/theme-provider";
+import ToastProvider from "@/components/providers/toast-provider";
 import TanstackQueryProvider from "@/components/providers/tanstack-query-provider";
 
 import { cn } from "@/utils/general/cn";
@@ -40,6 +41,7 @@ async function RootLayout({
 						disableTransitionOnChange
 					>
 						{children}
+						<ToastProvider />
 					</ThemeProvider>
 				</TanstackQueryProvider>
 			</body>
