@@ -47,10 +47,10 @@ const ThemeToggle = ({
 					<Button
 						key={colorMode}
 						variant="outline"
-						className="w-full justify-start border-transparent bg-transparent text-left hover:bg-surface-light-300 dark:border-transparent dark:hover:bg-surface-dark-500"
+						className="w-full justify-start border-transparent bg-transparent px-2.5 text-left hover:bg-surface-light-300 dark:border-transparent dark:hover:bg-surface-dark-500"
 						onClick={() => setTheme(colorMode)}
 					>
-						<span className="capitalize">{colorMode}</span>
+						<span className="font-semibold capitalize">{colorMode}</span>
 					</Button>
 				))}
 			</PopoverContent>

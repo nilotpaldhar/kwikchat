@@ -1,5 +1,8 @@
 import { prisma } from "@/lib/db";
 
+/**
+ *  Creates a new private one-on-one conversation between two users.
+ */
 const createPrivateConversation = async ({
 	userId1,
 	userId2,

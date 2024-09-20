@@ -1,5 +1,8 @@
 import { prisma } from "@/lib/db";
 
+/**
+ * Retrieves an existing one-on-one conversation between two users.
+ */
 const getConversationBetweenUsers = async ({
 	userId1,
 	userId2,

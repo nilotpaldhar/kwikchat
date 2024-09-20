@@ -36,9 +36,9 @@ const generateFriendships = async () => {
 		where: { id: { not: currentUser?.id } },
 	});
 
-	// Create friend requests for the first 10 users
+	// Create friend requests for the first 20 users
 	await Promise.all(
-		otherUsers.slice(0, 10).map((user) => {
+		otherUsers.slice(0, 20).map((user) => {
 			const senderId = currentUser?.id;
 			const receiverId = user.id;
 
@@ -50,9 +50,9 @@ const generateFriendships = async () => {
 		})
 	);
 
-	// Create friendships for the first 10 users
+	// Create friendships for the first 20 users
 	await Promise.all(
-		otherUsers.slice(0, 10).map((user) => {
+		otherUsers.slice(0, 20).map((user) => {
 			const senderId = currentUser?.id;
 			const receiverId = user.id;
 
@@ -83,7 +83,7 @@ const seed = async () => {
 		// Create new users from the provided data
 		console.log(chalk.yellow("💾 Creating new users..."));
 		await Promise.all(
-			users.slice(0, 10).map((user) =>
+			users.map((user) =>
 				prisma.user.create({
 					data: {
 						...user,

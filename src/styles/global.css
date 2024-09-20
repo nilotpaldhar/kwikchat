@@ -54,4 +54,28 @@ body {
 	.blockquote {
 		@apply mt-6 border-l-2 border-neutral-300 pl-6 italic text-neutral-500 dark:border-neutral-700 dark:text-neutral-400;
 	}
+
+	.animate-big-bounce {
+		animation: big-bounce 0.6s infinite ease-in-out;
+	}
+
+	.animation-delay-200 {
+		animation-delay: 0.2s;
+	}
+
+	.animation-delay-400 {
+		animation-delay: 0.4s;
+	}
+
+	@keyframes big-bounce {
+		0%,
+		100% {
+			transform: translateY(-50%);
+			animation-timing-function: cubic-bezier(0.8, 0, 1, 1);
+		}
+		50% {
+			transform: none;
+			animation-timing-function: cubic-bezier(0, 0, 0.2, 1);
+		}
+	}
 }

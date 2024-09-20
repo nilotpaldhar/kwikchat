@@ -27,7 +27,7 @@ const OpenChatPage = ({ searchParams }: OpenChatPageProps) => {
 				friendId,
 				fallbackPath,
 			});
-			if (error) toast.error("Failed to initialize chat!");
+			if (error) toast.error("Chat initialization failed. Please try again!");
 			router.replace(redirectPath);
 		};
 
@@ -36,7 +36,7 @@ const OpenChatPage = ({ searchParams }: OpenChatPageProps) => {
 
 	return (
 		<div className="flex h-full items-center justify-center">
-			<Loader loading />
+			<Loader />
 		</div>
 	);
 };

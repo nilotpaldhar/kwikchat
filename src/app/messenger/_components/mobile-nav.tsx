@@ -11,6 +11,7 @@ import { Button } from "@/components/ui/button";
 import ThemeToggle from "@/app/messenger/_components/theme-toggle";
 
 import { cn } from "@/utils/general/cn";
+import useMessengerDialogStore from "@/store/use-messenger-dialog-store";
 
 // ClassNames
 const linkClassNames =
@@ -40,6 +41,7 @@ const NavLink = ({
 
 const MobileNav = () => {
 	const pathname = usePathname();
+	const onOpen = useMessengerDialogStore().onOpen;
 
 	return (
 		<nav className="flex h-full w-full items-center">
@@ -47,8 +49,12 @@ const MobileNav = () => {
 				<li>
 					<NavLink
 						icon={MessagesSquare}
-						href="/messenger/chats"
-						active={pathname.startsWith("/messenger/chats") || pathname === "/messenger"}
+						href="/messenger"
+						active={
+							pathname.startsWith("/messenger/chats") ||
+							pathname === "/messenger/open-chat" ||
+							pathname === "/messenger"
+						}
 					>
 						Chats
 					</NavLink>
@@ -63,7 +69,11 @@ const MobileNav = () => {
 					</NavLink>
 				</li>
 				<li>
-					<Button size="icon" className="rounded-full shadow shadow-primary-400/25">
+					<Button
+						size="icon"
+						className="rounded-full shadow shadow-primary-400/25"
+						onClick={() => onOpen("NEW_CHAT")}
+					>
 						<Plus size={20} />
 					</Button>
 				</li>

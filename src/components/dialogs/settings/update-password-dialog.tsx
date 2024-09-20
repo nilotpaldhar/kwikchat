@@ -223,7 +223,12 @@ const UpdatePasswordDialog = () => {
 
 	// Render drawer for mobile
 	return (
-		<Drawer open={isDialogOpen} onOpenChange={handleClose}>
+		<Drawer
+			open={isDialogOpen}
+			onOpenChange={(open) => {
+				if (!open) handleClose();
+			}}
+		>
 			<DrawerContent>
 				<DrawerHeader>
 					<DrawerTitle>{title}</DrawerTitle>

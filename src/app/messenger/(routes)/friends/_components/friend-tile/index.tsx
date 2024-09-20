@@ -14,6 +14,7 @@ import {
 } from "@/app/messenger/(routes)/friends/_components/action-button";
 
 import { cn } from "@/utils/general/cn";
+import buildOpenChatUrl from "@/utils/messenger/build-open-chat-url";
 import { useBlock } from "@/hooks/tanstack-query/use-block";
 import { useUnfriend } from "@/hooks/tanstack-query/use-friend";
 
@@ -33,12 +34,7 @@ const FriendTile = ({ className, ...friend }: FriendTileProps) => {
 	const fallback = displayName ? displayName.charAt(0) : username?.charAt(0);
 
 	const handleInitChat = () => {
-		const params = new URLSearchParams();
-
-		params.append("friend_id", friend.id);
-		params.append("fallback_path", pathname);
-		const url = `/messenger/open-chat?${params.toString()}`;
-
+		const url = buildOpenChatUrl(friend.id, pathname);
 		router.push(url);
 	};
 
