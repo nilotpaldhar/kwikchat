@@ -18,6 +18,17 @@ interface ProfileOverviewProps {
 	copyableUsername?: boolean;
 	showLogout?: boolean;
 	className?: string;
+	classNames?: {
+		profileHeader?: string;
+		profileBanner?: string;
+		profileAvatar: {
+			className?: string;
+			wrapperClassName?: string;
+			indicatorClassName?: string;
+		};
+		profileContent?: string;
+		profileInfo?: string;
+	};
 }
 
 const ProfileOverview = ({
@@ -25,20 +36,27 @@ const ProfileOverview = ({
 	copyableUsername,
 	showLogout,
 	className,
+	classNames,
 }: ProfileOverviewProps) => {
 	const fallback = user.name ? user.name.charAt(0) : user.username?.charAt(0);
 
 	return (
 		<Profile className={className}>
-			<ProfileHeader>
-				<ProfileBanner color={user.banner_color ?? "#27ae80"} />
+			<ProfileHeader className={classNames?.profileHeader}>
+				<ProfileBanner
+					color={user.banner_color ?? "#27ae80"}
+					className={classNames?.profileBanner}
+				/>
 				<ProfileAvatar
 					src={user.avatar}
 					fallback={fallback?.toUpperCase() as string}
-					status="online"
+					status={user.isOnline ? "online" : "offline"}
+					className={classNames?.profileAvatar.className}
+					wrapperClassName={classNames?.profileAvatar.wrapperClassName}
+					indicatorClassName={classNames?.profileAvatar.indicatorClassName}
 				/>
 			</ProfileHeader>
-			<ProfileContent>
+			<ProfileContent className={classNames?.profileContent}>
 				<ProfileInfo
 					name={user.displayName as string}
 					username={user.username as string}
@@ -47,6 +65,7 @@ const ProfileOverview = ({
 					joiningDate={formatJoining(new Date(user.createdAt))}
 					copyableUsername={copyableUsername}
 					showLogout={showLogout}
+					className={classNames?.profileInfo}
 				/>
 			</ProfileContent>
 		</Profile>

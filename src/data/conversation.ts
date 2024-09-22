@@ -24,5 +24,34 @@ const getConversationBetweenUsers = async ({
 	}
 };
 
-// eslint-disable-next-line import/prefer-default-export
-export { getConversationBetweenUsers };
+/**
+ * Retrieves a conversation by its unique ID.
+ */
+const getConversationById = async (id: string) => {
+	try {
+		const conversation = await prisma.conversation.findUnique({
+			where: { id },
+		});
+
+		return conversation;
+	} catch (error) {
+		return null;
+	}
+};
+
+/**
+ * Retrieves a conversation by its ID and user ID.
+ */
+const getConversationByIdAndUserId = async ({ id, userId }: { id: string; userId: string }) => {
+	try {
+		const conversation = await prisma.conversation.findFirst({
+			where: { id, members: { some: { userId } } },
+		});
+
+		return conversation;
+	} catch (error) {
+		return null;
+	}
+};
+
+export { getConversationBetweenUsers, getConversationById, getConversationByIdAndUserId };

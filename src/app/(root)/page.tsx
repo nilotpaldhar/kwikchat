@@ -1,11 +1,7 @@
-import Loader from "@/components/ui/loader";
+import { redirect } from "next/navigation";
 
-async function HomePage() {
-	return (
-		<main>
-			<Loader />
-		</main>
-	);
-}
+const HomePage = () => {
+	redirect("/sign-in");
+};
 
 export default HomePage;
