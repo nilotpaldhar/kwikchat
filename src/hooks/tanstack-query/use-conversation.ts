@@ -5,6 +5,7 @@ import useCurrentUser from "@/hooks/tanstack-query/use-current-user";
 
 import { friendEvents } from "@/constants/pusher-events";
 import { conversationKeys } from "@/constants/tanstack-query";
+
 import { fetchParticipantInConversation } from "@/services/conversation";
 
 import { fetchFriendDetails } from "@/services/friendship";

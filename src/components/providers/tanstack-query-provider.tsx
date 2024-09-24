@@ -20,7 +20,7 @@ const TanstackQueryProvider = ({ children }: { children: React.ReactNode }) => {
 
 	return (
 		<QueryClientProvider client={queryClient}>
-			<ReactQueryDevtools />
+			<ReactQueryDevtools buttonPosition="top-right" />
 			{children}
 		</QueryClientProvider>
 	);

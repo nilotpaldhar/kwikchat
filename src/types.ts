@@ -1,4 +1,11 @@
-import type { User, FriendRequest, Friendship } from "@prisma/client";
+import type {
+	User,
+	FriendRequest,
+	Friendship,
+	Message,
+	TextMessage,
+	ImageMessage,
+} from "@prisma/client";
 import { PaginationMetadata } from "@/utils/general/calculate-pagination";
 
 export interface UserProfile extends Omit<User, "password" | "image"> {}
@@ -51,4 +58,9 @@ export interface FriendRequestWithRequestType extends FriendRequest {
 
 export interface FriendWithFriendship extends UserWithoutPassword {
 	friendship: Friendship;
+}
+
+export interface FullMessage extends Message {
+	textMessage: TextMessage | null;
+	imageMessage: ImageMessage | null;
 }

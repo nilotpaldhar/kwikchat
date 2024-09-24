@@ -1,6 +1,7 @@
 import "client-only";
 
 import type { APIResponse, UserWithoutPassword } from "@/types";
+
 import axios, { handleAxiosError } from "@/lib/axios";
 
 /**
