@@ -5,12 +5,14 @@ import dynamic from "next/dynamic";
 import { ArrowLeft } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
-import ChatParticipant from "@/app/messenger/_components/chat-participant";
-import ChatHeaderActions from "@/app/messenger/_components/chat-header-actions";
+import ChatParticipant from "@/app/messenger/(routes)/chats/_components/chat-participant";
+import ChatHeaderActions from "@/app/messenger/(routes)/chats/_components/chat-header-actions";
 
 import { useParticipantInConversationQuery } from "@/hooks/tanstack-query/use-conversation";
 
-const ChatContactInfo = dynamic(() => import("@/app/messenger/_components/chat-contact-info"));
+const ChatContactInfo = dynamic(
+	() => import("@/app/messenger/(routes)/chats/_components/chat-contact-info")
+);
 
 interface ChatHeaderProps {
 	conversationId: string;

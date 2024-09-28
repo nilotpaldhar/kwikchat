@@ -13,6 +13,7 @@ const ToastProvider = () => {
 	return (
 		<Toaster
 			richColors
+			position="top-right"
 			theme={theme as ThemeOptions}
 			icons={{
 				success: <CheckCircle2 size={18} />,

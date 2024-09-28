@@ -11,3 +11,7 @@ export const friendRequestEvents = {
 	accept: "accept_friend_request" as const,
 	reject: "reject_friend_request" as const,
 };
+
+export const conversationEvents = {
+	newMessage: "new_message" as const,
+};

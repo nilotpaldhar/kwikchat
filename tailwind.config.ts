@@ -87,7 +87,7 @@ const config = {
 			},
 		},
 	},
-	plugins: [tailwindcssAnimate, tailwindScrollbar],
+	plugins: [tailwindcssAnimate, tailwindScrollbar({ nocompatible: true })],
 } satisfies Config;
 
 export default config;

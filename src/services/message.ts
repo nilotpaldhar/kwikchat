@@ -1,15 +1,29 @@
 import "client-only";
 
 import type { Message } from "@prisma/client";
-import type { APIResponse, FullMessage } from "@/types";
+import type { APIResponse, CompleteMessage, PaginatedResponse } from "@/types";
 
 import axios, { handleAxiosError } from "@/lib/axios";
 
-const fetchPrivateMessages = async ({ conversationId }: { conversationId: string }) => {
+/**
+ * Fetches private messages for a given conversation with pagination support.
+ */
+const fetchPrivateMessages = async ({
+	conversationId,
+	page,
+}: {
+	conversationId: string;
+	page: number;
+}) => {
+	// Construct query parameters for pagination.
+	const params = new URLSearchParams();
+	params.append("page", `${page}`);
+
+	// Build the request URL with the query parameters.
+	const url = `/conversations/${conversationId}/messages?${params.toString()}`;
+
 	try {
-		const res = await axios.get<APIResponse<FullMessage[]>>(
-			`/conversations/${conversationId}/messages`
-		);
+		const res = await axios.get<APIResponse<PaginatedResponse<CompleteMessage>>>(url);
 		return res.data;
 	} catch (error) {
 		const errMsg = handleAxiosError(error);
@@ -17,12 +31,16 @@ const fetchPrivateMessages = async ({ conversationId }: { conversationId: string
 	}
 };
 
+/**
+ * Sends a private message to a specified conversation.
+ */
 const sendPrivateMessage = async ({
 	conversationId,
 	message,
 }: {
 	conversationId: string;
 	message: string;
+	senderId: string;
 }) => {
 	try {
 		const res = await axios.post<APIResponse<Message>>(

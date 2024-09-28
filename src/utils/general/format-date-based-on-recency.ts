@@ -1,6 +1,6 @@
 import { format, differenceInHours, differenceInDays } from "date-fns";
 
-const formatDateBasedOnRecency = (date: Date): string => {
+const formatDateBasedOnRecency = (date: Date, useTimeFormat: boolean = true): string => {
 	const now = new Date();
 
 	const hoursDifference = differenceInHours(now, date);
@@ -8,7 +8,7 @@ const formatDateBasedOnRecency = (date: Date): string => {
 
 	// Less than 24 hours old
 	if (hoursDifference < 24) {
-		return format(date, "hh:mm a");
+		return useTimeFormat ? format(date, "hh:mm a") : "today";
 	}
 
 	// Less than a week old

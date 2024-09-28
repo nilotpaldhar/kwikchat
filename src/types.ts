@@ -60,7 +60,26 @@ export interface FriendWithFriendship extends UserWithoutPassword {
 	friendship: Friendship;
 }
 
-export interface FullMessage extends Message {
+export interface CompleteMessage extends Message {
 	textMessage: TextMessage | null;
 	imageMessage: ImageMessage | null;
 }
+
+// const m: CompleteMessage = {
+// 	id,
+// 	conversationId,
+// 	createdAt,
+// 	isDeleted,
+// 	isEdited,
+// 	senderId,
+// 	type,
+// 	updatedAt,
+// 	textMessage:{
+// 		id,
+// 		content,
+// 		messageId,
+// 		created_at,
+// 		updated_at
+// 	},
+// 	imageMessage:null
+// };
