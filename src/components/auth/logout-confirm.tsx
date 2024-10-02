@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 import logout from "@/actions/auth/logout";
 
 import {
@@ -19,11 +20,13 @@ import { Loader2 } from "lucide-react";
 const LogoutConfirm = ({ children }: { children: React.ReactNode }) => {
 	const [open, setOpen] = useState(false);
 	const [pending, startTransition] = useTransition();
+	const queryClient = useQueryClient();
 
 	const onLogout = () => {
 		startTransition(() => {
 			logout().then(() => {
 				setOpen(false);
+				queryClient.clear();
 			});
 		});
 	};

@@ -232,7 +232,7 @@ model Conversation {
 
   // Relationship to the user who created the conversation.
   createdBy String
-  creator   User   @relation("CreatedConversations", fields: [createdBy], references: [id])
+  creator   User   @relation("CreatedConversations", fields: [createdBy], references: [id], onDelete: Cascade)
 
   // List of members participating in the conversation.
   members Member[]
@@ -249,11 +249,14 @@ model Member {
 
   // Relationship to the user.
   userId String
-  user   User   @relation(fields: [userId], references: [id])
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   // Relationship to the conversation.
   conversationId String
-  conversation   Conversation @relation(fields: [conversationId], references: [id])
+  conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+
+  // Relation to the MessageSeenStatus model to track seen statuses.
+  seenMessages MessageSeenStatus[]
 
   // Ensures that a user cannot join the same conversation more than once.
   @@unique([userId, conversationId])
@@ -261,27 +264,45 @@ model Member {
 
 // The Message model represents a message in a conversation.
 model Message {
-  id        String      @id @default(cuid())
-  type      MessageType // e.g., 'text', 'image'
-  isEdited  Boolean     @default(false)
-  isDeleted Boolean     @default(false)
+  id   String      @id @default(cuid())
+  type MessageType // e.g., 'text', 'image'
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   // Relationship to the user who sent the message.
   senderId String
-  sender   User   @relation(fields: [senderId], references: [id])
+  sender   User   @relation(fields: [senderId], references: [id], onDelete: Cascade)
 
   // Relationship to the conversation.
   conversationId String
-  conversation   Conversation @relation(fields: [conversationId], references: [id])
-
-  // Optional relation to a text message, if the message type is 'text'.
-  textMessage TextMessage?
+  conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
 
   // Optional relation to an image message, if the message type is 'image'.
   imageMessage ImageMessage?
+
+  // Relation to the MessageSeenStatus model to track seen statuses.
+  seenByMembers MessageSeenStatus[]
+
+  // Optional relation to a text message, if the message type is 'text'.
+  textMessage TextMessage?
+}
+
+// The MessageSeenStatus model represents the seen status of a message.
+model MessageSeenStatus {
+  id     String    @id @default(cuid())
+  seenAt DateTime?
+
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  memberId String
+  member   Member @relation(fields: [memberId], references: [id], onDelete: Cascade)
+
+  messageId String
+  message   Message @relation(fields: [messageId], references: [id], onDelete: Cascade)
+
+  @@unique([messageId, memberId]) // Ensures a unique entry for each message and member
 }
 
 // The TextMessage model represents a text message.
@@ -293,7 +314,7 @@ model TextMessage {
   updated_at DateTime @updatedAt
 
   messageId String  @unique
-  message   Message @relation(fields: [messageId], references: [id])
+  message   Message @relation(fields: [messageId], references: [id], onDelete: Cascade)
 }
 
 // The ImageMessage model represents an image message.
@@ -305,5 +326,5 @@ model ImageMessage {
   updated_at DateTime @updatedAt
 
   messageId String  @unique
-  message   Message @relation(fields: [messageId], references: [id])
+  message   Message @relation(fields: [messageId], references: [id], onDelete: Cascade)
 }

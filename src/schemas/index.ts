@@ -1,5 +1,3 @@
-/* eslint-disable import/prefer-default-export */
-
 import * as z from "zod";
 
 export const SigninSchema = z.object({
@@ -76,4 +74,8 @@ export const ProfileSchema = z.object({
 	bannerColor: z.string().nullable().optional(),
 	bio: z.string().max(190, "Bio must be 190 characters or fewer").nullable().optional(),
 	avatar: z.string().nullable().optional(),
+});
+
+export const SeenMessageSchema = z.object({
+	messageIds: z.array(z.string()),
 });

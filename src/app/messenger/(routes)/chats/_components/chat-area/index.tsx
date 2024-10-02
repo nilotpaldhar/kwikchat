@@ -80,8 +80,9 @@ const ChatArea = ({ currentUserId, conversationId }: ChatAreaProps) => {
 										{groupedMessages.map(({ date, messages }) => (
 											<ChatMessageDateGroup
 												key={date}
-												currentUserId={currentUserId}
 												date={date}
+												conversationId={conversationId}
+												currentUserId={currentUserId}
 												messages={messages}
 											/>
 										))}

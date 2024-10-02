@@ -13,6 +13,7 @@ import { areUsersFriends } from "@/lib/friendship";
 
 import { MAX_MESSAGE_CHAR_LENGTH } from "@/constants/chat-input";
 import { generatePrivateChatChannelName } from "@/utils/pusher/generate-chat-channel-name";
+import { CompleteMessage } from "@/types";
 
 type Params = { conversationId: string };
 
@@ -119,40 +120,40 @@ export async function POST(req: NextRequest, { params }: { params: Params }) {
 		);
 	}
 
-	// Find the conversation, ensuring the current user is a member
-	const conversation = await prisma.conversation.findFirst({
-		where: { id: conversationId, members: { some: { userId: senderId } } },
-		include: { members: true },
-	});
-
-	// Respond with 404 if the conversation is not found or the user is not a member
-	if (!conversation) {
-		return NextResponse.json(
-			{
-				success: false,
-				message:
-					"The conversation you're trying to access could not be found. Please verify the conversation ID or check your membership.",
-			},
-			{ status: 404 }
-		);
-	}
-
-	// Find the receiver (the other member of the conversation)
-	const receiverId = conversation.members.find((member) => member.userId !== senderId)?.userId;
-
-	// If no receiver is found, respond with 404
-	if (!receiverId) {
-		return NextResponse.json(
-			{
-				success: false,
-				message:
-					"Unable to find a recipient for this conversation. Please ensure you're messaging a valid participant.",
-			},
-			{ status: 404 }
-		);
-	}
-
 	try {
+		// Find the conversation, ensuring the current user is a member
+		const conversation = await prisma.conversation.findFirst({
+			where: { id: conversationId, members: { some: { userId: senderId } } },
+			include: { members: true },
+		});
+
+		// Respond with 404 if the conversation is not found or the user is not a member
+		if (!conversation) {
+			return NextResponse.json(
+				{
+					success: false,
+					message:
+						"The conversation you're trying to access could not be found. Please verify the conversation ID or check your membership.",
+				},
+				{ status: 404 }
+			);
+		}
+
+		// Find the receiver (the other member of the conversation)
+		const receiverId = conversation.members.find((member) => member.userId !== senderId)?.userId;
+
+		// If no receiver is found, respond with 404
+		if (!receiverId) {
+			return NextResponse.json(
+				{
+					success: false,
+					message:
+						"Unable to find a recipient for this conversation. Please ensure you're messaging a valid participant.",
+				},
+				{ status: 404 }
+			);
+		}
+
 		// Check if the sender is blocked by the receiver
 		const blocked = await isBlocked({ blockerId: receiverId, blockedId: senderId });
 		if (blocked) {
@@ -189,20 +190,33 @@ export async function POST(req: NextRequest, { params }: { params: Params }) {
 					create: { content: trimmedMessage },
 				},
 			},
-			include: { textMessage: true, imageMessage: true },
+			include: {
+				textMessage: true,
+				imageMessage: true,
+				seenByMembers: {
+					include: {
+						member: { select: { userId: true } },
+					},
+				},
+			},
 		});
+
+		const data: CompleteMessage = {
+			...newMessage,
+			seenByMembers: newMessage.seenByMembers.map((seenBy) => seenBy.member.userId),
+		};
 
 		// Trigger a Pusher event to notify the receiver about an incoming message
 		pusherServer.trigger(
 			generatePrivateChatChannelName({ conversationId: newMessage.conversationId, receiverId }),
 			conversationEvents.newMessage,
-			newMessage
+			data
 		);
 
 		return NextResponse.json({
 			success: true,
 			message: "Your message has been sent successfully!",
-			data: newMessage,
+			data,
 		});
 	} catch (error) {
 		return NextResponse.json(

@@ -1,8 +1,6 @@
 import "client-only";
 
-import type { Message } from "@prisma/client";
-import type { APIResponse, CompleteMessage, PaginatedResponse } from "@/types";
-
+import type { APIResponse, CompleteMessage, PaginatedResponse, MessageSeenMembers } from "@/types";
 import axios, { handleAxiosError } from "@/lib/axios";
 
 /**
@@ -43,7 +41,7 @@ const sendPrivateMessage = async ({
 	senderId: string;
 }) => {
 	try {
-		const res = await axios.post<APIResponse<Message>>(
+		const res = await axios.post<APIResponse<CompleteMessage>>(
 			`/conversations/${conversationId}/messages`,
 			{ message }
 		);
@@ -54,4 +52,26 @@ const sendPrivateMessage = async ({
 	}
 };
 
-export { fetchPrivateMessages, sendPrivateMessage };
+/**
+ * Updates the seen status of messages in a specific conversation.
+ */
+const updateMessageSeenStatus = async ({
+	conversationId,
+	messageIds,
+}: {
+	conversationId: string;
+	messageIds: string[];
+}) => {
+	try {
+		const res = await axios.post<APIResponse<MessageSeenMembers[]>>(
+			`/conversations/${conversationId}/messages/seen`,
+			{ messageIds }
+		);
+		return res.data;
+	} catch (error) {
+		const errMsg = handleAxiosError(error);
+		throw new Error(errMsg);
+	}
+};
+
+export { fetchPrivateMessages, sendPrivateMessage, updateMessageSeenStatus };

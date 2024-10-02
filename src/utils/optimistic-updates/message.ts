@@ -26,9 +26,8 @@ const createCompleteMessage = ({
 		senderId,
 		createdAt: new Date(),
 		updatedAt: new Date(),
-		isEdited: false,
-		isDeleted: false,
 		type: "text",
+		seenByMembers: [],
 		textMessage: {
 			id: nanoid(),
 			messageId: nanoid(),

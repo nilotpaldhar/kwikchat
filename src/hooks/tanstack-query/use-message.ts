@@ -1,4 +1,4 @@
-import type { CompleteMessage } from "@/types";
+import type { CompleteMessage, MessageSeenMembers } from "@/types";
 
 import { toast } from "sonner";
 
@@ -9,14 +9,21 @@ import useCurrentUser from "@/hooks/tanstack-query/use-current-user";
 import { messageKeys } from "@/constants/tanstack-query";
 import { conversationEvents } from "@/constants/pusher-events";
 
-import { fetchPrivateMessages, sendPrivateMessage } from "@/services/message";
+import {
+	fetchPrivateMessages,
+	sendPrivateMessage,
+	updateMessageSeenStatus,
+} from "@/services/message";
 
 import {
 	optimisticSendPrivateMessage,
 	optimisticSendPrivateMessageError,
 	refetchOptimisticPrivateMessages,
 } from "@/utils/optimistic-updates/message";
-import { prependConversationMessage } from "@/utils/tanstack-query-cache/message";
+import {
+	prependConversationMessage,
+	updateMessagesSeenMembers,
+} from "@/utils/tanstack-query-cache/message";
 
 import { generatePrivateChatChannelName } from "@/utils/pusher/generate-chat-channel-name";
 
@@ -44,6 +51,13 @@ const usePrivateMessagesQuery = ({ conversationId }: { conversationId: string })
 		conversationEvents.newMessage,
 		(completeMessage) => {
 			prependConversationMessage({ conversationId, message: completeMessage, queryClient });
+		}
+	);
+	usePusher<MessageSeenMembers[]>(
+		conversationChannel,
+		conversationEvents.seenMessage,
+		(messageSeenMembers) => {
+			updateMessagesSeenMembers({ conversationId, messageSeenMembers, queryClient });
 		}
 	);
 
@@ -83,4 +97,28 @@ const useSendPrivateMessage = () => {
 	});
 };
 
-export { usePrivateMessagesQuery, useSendPrivateMessage };
+/**
+ * Custom hook for managing the seen status of messages.
+ *
+ * This hook utilizes a mutation to update the seen status and
+ * handles updating the local state in the query client upon success.
+ */
+const useMessagesSeenStatus = () => {
+	const queryClient = useQueryClient();
+
+	return useMutation({
+		// The function that performs the mutation (updating seen status)
+		mutationFn: updateMessageSeenStatus,
+
+		// Function to run upon a successful mutation
+		onSuccess: (data, { conversationId }) => {
+			// Extract the updated message seen members from the response
+			const messageSeenMembers = data.data;
+
+			// Update the local state cache with the new seen members for the specified conversation
+			updateMessagesSeenMembers({ conversationId, messageSeenMembers, queryClient });
+		},
+	});
+};
+
+export { usePrivateMessagesQuery, useSendPrivateMessage, useMessagesSeenStatus };

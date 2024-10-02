@@ -30,7 +30,15 @@ const getMessagesFromDB = async ({
 		const [messageList, totalItems] = await Promise.all([
 			prisma.message.findMany({
 				where: { conversationId },
-				include: { textMessage: true, imageMessage: true },
+				include: {
+					textMessage: true,
+					imageMessage: true,
+					seenByMembers: {
+						include: {
+							member: { select: { userId: true } },
+						},
+					},
+				},
 				skip,
 				take,
 				orderBy: { createdAt: "desc" },
@@ -40,7 +48,13 @@ const getMessagesFromDB = async ({
 			}),
 		]);
 
-		return { messageList, totalItems };
+		return {
+			messageList: messageList.map((message) => ({
+				...message,
+				seenByMembers: message.seenByMembers.map((seenBy) => seenBy.member.userId),
+			})),
+			totalItems,
+		};
 	} catch (error) {
 		return { messageList: [], totalItems: 0 };
 	}

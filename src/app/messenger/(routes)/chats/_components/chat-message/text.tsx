@@ -3,7 +3,7 @@
 import { useMemo, useState } from "react";
 import { format } from "date-fns";
 
-import { Check, CheckCheck, Ban } from "lucide-react";
+import { CheckCheck, Ban } from "lucide-react";
 import ChatMessageActions from "@/app/messenger/(routes)/chats/_components/chat-message/actions";
 
 import { cn } from "@/utils/general/cn";
@@ -73,15 +73,16 @@ const ChatMessageText = ({
 						isSender ? "justify-end" : "justify-start"
 					)}
 				>
-					<span
-						className={cn(
-							"block",
-							isSender && "order-1",
-							isRead ? "text-blue-600" : "text-neutral-500 dark:text-neutral-400"
-						)}
-					>
-						{isRead ? <CheckCheck size={14} /> : <Check size={14} />}
-					</span>
+					{isSender && (
+						<span
+							className={cn(
+								"order-1 block",
+								isRead ? "text-blue-600" : "text-neutral-500 dark:text-neutral-400"
+							)}
+						>
+							<CheckCheck size={14} />
+						</span>
+					)}
 					<span className="block text-xs font-semibold lowercase leading-none text-neutral-500 dark:text-neutral-400">
 						{formattedTime}
 					</span>
