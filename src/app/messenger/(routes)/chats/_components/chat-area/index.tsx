@@ -10,7 +10,7 @@ import ErrorAlert from "@/app/messenger/_components/error-alert";
 import ChatAreaLoader from "@/app/messenger/(routes)/chats/_components/chat-area/loader";
 import ChatMessageDateGroup from "@/app/messenger/(routes)/chats/_components/chat-message-date-group";
 
-import groupMessagesByDate from "@/utils/messenger/groupMessagesByDate";
+import groupMessagesByDate from "@/utils/messenger/group-messages-by-date";
 
 import useChatAreaScroll from "@/hooks/use-chat-area-scroll";
 import { usePrivateMessagesQuery } from "@/hooks/tanstack-query/use-message";

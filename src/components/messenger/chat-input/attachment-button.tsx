@@ -25,7 +25,10 @@ const AttachmentButton = ({ className }: { className?: string }) => {
 				<Button
 					size="icon"
 					variant="outline"
-					className={cn("rounded-full text-neutral-500 dark:text-neutral-400", className)}
+					className={cn(
+						"rounded-full bg-transparent text-neutral-500 dark:bg-transparent dark:text-neutral-400",
+						className
+					)}
 				>
 					<Plus size={20} />
 					<span className="sr-only">Attachments</span>

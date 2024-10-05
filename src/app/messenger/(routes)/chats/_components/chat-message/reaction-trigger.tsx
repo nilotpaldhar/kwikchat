@@ -1,13 +1,25 @@
 "use client";
 
+import type { EmojiClickData } from "emoji-picker-react";
+
 import { Smile } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import EmojiPicker from "@/components/ui/emoji-picker";
 import { Popover, PopoverTrigger, PopoverContent } from "@/components/ui/popover";
 
-const ReactionTrigger = () => (
-	<Popover>
+interface ReactionTriggerProps {
+	open?: boolean;
+	onOpenChange?: (open: boolean) => void;
+	onReaction?: (emoji: EmojiClickData) => void;
+}
+
+const ReactionTrigger = ({
+	open = false,
+	onOpenChange = () => {},
+	onReaction = () => {},
+}: ReactionTriggerProps) => (
+	<Popover open={open} onOpenChange={onOpenChange}>
 		<PopoverTrigger asChild>
 			<Button
 				size="icon"
@@ -29,8 +41,7 @@ const ReactionTrigger = () => (
 				reactionsDefaultOpen
 				allowExpandReactions={false}
 				className="!border-transparent dark:bg-transparent"
-				// eslint-disable-next-line no-console
-				onReactionClick={(emoji) => console.log(emoji)}
+				onReactionClick={(emoji) => onReaction(emoji)}
 			/>
 		</PopoverContent>
 	</Popover>

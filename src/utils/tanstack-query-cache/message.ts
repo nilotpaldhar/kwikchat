@@ -89,4 +89,42 @@ const updateMessagesSeenMembers = ({
 	);
 };
 
-export { prependConversationMessage, updateMessagesSeenMembers };
+const updateTextMessageContent = ({
+	conversationId,
+	messageId,
+	messageContent,
+	queryClient,
+}: {
+	conversationId: string;
+	messageId: string;
+	messageContent: string;
+	queryClient: QueryClient;
+}) => {
+	queryClient.setQueryData<InfiniteData<APIResponse<PaginatedResponse<CompleteMessage>>>>(
+		messageKeys.all(conversationId),
+		(existingData) =>
+			updateInfinitePaginatedData<CompleteMessage>({
+				existingData,
+				updateFn: (data, pagination) => {
+					const items = data?.items ?? [];
+
+					const updatedItems = items.map((message) => {
+						if (message.id !== messageId) return message;
+
+						return {
+							...message,
+							textMessage: {
+								...message.textMessage,
+								content: messageContent,
+								updated_at: new Date(),
+							},
+						} as CompleteMessage;
+					});
+
+					return { data, pagination, items: updatedItems };
+				},
+			})
+	);
+};
+
+export { prependConversationMessage, updateMessagesSeenMembers, updateTextMessageContent };

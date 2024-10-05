@@ -12,17 +12,20 @@ import { conversationEvents } from "@/constants/pusher-events";
 import {
 	fetchPrivateMessages,
 	sendPrivateMessage,
+	updatePrivateMessage,
 	updateMessageSeenStatus,
 } from "@/services/message";
 
 import {
 	optimisticSendPrivateMessage,
-	optimisticSendPrivateMessageError,
+	optimisticPrivateMessageError,
+	optimisticUpdatePrivateTextMessage,
 	refetchOptimisticPrivateMessages,
 } from "@/utils/optimistic-updates/message";
 import {
 	prependConversationMessage,
 	updateMessagesSeenMembers,
+	updateTextMessageContent,
 } from "@/utils/tanstack-query-cache/message";
 
 import { generatePrivateChatChannelName } from "@/utils/pusher/generate-chat-channel-name";
@@ -51,6 +54,18 @@ const usePrivateMessagesQuery = ({ conversationId }: { conversationId: string })
 		conversationEvents.newMessage,
 		(completeMessage) => {
 			prependConversationMessage({ conversationId, message: completeMessage, queryClient });
+		}
+	);
+	usePusher<CompleteMessage>(
+		conversationChannel,
+		conversationEvents.updateMessage,
+		(completeMessage) => {
+			updateTextMessageContent({
+				conversationId,
+				messageId: completeMessage?.id!,
+				messageContent: completeMessage?.textMessage?.content!,
+				queryClient,
+			});
 		}
 	);
 	usePusher<MessageSeenMembers[]>(
@@ -83,11 +98,47 @@ const useSendPrivateMessage = () => {
 
 		//  Handles any error that occurs during the message sending mutation.
 		onError: (error, { conversationId }, context) => {
-			optimisticSendPrivateMessageError({ conversationId, context, queryClient });
+			optimisticPrivateMessageError({ conversationId, context, queryClient });
 			toast.error(error.message);
 		},
 
 		// Called once the mutation is either successful or fails.
+		onSettled: (data) => {
+			refetchOptimisticPrivateMessages({
+				conversationId: data?.data?.conversationId!,
+				queryClient,
+			});
+		},
+	});
+};
+
+/**
+ * Custom hook for updating a private message in a conversation.
+ *
+ * It uses React Query's `useMutation` to handle the mutation process
+ * and provides optimistic updates for a better user experience.
+ */
+const useUpdatePrivateMessage = () => {
+	const queryClient = useQueryClient();
+
+	return useMutation({
+		// Function that performs the actual message update
+		mutationFn: updatePrivateMessage,
+
+		// Optimistically updates the message in the cache before the mutation occurs on the server
+		// This ensures the UI is updated immediately, providing a faster response for the user
+		onMutate: ({ conversationId, messageId, message }) =>
+			optimisticUpdatePrivateTextMessage({ conversationId, messageId, message, queryClient }),
+
+		// Handles any errors that occur during the mutation
+		// Rolls back the optimistic update if the mutation fails
+		onError: (error, { conversationId }, context) => {
+			optimisticPrivateMessageError({ conversationId, context, queryClient });
+			toast.error(error.message);
+		},
+
+		// Called once the mutation is either successful or fails
+		// Ensures the cache is refetched and up to date after the mutation settles
 		onSettled: (data) => {
 			refetchOptimisticPrivateMessages({
 				conversationId: data?.data?.conversationId!,
@@ -121,4 +172,9 @@ const useMessagesSeenStatus = () => {
 	});
 };
 
-export { usePrivateMessagesQuery, useSendPrivateMessage, useMessagesSeenStatus };
+export {
+	usePrivateMessagesQuery,
+	useSendPrivateMessage,
+	useUpdatePrivateMessage,
+	useMessagesSeenStatus,
+};

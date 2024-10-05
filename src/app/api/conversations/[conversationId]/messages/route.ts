@@ -1,3 +1,5 @@
+import type { CompleteMessage } from "@/types";
+
 import { type NextRequest, NextResponse } from "next/server";
 
 import { prisma } from "@/lib/db";
@@ -13,7 +15,6 @@ import { areUsersFriends } from "@/lib/friendship";
 
 import { MAX_MESSAGE_CHAR_LENGTH } from "@/constants/chat-input";
 import { generatePrivateChatChannelName } from "@/utils/pusher/generate-chat-channel-name";
-import { CompleteMessage } from "@/types";
 
 type Params = { conversationId: string };
 

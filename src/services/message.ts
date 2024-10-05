@@ -53,6 +53,30 @@ const sendPrivateMessage = async ({
 };
 
 /**
+ * Update a private message to a specified conversation.
+ */
+const updatePrivateMessage = async ({
+	conversationId,
+	messageId,
+	message,
+}: {
+	conversationId: string;
+	messageId: string;
+	message: string;
+}) => {
+	try {
+		const res = await axios.patch<APIResponse<CompleteMessage>>(
+			`/conversations/${conversationId}/messages/${messageId}`,
+			{ message }
+		);
+		return res.data;
+	} catch (error) {
+		const errMsg = handleAxiosError(error);
+		throw new Error(errMsg);
+	}
+};
+
+/**
  * Updates the seen status of messages in a specific conversation.
  */
 const updateMessageSeenStatus = async ({
@@ -74,4 +98,4 @@ const updateMessageSeenStatus = async ({
 	}
 };
 
-export { fetchPrivateMessages, sendPrivateMessage, updateMessageSeenStatus };
+export { fetchPrivateMessages, sendPrivateMessage, updatePrivateMessage, updateMessageSeenStatus };

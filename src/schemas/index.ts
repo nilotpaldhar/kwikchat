@@ -1,5 +1,7 @@
 import * as z from "zod";
 
+import { MAX_MESSAGE_CHAR_LENGTH } from "@/constants/chat-input";
+
 export const SigninSchema = z.object({
 	email: z.string().email({ message: "Please enter a valid email address" }),
 	password: z.string().min(1, { message: "Please enter a valid password" }),
@@ -74,6 +76,17 @@ export const ProfileSchema = z.object({
 	bannerColor: z.string().nullable().optional(),
 	bio: z.string().max(190, "Bio must be 190 characters or fewer").nullable().optional(),
 	avatar: z.string().nullable().optional(),
+});
+
+export const TextMessageSchema = z.object({
+	message: z
+		.string()
+		.trim()
+		.min(1, { message: "Message content cannot be empty." })
+		.max(
+			MAX_MESSAGE_CHAR_LENGTH,
+			`Your message is too long (over ${MAX_MESSAGE_CHAR_LENGTH} characters). Please shorten it and try again.`
+		),
 });
 
 export const SeenMessageSchema = z.object({

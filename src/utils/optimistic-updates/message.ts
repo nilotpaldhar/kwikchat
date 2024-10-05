@@ -7,7 +7,10 @@ import type { APIResponse, CompleteMessage, PaginatedResponse } from "@/types";
 
 import { messageKeys } from "@/constants/tanstack-query";
 
-import { prependConversationMessage } from "@/utils/tanstack-query-cache/message";
+import {
+	prependConversationMessage,
+	updateTextMessageContent,
+} from "@/utils/tanstack-query-cache/message";
 
 import { getInfiniteQueryData } from "@/utils/tanstack-query-cache/helpers";
 
@@ -67,7 +70,7 @@ const optimisticSendPrivateMessage = async ({
 	return { messagesData };
 };
 
-const optimisticSendPrivateMessageError = async ({
+const optimisticPrivateMessageError = async ({
 	conversationId,
 	context,
 	queryClient,
@@ -92,8 +95,38 @@ const refetchOptimisticPrivateMessages = ({
 	queryClient.invalidateQueries({ queryKey: messageKeys.all(conversationId) });
 };
 
+const optimisticUpdatePrivateTextMessage = async ({
+	conversationId,
+	messageId,
+	message,
+	queryClient,
+}: {
+	conversationId: string;
+	messageId: string;
+	message: string;
+	queryClient: QueryClient;
+}) => {
+	// Cancel ongoing queries related to messages to ensure cache consistency
+	await queryClient.cancelQueries({ queryKey: messageKeys.all(conversationId) });
+
+	const messagesData = getInfiniteQueryData<CompleteMessage>({
+		keys: messageKeys.all(conversationId),
+		queryClient,
+	});
+
+	updateTextMessageContent({
+		conversationId,
+		messageId,
+		messageContent: message,
+		queryClient,
+	});
+
+	return { messagesData };
+};
+
 export {
 	optimisticSendPrivateMessage,
-	optimisticSendPrivateMessageError,
+	optimisticPrivateMessageError,
 	refetchOptimisticPrivateMessages,
+	optimisticUpdatePrivateTextMessage,
 };

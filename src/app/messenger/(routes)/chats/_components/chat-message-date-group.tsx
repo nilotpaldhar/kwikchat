@@ -43,7 +43,7 @@ const ChatMessageDateGroup = ({
 
 	return (
 		<div className={cn("flex flex-col gap-y-14", className)}>
-			<div className="relative flex justify-center">
+			<div className="relative flex select-none justify-center">
 				<div className="relative z-20 max-w-max rounded-lg bg-surface-light-100 px-3 py-1 shadow-md dark:bg-surface-dark-400">
 					<span className="block text-sm font-medium capitalize text-neutral-500 dark:text-neutral-400">
 						{date}

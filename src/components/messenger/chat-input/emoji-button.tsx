@@ -30,7 +30,7 @@ const EmojiButton = ({ onSelect, className }: EmojiButtonProps) => {
 					size="icon"
 					variant="outline"
 					className={cn(
-						"rounded-full border-transparent text-neutral-500 hover:bg-transparent dark:border-transparent dark:text-neutral-400 dark:hover:bg-transparent",
+						"rounded-full border-transparent bg-transparent text-neutral-500 hover:bg-transparent dark:border-transparent dark:bg-transparent dark:text-neutral-400 dark:hover:bg-transparent",
 						className
 					)}
 				>

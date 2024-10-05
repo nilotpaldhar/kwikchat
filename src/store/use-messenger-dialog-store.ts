@@ -1,11 +1,21 @@
 import { create } from "zustand";
 
-export type ModalType = "NEW_CHAT" | "NEW_GROUP_CHAT";
+export type ModalType = "NEW_CHAT" | "NEW_GROUP_CHAT" | "EDIT_MESSAGE";
+
+interface DialogData {
+	messageToEdit?: {
+		messageid: string;
+		conversationId: string;
+		content: string;
+		timestamp: string;
+	};
+}
 
 interface MessengerDialogStore {
 	type: ModalType | null;
 	isOpen: boolean;
-	onOpen: (type: ModalType) => void;
+	data: DialogData;
+	onOpen: (type: ModalType, data?: DialogData) => void;
 	setOpen: (isOpen: boolean) => void;
 	onClose: () => void;
 }
@@ -13,9 +23,10 @@ interface MessengerDialogStore {
 const useMessengerDialogStore = create<MessengerDialogStore>((set) => ({
 	type: null,
 	isOpen: false,
-	onOpen: (type) => set({ isOpen: true, type }),
+	data: {},
+	onOpen: (type, data = {}) => set({ isOpen: true, type, data }),
 	setOpen: (isOpen) => set({ isOpen }),
-	onClose: () => set({ isOpen: false }),
+	onClose: () => set({ isOpen: false, data: { messageToEdit: undefined } }),
 }));
 
 export default useMessengerDialogStore;

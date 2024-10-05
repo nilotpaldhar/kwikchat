@@ -17,7 +17,8 @@ import { MAX_INPUT_SIZE, MAX_MESSAGE_CHAR_LENGTH } from "@/constants/chat-input"
 interface ChatInputProps {
 	placeHolder?: string;
 	maxMessageLength?: number;
-	onSubmit?: (message: string) => void;
+	attachment?: boolean;
+	emojiPicker?: boolean;
 	className?: string;
 	classNames?: {
 		wrapperClassName?: string;
@@ -25,14 +26,17 @@ interface ChatInputProps {
 		emojiButtonClassName?: string;
 		submitButtonClassName?: string;
 	};
+	onSubmit?: (message: string) => void;
 }
 
 const ChatInput = ({
 	placeHolder = "Type a message",
 	maxMessageLength = MAX_MESSAGE_CHAR_LENGTH,
-	onSubmit,
+	attachment = true,
+	emojiPicker = true,
 	className,
 	classNames,
+	onSubmit,
 }: ChatInputProps) => {
 	const textareaRef = useRef<HTMLTextAreaElement>(null);
 	const [message, setMessage] = useState("");
@@ -122,9 +126,11 @@ const ChatInput = ({
 
 	return (
 		<div className={cn("flex w-full items-start space-x-2", classNames?.wrapperClassName)}>
-			<AttachmentButton className={classNames?.attachmentButtonClassName} />
+			{attachment && <AttachmentButton className={classNames?.attachmentButtonClassName} />}
 			<div className="flex flex-1 items-start space-x-1 rounded-lg border border-neutral-200 px-2 dark:border-neutral-800">
-				<EmojiButton className={classNames?.emojiButtonClassName} onSelect={handleEmojiSelect} />
+				{emojiPicker && (
+					<EmojiButton className={classNames?.emojiButtonClassName} onSelect={handleEmojiSelect} />
+				)}
 				<TextArea
 					autoFocus
 					rows={1}
@@ -145,7 +151,7 @@ const ChatInput = ({
 				variant="outline"
 				onClick={handleSubmit}
 				className={cn(
-					"h-10 w-6 border-transparent text-neutral-500 hover:bg-transparent dark:border-transparent dark:text-neutral-400 dark:hover:bg-transparent",
+					"h-10 w-6 border-transparent bg-transparent text-neutral-500 hover:bg-transparent dark:border-transparent dark:bg-transparent dark:text-neutral-400 dark:hover:bg-transparent",
 					classNames?.submitButtonClassName
 				)}
 			>

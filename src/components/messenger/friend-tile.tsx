@@ -1,3 +1,5 @@
+/* eslint-disable jsx-a11y/click-events-have-key-events */
+
 "use client";
 
 import type { FriendWithFriendship } from "@/types";
@@ -28,13 +30,17 @@ const FriendTile = ({ showCheckbox = true, className, onChange, ...friend }: Fri
 	};
 
 	return (
-		// eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions
 		<div
+			tabIndex={0}
+			role="button"
+			onClick={handleClick}
+			onKeyDown={(evt) => {
+				if (evt.key === "Enter") handleClick();
+			}}
 			className={cn(
-				"flex w-full cursor-pointer select-none items-center px-4 text-left transition hover:bg-neutral-100 dark:hover:bg-neutral-800",
+				"flex w-full cursor-pointer select-none items-center px-4 text-left transition hover:bg-neutral-100 focus-visible:bg-neutral-100 focus-visible:outline-none dark:hover:bg-neutral-800 dark:focus-visible:bg-neutral-800",
 				className
 			)}
-			onClick={handleClick}
 		>
 			<div className="flex flex-1 items-center space-x-5 border-b border-neutral-200 py-3 dark:border-neutral-800">
 				{showCheckbox && (

@@ -33,7 +33,7 @@ const ChatSidePanel = () => {
 							</Button>
 						</PopoverTrigger>
 						<PopoverContent
-							className="max-w-48 p-1.5"
+							className="flex max-w-48 flex-col space-y-1 p-1.5"
 							side="bottom"
 							sideOffset={0}
 							align="end"

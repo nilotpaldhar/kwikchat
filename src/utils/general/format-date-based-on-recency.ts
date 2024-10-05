@@ -1,4 +1,4 @@
-import { format, differenceInHours, differenceInDays } from "date-fns";
+import { format, differenceInHours, differenceInDays, isYesterday } from "date-fns";
 
 const formatDateBasedOnRecency = (date: Date, useTimeFormat: boolean = true): string => {
 	const now = new Date();
@@ -8,6 +8,11 @@ const formatDateBasedOnRecency = (date: Date, useTimeFormat: boolean = true): st
 
 	// Less than 24 hours old
 	if (hoursDifference < 24) {
+		// If the date is from the previous day
+		if (isYesterday(date)) {
+			return useTimeFormat ? format(date, "hh:mm a") : "yesterday";
+		}
+
 		return useTimeFormat ? format(date, "hh:mm a") : "today";
 	}
 

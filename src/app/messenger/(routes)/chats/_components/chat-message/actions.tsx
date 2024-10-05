@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 
 import ActionsTrigger from "@/app/messenger/(routes)/chats/_components/chat-message/actions-trigger";
@@ -10,9 +11,17 @@ import { cn } from "@/utils/general/cn";
 interface ChatMessageActionsProps {
 	isOpen?: boolean;
 	isSender?: boolean;
+	onEdit?: () => void;
 }
 
-const ChatMessageActions = ({ isOpen = false, isSender = false }: ChatMessageActionsProps) => {
+const ChatMessageActions = ({
+	isOpen = false,
+	isSender = false,
+	onEdit = () => {},
+}: ChatMessageActionsProps) => {
+	const [openActionsTrigger, setOpenActionsTrigger] = useState(false);
+	const [openReactionTrigger, setOpenReactionTrigger] = useState(false);
+
 	const containerVariants = {
 		open: {
 			opacity: 1,
@@ -28,9 +37,16 @@ const ChatMessageActions = ({ isOpen = false, isSender = false }: ChatMessageAct
 	};
 
 	const childVariants = {
-		open: { opacity: 1, scale: 1, transformOrigin: "center", transition: { duration: 0.2 } },
-		closed: { opacity: 0, scale: 0, transformOrigin: "center", transition: { duration: 0.1 } },
+		open: { opacity: 1, transformOrigin: "center", transition: { duration: 0.2 } },
+		closed: { opacity: 0, transformOrigin: "center", transition: { duration: 0.1 } },
 	};
+
+	useEffect(() => {
+		if (!isOpen) {
+			setOpenActionsTrigger(false);
+			setOpenReactionTrigger(false);
+		}
+	}, [isOpen]);
 
 	return (
 		<AnimatePresence mode="wait">
@@ -51,14 +67,22 @@ const ChatMessageActions = ({ isOpen = false, isSender = false }: ChatMessageAct
 						variants={childVariants}
 						className={cn("h-max", isSender && "order-2")}
 					>
-						<ReactionTrigger />
+						<ReactionTrigger
+							open={isOpen && openReactionTrigger}
+							onOpenChange={setOpenReactionTrigger}
+						/>
 					</motion.div>
 					<motion.div
 						key="actions-trigger"
 						variants={childVariants}
 						className={cn("h-max", isSender && "order-1")}
 					>
-						<ActionsTrigger />
+						<ActionsTrigger
+							isSender={isSender}
+							open={isOpen && openActionsTrigger}
+							onOpenChange={setOpenActionsTrigger}
+							onEdit={onEdit}
+						/>
 					</motion.div>
 				</motion.div>
 			)}
