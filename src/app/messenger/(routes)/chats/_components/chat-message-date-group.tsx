@@ -51,7 +51,7 @@ const ChatMessageDateGroup = ({
 				</div>
 				<div className="absolute left-0 right-0 top-1/2 z-10 h-px -translate-y-1/2 transform border-t border-dashed border-neutral-300 dark:border-neutral-800" />
 			</div>
-			<ul className="flex flex-col-reverse gap-y-4">
+			<ul className="flex flex-col-reverse gap-y-8">
 				{messages.map((message) => (
 					<li key={message.id}>
 						<ChatMessageFactory message={message} currentUserId={currentUserId} />

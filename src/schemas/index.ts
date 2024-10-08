@@ -1,6 +1,7 @@
 import * as z from "zod";
 
 import { MAX_MESSAGE_CHAR_LENGTH } from "@/constants/chat-input";
+import { MessageReactionType } from "@prisma/client";
 
 export const SigninSchema = z.object({
 	email: z.string().email({ message: "Please enter a valid email address" }),
@@ -91,4 +92,10 @@ export const TextMessageSchema = z.object({
 
 export const SeenMessageSchema = z.object({
 	messageIds: z.array(z.string()),
+});
+
+export const MessageReactionSchema = z.object({
+	reactionType: z.nativeEnum(MessageReactionType),
+	emoji: z.string().emoji().min(1, "Emoji is required"),
+	emojiImageUrl: z.string().url("Emoji image URL is not valid "),
 });

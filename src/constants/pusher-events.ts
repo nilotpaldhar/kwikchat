@@ -16,4 +16,7 @@ export const conversationEvents = {
 	newMessage: "new_message" as const,
 	updateMessage: "update_message" as const,
 	seenMessage: "seen_message" as const,
+	createReaction: "create_reaction" as const,
+	updateReaction: "update_reaction " as const,
+	removeReaction: "remove_reaction " as const,
 };

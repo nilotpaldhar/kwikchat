@@ -54,8 +54,7 @@ export async function PATCH(req: NextRequest, { params }: { params: Params }) {
 
 	// Extract necessary parameters and data from the request
 	const senderId = currentUser.id;
-	const conversationId = params.conversationId;
-	const messageId = params.messageId;
+	const { conversationId, messageId } = params;
 	const messageContent = validatedFields.data.message;
 
 	try {
@@ -119,6 +118,7 @@ export async function PATCH(req: NextRequest, { params }: { params: Params }) {
 			include: {
 				textMessage: true,
 				imageMessage: true,
+				reactions: true,
 				seenByMembers: {
 					include: {
 						member: { select: { userId: true } },

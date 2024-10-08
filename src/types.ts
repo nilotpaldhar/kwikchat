@@ -5,6 +5,7 @@ import type {
 	Message,
 	TextMessage,
 	ImageMessage,
+	MessageReaction,
 } from "@prisma/client";
 import { PaginationMetadata } from "@/utils/general/calculate-pagination";
 
@@ -63,10 +64,17 @@ export interface FriendWithFriendship extends UserWithoutPassword {
 export interface CompleteMessage extends Message {
 	textMessage: TextMessage | null;
 	imageMessage: ImageMessage | null;
+	reactions: MessageReaction[];
 	seenByMembers: string[];
 }
 
 export interface MessageSeenMembers {
 	messageId: string;
 	seenByMembers: string[];
+}
+
+export interface MessageWithUserID extends Message {
+	conversation: {
+		members: { userId: string }[];
+	};
 }

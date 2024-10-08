@@ -13,12 +13,12 @@ const isMessageEdited = (message: CompleteMessage) => {
 
 	// Check if the message is a text message and perform the timestamp comparison
 	if (type === "text" && textMessage) {
-		return !compareTimestamps(textMessage.created_at, textMessage.updated_at);
+		return !compareTimestamps(textMessage.createdAt, textMessage.updatedAt);
 	}
 
 	// Check if the message is an image message and perform the timestamp comparison
 	if (type === "image" && imageMessage) {
-		return !compareTimestamps(imageMessage.created_at, imageMessage.updated_at);
+		return !compareTimestamps(imageMessage.createdAt, imageMessage.updatedAt);
 	}
 
 	return false;

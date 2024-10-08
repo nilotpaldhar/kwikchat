@@ -194,6 +194,7 @@ export async function POST(req: NextRequest, { params }: { params: Params }) {
 			include: {
 				textMessage: true,
 				imageMessage: true,
+				reactions: true,
 				seenByMembers: {
 					include: {
 						member: { select: { userId: true } },

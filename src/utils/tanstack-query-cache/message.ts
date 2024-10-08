@@ -3,6 +3,7 @@ import "client-only";
 import type { InfiniteData, QueryClient } from "@tanstack/react-query";
 import type { APIResponse, PaginatedResponse, CompleteMessage, MessageSeenMembers } from "@/types";
 import type { PaginationMetadata } from "@/utils/general/calculate-pagination";
+import type { MessageReaction } from "@prisma/client";
 
 import { messageKeys } from "@/constants/tanstack-query";
 
@@ -116,7 +117,7 @@ const updateTextMessageContent = ({
 							textMessage: {
 								...message.textMessage,
 								content: messageContent,
-								updated_at: new Date(),
+								updatedAt: new Date(),
 							},
 						} as CompleteMessage;
 					});
@@ -127,4 +128,110 @@ const updateTextMessageContent = ({
 	);
 };
 
-export { prependConversationMessage, updateMessagesSeenMembers, updateTextMessageContent };
+const appendMessageReaction = ({
+	conversationId,
+	messageReaction,
+	queryClient,
+}: {
+	conversationId: string;
+	messageReaction?: MessageReaction;
+	queryClient: QueryClient;
+}) => {
+	queryClient.setQueryData<InfiniteData<APIResponse<PaginatedResponse<CompleteMessage>>>>(
+		messageKeys.all(conversationId),
+		(existingData) =>
+			updateInfinitePaginatedData<CompleteMessage>({
+				existingData,
+				updateFn: (data, pagination) => {
+					const items = data?.items ?? [];
+
+					const updatedItems = items.map((message) => {
+						if (message.id !== messageReaction?.messageId) return message;
+
+						return {
+							...message,
+							reactions: [...message.reactions, messageReaction],
+						};
+					});
+
+					return { data, pagination, items: updatedItems };
+				},
+			})
+	);
+};
+
+const updateMessageReaction = ({
+	conversationId,
+	messageReaction,
+	queryClient,
+}: {
+	conversationId: string;
+	messageReaction?: MessageReaction;
+	queryClient: QueryClient;
+}) => {
+	queryClient.setQueryData<InfiniteData<APIResponse<PaginatedResponse<CompleteMessage>>>>(
+		messageKeys.all(conversationId),
+		(existingData) =>
+			updateInfinitePaginatedData<CompleteMessage>({
+				existingData,
+				updateFn: (data, pagination) => {
+					const items = data?.items ?? [];
+
+					const updatedItems = items.map((message) => {
+						if (message.id !== messageReaction?.messageId) return message;
+
+						return {
+							...message,
+							reactions: message.reactions.map((reaction) => {
+								if (reaction.id !== messageReaction.id) return reaction;
+								return messageReaction;
+							}),
+						};
+					});
+
+					return { data, pagination, items: updatedItems };
+				},
+			})
+	);
+};
+
+const removeMessageReaction = ({
+	conversationId,
+	messageReaction,
+	queryClient,
+}: {
+	conversationId: string;
+	messageReaction?: MessageReaction;
+	queryClient: QueryClient;
+}) => {
+	queryClient.setQueryData<InfiniteData<APIResponse<PaginatedResponse<CompleteMessage>>>>(
+		messageKeys.all(conversationId),
+		(existingData) =>
+			updateInfinitePaginatedData<CompleteMessage>({
+				existingData,
+				updateFn: (data, pagination) => {
+					const items = data?.items ?? [];
+
+					const updatedItems = items.map((message) => {
+						if (message.id !== messageReaction?.messageId) return message;
+
+						return {
+							...message,
+							reactions: message.reactions.filter((reaction) => reaction.id !== messageReaction.id),
+						};
+					});
+
+					return { data, pagination, items: updatedItems };
+				},
+			})
+	);
+};
+
+export {
+	prependConversationMessage,
+	updateMessagesSeenMembers,
+	updateTextMessageContent,
+	appendMessageReaction,
+	updateMessageReaction,
+	removeMessageReaction,
+};

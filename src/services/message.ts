@@ -1,5 +1,6 @@
 import "client-only";
 
+import type { MessageReaction, MessageReactionType } from "@prisma/client";
 import type { APIResponse, CompleteMessage, PaginatedResponse, MessageSeenMembers } from "@/types";
 import axios, { handleAxiosError } from "@/lib/axios";
 
@@ -98,4 +99,92 @@ const updateMessageSeenStatus = async ({
 	}
 };
 
-export { fetchPrivateMessages, sendPrivateMessage, updatePrivateMessage, updateMessageSeenStatus };
+/**
+ * Creates a new reaction for a message in a conversation.
+ */
+const createMessageReaction = async ({
+	conversationId,
+	messageId,
+	reactionType,
+	emoji,
+	emojiImageUrl,
+}: {
+	conversationId: string;
+	messageId: string;
+	userId: string;
+	reactionType: MessageReactionType;
+	emoji: string;
+	emojiImageUrl: string;
+}) => {
+	try {
+		const res = await axios.post<APIResponse<MessageReaction>>(
+			`/conversations/${conversationId}/messages/${messageId}/reactions`,
+			{ reactionType, emoji, emojiImageUrl }
+		);
+		return res.data;
+	} catch (error) {
+		const errMsg = handleAxiosError(error);
+		throw new Error(errMsg);
+	}
+};
+
+/**
+ * Updates an existing reaction for a message in a conversation.
+ */
+const updateMessageReaction = async ({
+	conversationId,
+	messageId,
+	data,
+}: {
+	conversationId: string;
+	messageId: string;
+	messageReaction: MessageReaction;
+	data: {
+		reactionType: MessageReactionType;
+		emoji: string;
+		emojiImageUrl: string;
+	};
+}) => {
+	try {
+		const res = await axios.patch<APIResponse<MessageReaction>>(
+			`/conversations/${conversationId}/messages/${messageId}/reactions`,
+			data
+		);
+		return res.data;
+	} catch (error) {
+		const errMsg = handleAxiosError(error);
+		throw new Error(errMsg);
+	}
+};
+
+/**
+ * Deletes a reaction from a message in a conversation.
+ */
+const deleteMessageReaction = async ({
+	conversationId,
+	messageId,
+}: {
+	conversationId: string;
+	messageId: string;
+	messageReaction: MessageReaction;
+}) => {
+	try {
+		const res = await axios.delete<APIResponse<undefined>>(
+			`/conversations/${conversationId}/messages/${messageId}/reactions`
+		);
+		return res.data;
+	} catch (error) {
+		const errMsg = handleAxiosError(error);
+		throw new Error(errMsg);
+	}
+};
+
+export {
+	fetchPrivateMessages,
+	sendPrivateMessage,
+	updatePrivateMessage,
+	updateMessageSeenStatus,
+	createMessageReaction,
+	updateMessageReaction,
+	deleteMessageReaction,
+};

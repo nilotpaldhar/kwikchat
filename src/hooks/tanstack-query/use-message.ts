@@ -1,3 +1,4 @@
+import type { MessageReaction } from "@prisma/client";
 import type { CompleteMessage, MessageSeenMembers } from "@/types";
 
 import { toast } from "sonner";
@@ -14,18 +15,27 @@ import {
 	sendPrivateMessage,
 	updatePrivateMessage,
 	updateMessageSeenStatus,
+	createMessageReaction,
+	updateMessageReaction,
+	deleteMessageReaction,
 } from "@/services/message";
 
 import {
 	optimisticSendPrivateMessage,
 	optimisticPrivateMessageError,
 	optimisticUpdatePrivateTextMessage,
+	optimisticCreateMessageReaction,
+	optimisticUpdateMessageReaction,
+	optimisticDeleteMessageReaction,
 	refetchOptimisticPrivateMessages,
 } from "@/utils/optimistic-updates/message";
 import {
 	prependConversationMessage,
 	updateMessagesSeenMembers,
 	updateTextMessageContent,
+	appendMessageReaction,
+	updateMessageReaction as updateMessageReactionCache,
+	removeMessageReaction as removeMessageReactionCache,
 } from "@/utils/tanstack-query-cache/message";
 
 import { generatePrivateChatChannelName } from "@/utils/pusher/generate-chat-channel-name";
@@ -73,6 +83,27 @@ const usePrivateMessagesQuery = ({ conversationId }: { conversationId: string })
 		conversationEvents.seenMessage,
 		(messageSeenMembers) => {
 			updateMessagesSeenMembers({ conversationId, messageSeenMembers, queryClient });
+		}
+	);
+	usePusher<MessageReaction>(
+		conversationChannel,
+		conversationEvents.createReaction,
+		(messageReaction) => {
+			appendMessageReaction({ conversationId, messageReaction, queryClient });
+		}
+	);
+	usePusher<MessageReaction>(
+		conversationChannel,
+		conversationEvents.updateReaction,
+		(messageReaction) => {
+			updateMessageReactionCache({ conversationId, messageReaction, queryClient });
+		}
+	);
+	usePusher<MessageReaction>(
+		conversationChannel,
+		conversationEvents.removeReaction,
+		(messageReaction) => {
+			removeMessageReactionCache({ conversationId, messageReaction, queryClient });
 		}
 	);
 
@@ -172,9 +203,125 @@ const useMessagesSeenStatus = () => {
 	});
 };
 
+/**
+ * Custom hook for creating a message reaction.
+ *
+ * Uses an optimistic update approach to instantly reflect the reaction on the UI.
+ * Handles potential errors and ensures data consistency by refetching the conversation.
+ */
+const useCreateMessageReaction = () => {
+	const queryClient = useQueryClient();
+
+	return useMutation({
+		// The mutation function responsible for creating a message reaction
+		mutationFn: createMessageReaction,
+
+		// Called before the mutation function is fired to perform an optimistic update
+		onMutate: ({ conversationId, messageId, userId, reactionType, emoji, emojiImageUrl }) =>
+			optimisticCreateMessageReaction({
+				conversationId,
+				messageId,
+				userId,
+				reactionType,
+				emoji,
+				emojiImageUrl,
+				queryClient,
+			}),
+
+		// Handles any errors that occur during the mutation
+		// Rolls back the optimistic update if the mutation fails
+		onError: (error, { conversationId }, context) => {
+			optimisticPrivateMessageError({ conversationId, context, queryClient });
+			toast.error(error.message);
+		},
+
+		// Called once the mutation is either successful or fails
+		// Ensures the cache is refetched and up to date after the mutation settles
+		onSettled: (data, _error, { conversationId }) => {
+			refetchOptimisticPrivateMessages({
+				conversationId,
+				queryClient,
+			});
+		},
+	});
+};
+
+/**
+ * Custom hook for updating a message reaction.
+ *
+ * Uses an optimistic update approach to instantly reflect the changes on the UI.
+ * Handles errors and ensures data consistency by refetching the conversation.
+ */
+const useUpdateMessageReaction = () => {
+	const queryClient = useQueryClient();
+
+	return useMutation({
+		// The mutation function responsible for updating a message reaction
+		mutationFn: updateMessageReaction,
+
+		// Called before the mutation function is fired to perform an optimistic update
+		onMutate: ({ conversationId, messageReaction }) =>
+			optimisticUpdateMessageReaction({ conversationId, messageReaction, queryClient }),
+
+		// Handles any errors that occur during the mutation
+		// Rolls back the optimistic update if the mutation fails
+		onError: (error, { conversationId }, context) => {
+			optimisticPrivateMessageError({ conversationId, context, queryClient });
+			toast.error(error.message);
+		},
+
+		// Called once the mutation is either successful or fails
+		// Ensures the cache is refetched and up to date after the mutation settles
+		onSettled: (data, _error, { conversationId }) => {
+			refetchOptimisticPrivateMessages({
+				conversationId,
+				queryClient,
+			});
+		},
+	});
+};
+
+/**
+ * Custom hook for deleting a message reaction.
+ *
+ * Uses an optimistic update approach to instantly remove the reaction from the UI.
+ * Handles errors and ensures data consistency by refetching the conversation.
+ */
+const useDeleteMessageReaction = () => {
+	const queryClient = useQueryClient();
+
+	return useMutation({
+		// The mutation function responsible for deleting a message reaction
+		mutationFn: deleteMessageReaction,
+
+		// Called before the mutation function is fired to perform an optimistic update
+		onMutate: ({ conversationId, messageReaction }) =>
+			optimisticDeleteMessageReaction({ conversationId, messageReaction, queryClient }),
+
+		// Handles any errors that occur during the mutation
+		// Rolls back the optimistic update if the mutation fails
+		onError: (error, { conversationId }, context) => {
+			optimisticPrivateMessageError({ conversationId, context, queryClient });
+			toast.error(error.message);
+		},
+
+		// Called once the mutation is either successful or fails
+		// Ensures the cache is refetched and up to date after the mutation settles
+		onSettled: (data, _error, { conversationId }) => {
+			refetchOptimisticPrivateMessages({
+				conversationId,
+				queryClient,
+			});
+		},
+	});
+};
+
 export {
 	usePrivateMessagesQuery,
 	useSendPrivateMessage,
 	useUpdatePrivateMessage,
 	useMessagesSeenStatus,
+	useCreateMessageReaction,
+	useUpdateMessageReaction,
+	useDeleteMessageReaction,
 };

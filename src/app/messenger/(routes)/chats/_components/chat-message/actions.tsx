@@ -4,7 +4,9 @@ import { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 
 import ActionsTrigger from "@/app/messenger/(routes)/chats/_components/chat-message/actions-trigger";
-import ReactionTrigger from "@/app/messenger/(routes)/chats/_components/chat-message/reaction-trigger";
+import ReactionTrigger, {
+	type ReactionClickData,
+} from "@/app/messenger/(routes)/chats/_components/chat-message/reaction-trigger";
 
 import { cn } from "@/utils/general/cn";
 
@@ -12,12 +14,14 @@ interface ChatMessageActionsProps {
 	isOpen?: boolean;
 	isSender?: boolean;
 	onEdit?: () => void;
+	onReaction?: (emoji: ReactionClickData) => void;
 }
 
 const ChatMessageActions = ({
 	isOpen = false,
 	isSender = false,
 	onEdit = () => {},
+	onReaction = () => {},
 }: ChatMessageActionsProps) => {
 	const [openActionsTrigger, setOpenActionsTrigger] = useState(false);
 	const [openReactionTrigger, setOpenReactionTrigger] = useState(false);
@@ -70,6 +74,7 @@ const ChatMessageActions = ({
 						<ReactionTrigger
 							open={isOpen && openReactionTrigger}
 							onOpenChange={setOpenReactionTrigger}
+							onReaction={onReaction}
 						/>
 					</motion.div>
 					<motion.div
