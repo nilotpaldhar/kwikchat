@@ -1,7 +1,14 @@
 import "client-only";
 
 import type { MessageReaction, MessageReactionType } from "@prisma/client";
-import type { APIResponse, CompleteMessage, PaginatedResponse, MessageSeenMembers } from "@/types";
+import type {
+	APIResponse,
+	CompleteMessage,
+	PaginatedResponse,
+	MessageSeenMembers,
+	UserProfile,
+} from "@/types";
+
 import axios, { handleAxiosError } from "@/lib/axios";
 
 /**
@@ -31,6 +38,32 @@ const fetchPrivateMessages = async ({
 };
 
 /**
+ * Fetches starred messages for a given conversation with pagination support.
+ */
+const fetchStarredMessages = async ({
+	conversationId,
+	page,
+}: {
+	conversationId: string;
+	page: number;
+}) => {
+	// Construct query parameters for pagination.
+	const params = new URLSearchParams();
+	params.append("page", `${page}`);
+
+	// Build the request URL with the query parameters.
+	const url = `/conversations/${conversationId}/starred-messages?${params.toString()}`;
+
+	try {
+		const res = await axios.get<APIResponse<PaginatedResponse<CompleteMessage>>>(url);
+		return res.data;
+	} catch (error) {
+		const errMsg = handleAxiosError(error);
+		throw new Error(errMsg);
+	}
+};
+
+/**
  * Sends a private message to a specified conversation.
  */
 const sendPrivateMessage = async ({
@@ -39,7 +72,7 @@ const sendPrivateMessage = async ({
 }: {
 	conversationId: string;
 	message: string;
-	senderId: string;
+	sender: UserProfile;
 }) => {
 	try {
 		const res = await axios.post<APIResponse<CompleteMessage>>(
@@ -179,12 +212,42 @@ const deleteMessageReaction = async ({
 	}
 };
 
+/**
+ * Toggles the star status of a message in a conversation.
+ */
+const toggleMessageStarStatus = async ({
+	conversationId,
+	message,
+}: {
+	conversationId: string;
+	message: CompleteMessage;
+}) => {
+	try {
+		if (message.isStarred) {
+			const res = await axios.delete<APIResponse<CompleteMessage>>(
+				`/conversations/${conversationId}/messages/${message.id}/star`
+			);
+			return res.data;
+		}
+
+		const res = await axios.post<APIResponse<undefined>>(
+			`/conversations/${conversationId}/messages/${message.id}/star`
+		);
+		return res.data;
+	} catch (error) {
+		const errMsg = handleAxiosError(error);
+		throw new Error(errMsg);
+	}
+};
+
 export {
 	fetchPrivateMessages,
+	fetchStarredMessages,
 	sendPrivateMessage,
 	updatePrivateMessage,
 	updateMessageSeenStatus,
 	createMessageReaction,
 	updateMessageReaction,
 	deleteMessageReaction,
+	toggleMessageStarStatus,
 };

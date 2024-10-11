@@ -16,6 +16,7 @@ interface ChatMessageImageProps {
 	isEdited?: boolean;
 	isStarred?: boolean;
 	onReaction: (emoji: ReactionClickData) => void;
+	onToggleStar: () => void;
 }
 
 const ChatMessageImage = ({
@@ -26,6 +27,7 @@ const ChatMessageImage = ({
 	isEdited = false,
 	isStarred = false,
 	onReaction,
+	onToggleStar,
 }: ChatMessageImageProps) => (
 	<ChatMessageContainer
 		timestamp={timestamp}
@@ -35,6 +37,7 @@ const ChatMessageImage = ({
 		isEdited={isEdited}
 		isStarred={isStarred}
 		onReaction={onReaction}
+		onToggleStar={onToggleStar}
 	>
 		<div
 			className={cn(

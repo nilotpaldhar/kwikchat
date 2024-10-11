@@ -64,8 +64,10 @@ export interface FriendWithFriendship extends UserWithoutPassword {
 export interface CompleteMessage extends Message {
 	textMessage: TextMessage | null;
 	imageMessage: ImageMessage | null;
-	reactions: MessageReaction[];
 	seenByMembers: string[];
+	sender: UserProfile;
+	reactions: MessageReaction[];
+	isStarred: boolean;
 }
 
 export interface MessageSeenMembers {

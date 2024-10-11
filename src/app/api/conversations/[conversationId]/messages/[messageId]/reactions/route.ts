@@ -8,61 +8,15 @@ import { pusherServer } from "@/lib/pusher/server";
 import { conversationEvents } from "@/constants/pusher-events";
 
 import { getCurrentUser } from "@/data/auth/session";
-import { GetUserMessageError, getUserMessage } from "@/data/message";
+import { getUserMessage } from "@/data/message";
+
+import handleUserMessageError from "@/utils/api/handle-user-message-error";
 import { generatePrivateChatChannelName } from "@/utils/pusher/generate-chat-channel-name";
 
 type Params = {
 	conversationId: string;
 	messageId: string;
 };
-
-/**
- * Handles errors returned from the getUserMessage function
- * and returns appropriate responses based on the error type.
- */
-function handleUserMessageError(error: GetUserMessageError) {
-	switch (error) {
-		case GetUserMessageError.MessageNotFound:
-			return NextResponse.json(
-				{ success: false, message: "Message could not be found." },
-				{ status: 404 }
-			);
-		case GetUserMessageError.NotMember:
-			return NextResponse.json(
-				{ success: false, message: "You are not a member of this conversation." },
-				{ status: 403 }
-			);
-		case GetUserMessageError.NoRecipient:
-			return NextResponse.json(
-				{ success: false, message: "No recipient found for this conversation." },
-				{ status: 422 }
-			);
-		case GetUserMessageError.NotAllowed:
-			return NextResponse.json(
-				{ success: false, message: "You are not allowed to perform this action." },
-				{ status: 422 }
-			);
-		default:
-			return NextResponse.json(
-				{ success: false, message: "An unexpected error occurred. Please try again later" },
-				{ status: 500 }
-			);
-	}
-}
-
-/**
- * Handler function for
- *
- * @returns A JSON response
- */
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-export async function GET(req: NextRequest, { params }: { params: Params }) {
-	return NextResponse.json({
-		success: true,
-		message: "List of reactions",
-		data: undefined,
-	});
-}
 
 /**
  * Handler function for the creation of a message reaction for a conversation.

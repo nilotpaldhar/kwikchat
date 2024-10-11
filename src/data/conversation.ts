@@ -54,4 +54,34 @@ const getConversationByIdAndUserId = async ({ id, userId }: { id: string; userId
 	}
 };
 
-export { getConversationBetweenUsers, getConversationById, getConversationByIdAndUserId };
+/**
+ * Retrieves the first conversation for a given conversation ID
+ * and checks if the current user is a member of that conversation.
+ */
+const getUserConversation = async ({
+	conversationId,
+	userId,
+}: {
+	conversationId: string;
+	userId: string;
+}) => {
+	try {
+		const conversation = await prisma.conversation.findFirst({
+			where: {
+				id: conversationId,
+				members: { some: { userId } },
+			},
+		});
+
+		return conversation;
+	} catch (error) {
+		return null;
+	}
+};
+
+export {
+	getConversationBetweenUsers,
+	getConversationById,
+	getConversationByIdAndUserId,
+	getUserConversation,
+};

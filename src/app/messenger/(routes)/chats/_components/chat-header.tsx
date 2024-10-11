@@ -47,6 +47,7 @@ const ChatHeader = ({ conversationId, conversationType }: ChatHeaderProps) => {
 				<ChatHeaderActions />
 			</header>
 			<ChatContactInfo
+				conversationId={conversationId}
 				participant={data?.data}
 				isLoading={isLoading}
 				isError={isError}

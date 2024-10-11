@@ -13,6 +13,7 @@ import {
 	useCreateMessageReaction,
 	useUpdateMessageReaction,
 	useDeleteMessageReaction,
+	useToggleMessageStarStatus,
 } from "@/hooks/tanstack-query/use-message";
 
 import isMessageEdited from "@/utils/messenger/is-message-edited";
@@ -33,6 +34,7 @@ const ChatMessageFactory = ({ message, currentUserId }: ChatMessageFactoryProps)
 	const { mutate: createMessageReactionMutation } = useCreateMessageReaction();
 	const { mutate: updateMessageReactionMutation } = useUpdateMessageReaction();
 	const { mutate: deleteMessageReactionMutation } = useDeleteMessageReaction();
+	const { mutate: toggleMessageStarStatusMutation } = useToggleMessageStarStatus();
 
 	/**
 	 * Handles the user's reaction to a message by creating, updating, or deleting the reaction
@@ -74,6 +76,14 @@ const ChatMessageFactory = ({ message, currentUserId }: ChatMessageFactoryProps)
 		});
 	};
 
+	/**
+	 * Handles the toggle action for the star status of a message.
+	 * Calls the mutation to toggle the star status of the specified message.
+	 */
+	const handleToggleStarStatus = () => {
+		toggleMessageStarStatusMutation({ conversationId: message.conversationId, message });
+	};
+
 	if (message.type === "image") {
 		return (
 			<ChatMessageImage
@@ -82,7 +92,9 @@ const ChatMessageFactory = ({ message, currentUserId }: ChatMessageFactoryProps)
 				isSender={isSender}
 				isRead={isRead}
 				isEdited={isEdited}
+				isStarred={message.isStarred}
 				onReaction={handleReaction}
+				onToggleStar={handleToggleStarStatus}
 			/>
 		);
 	}
@@ -98,7 +110,9 @@ const ChatMessageFactory = ({ message, currentUserId }: ChatMessageFactoryProps)
 				isSender={isSender}
 				isRead={isRead}
 				isEdited={isEdited}
+				isStarred={message.isStarred}
 				onReaction={handleReaction}
+				onToggleStar={handleToggleStarStatus}
 			/>
 		);
 	}

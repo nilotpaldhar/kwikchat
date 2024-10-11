@@ -2,7 +2,7 @@ import "client-only";
 
 import type { MessageReaction, MessageReactionType } from "@prisma/client";
 import type { InfiniteData, QueryClient } from "@tanstack/react-query";
-import type { APIResponse, CompleteMessage, PaginatedResponse } from "@/types";
+import type { APIResponse, CompleteMessage, PaginatedResponse, UserProfile } from "@/types";
 
 import { nanoid } from "nanoid";
 
@@ -14,23 +14,27 @@ import {
 	appendMessageReaction,
 	updateMessageReaction,
 	removeMessageReaction,
+	toggleMessageStarStatus,
+	appendStarredMessage,
+	removeStarredMessage,
 } from "@/utils/tanstack-query-cache/message";
 
 import { getInfiniteQueryData } from "@/utils/tanstack-query-cache/helpers";
 
 const createCompleteMessage = ({
 	conversationId,
-	senderId,
+	sender,
 	message,
 }: {
 	conversationId: string;
-	senderId: string;
+	sender: UserProfile;
 	message: string;
 }) => {
 	const newMessage: CompleteMessage = {
 		id: nanoid(),
 		conversationId,
-		senderId,
+		sender,
+		senderId: sender.id,
 		createdAt: new Date(),
 		updatedAt: new Date(),
 		type: "text",
@@ -44,6 +48,7 @@ const createCompleteMessage = ({
 		},
 		imageMessage: null,
 		reactions: [],
+		isStarred: false,
 	};
 
 	return newMessage;
@@ -78,16 +83,16 @@ const createMessageReaction = ({
 
 const optimisticSendPrivateMessage = async ({
 	conversationId,
-	senderId,
+	sender,
 	message,
 	queryClient,
 }: {
 	conversationId: string;
-	senderId: string;
+	sender: UserProfile;
 	message: string;
 	queryClient: QueryClient;
 }) => {
-	const newMessage = createCompleteMessage({ conversationId, senderId, message });
+	const newMessage = createCompleteMessage({ conversationId, sender, message });
 
 	// Cancel ongoing queries related to messages to ensure cache consistency
 	await queryClient.cancelQueries({ queryKey: messageKeys.all(conversationId) });
@@ -217,6 +222,38 @@ const optimisticDeleteMessageReaction = async ({
 	return { messagesData };
 };
 
+const optimisticToggleMessageStarStatus = async ({
+	conversationId,
+	message,
+	queryClient,
+}: {
+	conversationId: string;
+	message?: CompleteMessage;
+	queryClient: QueryClient;
+}) => {
+	// Cancel ongoing queries related to messages to ensure cache consistency
+	await queryClient.cancelQueries({ queryKey: messageKeys.all(conversationId) });
+	await queryClient.cancelQueries({ queryKey: messageKeys.starred(conversationId) });
+
+	const messagesData = getInfiniteQueryData<CompleteMessage>({
+		keys: messageKeys.all(conversationId),
+		queryClient,
+	});
+	const starredMessagesData = getInfiniteQueryData<CompleteMessage>({
+		keys: messageKeys.starred(conversationId),
+		queryClient,
+	});
+
+	toggleMessageStarStatus({ conversationId, message, queryClient });
+	if (!message?.isStarred) {
+		appendStarredMessage({ conversationId, message, queryClient });
+	} else {
+		removeStarredMessage({ conversationId, message, queryClient });
+	}
+
+	return { messagesData, starredMessagesData };
+};
+
 const optimisticPrivateMessageError = async ({
 	conversationId,
 	context,
@@ -232,6 +269,21 @@ const optimisticPrivateMessageError = async ({
 	queryClient.setQueryData(messageKeys.all(conversationId), context.messagesData);
 };
 
+const optimisticToggleMessageStarStatusError = async ({
+	conversationId,
+	context,
+	queryClient,
+}: {
+	conversationId: string;
+	context?: {
+		starredMessagesData?: InfiniteData<APIResponse<PaginatedResponse<CompleteMessage>>>;
+	};
+	queryClient: QueryClient;
+}) => {
+	if (!context) return;
+	queryClient.setQueryData(messageKeys.starred(conversationId), context.starredMessagesData);
+};
+
 const refetchOptimisticPrivateMessages = ({
 	conversationId,
 	queryClient,
@@ -240,14 +292,17 @@ const refetchOptimisticPrivateMessages = ({
 	queryClient: QueryClient;
 }) => {
 	queryClient.invalidateQueries({ queryKey: messageKeys.all(conversationId) });
+	queryClient.invalidateQueries({ queryKey: messageKeys.starred(conversationId) });
 };
 
 export {
 	optimisticSendPrivateMessage,
-	optimisticPrivateMessageError,
-	refetchOptimisticPrivateMessages,
 	optimisticUpdatePrivateTextMessage,
 	optimisticCreateMessageReaction,
 	optimisticUpdateMessageReaction,
 	optimisticDeleteMessageReaction,
+	optimisticToggleMessageStarStatus,
+	optimisticPrivateMessageError,
+	optimisticToggleMessageStarStatusError,
+	refetchOptimisticPrivateMessages,
 };

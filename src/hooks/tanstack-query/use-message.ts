@@ -12,22 +12,26 @@ import { conversationEvents } from "@/constants/pusher-events";
 
 import {
 	fetchPrivateMessages,
+	fetchStarredMessages,
 	sendPrivateMessage,
 	updatePrivateMessage,
 	updateMessageSeenStatus,
 	createMessageReaction,
 	updateMessageReaction,
 	deleteMessageReaction,
+	toggleMessageStarStatus,
 } from "@/services/message";
 
 import {
 	optimisticSendPrivateMessage,
-	optimisticPrivateMessageError,
 	optimisticUpdatePrivateTextMessage,
 	optimisticCreateMessageReaction,
 	optimisticUpdateMessageReaction,
 	optimisticDeleteMessageReaction,
+	optimisticToggleMessageStarStatus,
+	optimisticPrivateMessageError,
 	refetchOptimisticPrivateMessages,
+	optimisticToggleMessageStarStatusError,
 } from "@/utils/optimistic-updates/message";
 import {
 	prependConversationMessage,
@@ -111,6 +115,20 @@ const usePrivateMessagesQuery = ({ conversationId }: { conversationId: string })
 };
 
 /**
+ * Custom hook for fetching starred messages in a conversation using infinite scrolling.
+ */
+const useStarredMessagesQuery = ({ conversationId }: { conversationId: string }) => {
+	const query = useInfiniteQuery({
+		queryKey: messageKeys.starred(conversationId),
+		queryFn: ({ pageParam }) => fetchStarredMessages({ conversationId, page: pageParam }),
+		initialPageParam: 1,
+		getNextPageParam: (lastPage) => lastPage.data?.pagination.nextPage,
+	});
+
+	return query;
+};
+
+/**
  * Custom hook for sending private messages with optimistic updates.
  *
  * This hook manages sending private messages using mutations, including optimistic updates,
@@ -124,8 +142,8 @@ const useSendPrivateMessage = () => {
 		mutationFn: sendPrivateMessage,
 
 		// Optimistically updates the message list before the mutation occurs.
-		onMutate: ({ conversationId, senderId, message }) =>
-			optimisticSendPrivateMessage({ conversationId, senderId, message, queryClient }),
+		onMutate: ({ conversationId, sender, message }) =>
+			optimisticSendPrivateMessage({ conversationId, sender, message, queryClient }),
 
 		//  Handles any error that occurs during the message sending mutation.
 		onError: (error, { conversationId }, context) => {
@@ -134,9 +152,9 @@ const useSendPrivateMessage = () => {
 		},
 
 		// Called once the mutation is either successful or fails.
-		onSettled: (data) => {
+		onSettled: (_data, _error, { conversationId }) => {
 			refetchOptimisticPrivateMessages({
-				conversationId: data?.data?.conversationId!,
+				conversationId,
 				queryClient,
 			});
 		},
@@ -170,9 +188,9 @@ const useUpdatePrivateMessage = () => {
 
 		// Called once the mutation is either successful or fails
 		// Ensures the cache is refetched and up to date after the mutation settles
-		onSettled: (data) => {
+		onSettled: (_data, _error, { conversationId }) => {
 			refetchOptimisticPrivateMessages({
-				conversationId: data?.data?.conversationId!,
+				conversationId,
 				queryClient,
 			});
 		},
@@ -237,7 +255,7 @@ const useCreateMessageReaction = () => {
 
 		// Called once the mutation is either successful or fails
 		// Ensures the cache is refetched and up to date after the mutation settles
-		onSettled: (data, _error, { conversationId }) => {
+		onSettled: (_data, _error, { conversationId }) => {
 			refetchOptimisticPrivateMessages({
 				conversationId,
 				queryClient,
@@ -272,7 +290,7 @@ const useUpdateMessageReaction = () => {
 
 		// Called once the mutation is either successful or fails
 		// Ensures the cache is refetched and up to date after the mutation settles
-		onSettled: (data, _error, { conversationId }) => {
+		onSettled: (_data, _error, { conversationId }) => {
 			refetchOptimisticPrivateMessages({
 				conversationId,
 				queryClient,
@@ -307,7 +325,42 @@ const useDeleteMessageReaction = () => {
 
 		// Called once the mutation is either successful or fails
 		// Ensures the cache is refetched and up to date after the mutation settles
-		onSettled: (data, _error, { conversationId }) => {
+		onSettled: (_data, _error, { conversationId }) => {
+			refetchOptimisticPrivateMessages({
+				conversationId,
+				queryClient,
+			});
+		},
+	});
+};
+
+/**
+ * Custom hook that provides functionality to toggle the star status of a message.
+ *
+ * It handles the mutation logic, optimistic updates, error handling, and cache refetching.
+ */
+const useToggleMessageStarStatus = () => {
+	const queryClient = useQueryClient();
+
+	return useMutation({
+		// Function to be called when the mutation is triggered
+		mutationFn: toggleMessageStarStatus,
+
+		// Optimistically updates the cache with the new star status before the mutation is completed
+		onMutate: ({ conversationId, message }) =>
+			optimisticToggleMessageStarStatus({ conversationId, message, queryClient }),
+
+		// Handles any errors that occur during the mutation
+		// Rolls back the optimistic update if the mutation fails
+		onError: (error, { conversationId }, context) => {
+			optimisticPrivateMessageError({ conversationId, context, queryClient });
+			optimisticToggleMessageStarStatusError({ conversationId, context, queryClient });
+			toast.error(error.message);
+		},
+
+		// Called once the mutation is either successful or fails
+		// Ensures the cache is refetched and up to date after the mutation settles
+		onSettled: (_data, _error, { conversationId }) => {
 			refetchOptimisticPrivateMessages({
 				conversationId,
 				queryClient,
@@ -318,10 +371,12 @@ const useDeleteMessageReaction = () => {
 
 export {
 	usePrivateMessagesQuery,
+	useStarredMessagesQuery,
 	useSendPrivateMessage,
 	useUpdatePrivateMessage,
 	useMessagesSeenStatus,
 	useCreateMessageReaction,
 	useUpdateMessageReaction,
 	useDeleteMessageReaction,
+	useToggleMessageStarStatus,
 };

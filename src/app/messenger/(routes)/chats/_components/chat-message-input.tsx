@@ -17,7 +17,7 @@ const ChatMessageInput = ({ conversationId }: ChatMessageInputProps) => {
 	const { data, isLoading, isError, error, refetch } = useCurrentUser();
 	const { mutate } = useSendPrivateMessage();
 
-	const senderId = data?.data?.id;
+	const sender = data?.data;
 
 	if (isLoading)
 		return (
@@ -28,14 +28,14 @@ const ChatMessageInput = ({ conversationId }: ChatMessageInputProps) => {
 			</div>
 		);
 
-	if (isError || !senderId)
+	if (isError || !sender)
 		return (
 			<ErrorAlert onClick={() => refetch()}>
 				{error ? error.message : "Something went wrong!"}
 			</ErrorAlert>
 		);
 
-	return <ChatInput onSubmit={(message) => mutate({ conversationId, senderId, message })} />;
+	return <ChatInput onSubmit={(message) => mutate({ conversationId, sender, message })} />;
 };
 
 export default ChatMessageInput;

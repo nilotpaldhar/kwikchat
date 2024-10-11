@@ -13,15 +13,19 @@ import { cn } from "@/utils/general/cn";
 interface ChatMessageActionsProps {
 	isOpen?: boolean;
 	isSender?: boolean;
+	isStarred: boolean;
 	onEdit?: () => void;
 	onReaction?: (emoji: ReactionClickData) => void;
+	onToggleStar?: () => void;
 }
 
 const ChatMessageActions = ({
 	isOpen = false,
 	isSender = false,
+	isStarred,
 	onEdit = () => {},
 	onReaction = () => {},
+	onToggleStar = () => {},
 }: ChatMessageActionsProps) => {
 	const [openActionsTrigger, setOpenActionsTrigger] = useState(false);
 	const [openReactionTrigger, setOpenReactionTrigger] = useState(false);
@@ -43,6 +47,11 @@ const ChatMessageActions = ({
 	const childVariants = {
 		open: { opacity: 1, transformOrigin: "center", transition: { duration: 0.2 } },
 		closed: { opacity: 0, transformOrigin: "center", transition: { duration: 0.1 } },
+	};
+
+	const handleToggleStar = () => {
+		setOpenActionsTrigger(false);
+		onToggleStar();
 	};
 
 	useEffect(() => {
@@ -84,9 +93,11 @@ const ChatMessageActions = ({
 					>
 						<ActionsTrigger
 							isSender={isSender}
+							isStarred={isStarred}
 							open={isOpen && openActionsTrigger}
 							onOpenChange={setOpenActionsTrigger}
 							onEdit={onEdit}
+							onToggleStar={handleToggleStar}
 						/>
 					</motion.div>
 				</motion.div>

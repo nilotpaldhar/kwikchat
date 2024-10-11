@@ -30,6 +30,27 @@ const addMessage = ({
 	};
 };
 
+const removeMessage = ({
+	message,
+	data,
+	pagination,
+}: {
+	message?: CompleteMessage;
+	data: PaginatedResponse<CompleteMessage> | undefined;
+	pagination: PaginationMetadata;
+}) => {
+	const items = data?.items ?? [];
+	const itemExists = items.some((item) => item.id === message?.id);
+
+	return {
+		pagination: {
+			...pagination,
+			totalItems: itemExists ? pagination.totalItems - 1 : pagination.totalItems,
+		},
+		items: message && itemExists ? items.filter((i) => i.id !== message.id) : items,
+	};
+};
+
 const prependConversationMessage = ({
 	conversationId,
 	message,
@@ -101,30 +122,38 @@ const updateTextMessageContent = ({
 	messageContent: string;
 	queryClient: QueryClient;
 }) => {
+	const updateMessage = (
+		existingData: InfiniteData<APIResponse<PaginatedResponse<CompleteMessage>>, unknown> | undefined
+	) =>
+		updateInfinitePaginatedData<CompleteMessage>({
+			existingData,
+			updateFn: (data, pagination) => {
+				const items = data?.items ?? [];
+
+				const updatedItems = items.map((message) => {
+					if (message.id !== messageId) return message;
+
+					return {
+						...message,
+						textMessage: {
+							...message.textMessage,
+							content: messageContent,
+							updatedAt: new Date(),
+						},
+					} as CompleteMessage;
+				});
+
+				return { data, pagination, items: updatedItems };
+			},
+		});
+
 	queryClient.setQueryData<InfiniteData<APIResponse<PaginatedResponse<CompleteMessage>>>>(
 		messageKeys.all(conversationId),
-		(existingData) =>
-			updateInfinitePaginatedData<CompleteMessage>({
-				existingData,
-				updateFn: (data, pagination) => {
-					const items = data?.items ?? [];
-
-					const updatedItems = items.map((message) => {
-						if (message.id !== messageId) return message;
-
-						return {
-							...message,
-							textMessage: {
-								...message.textMessage,
-								content: messageContent,
-								updatedAt: new Date(),
-							},
-						} as CompleteMessage;
-					});
-
-					return { data, pagination, items: updatedItems };
-				},
-			})
+		(existingData) => updateMessage(existingData)
+	);
+	queryClient.setQueryData<InfiniteData<APIResponse<PaginatedResponse<CompleteMessage>>>>(
+		messageKeys.starred(conversationId),
+		(existingData) => updateMessage(existingData)
 	);
 };
 
@@ -227,6 +256,72 @@ const removeMessageReaction = ({
 	);
 };
 
+const toggleMessageStarStatus = ({
+	conversationId,
+	message,
+	queryClient,
+}: {
+	conversationId: string;
+	message?: CompleteMessage;
+	queryClient: QueryClient;
+}) => {
+	queryClient.setQueryData<InfiniteData<APIResponse<PaginatedResponse<CompleteMessage>>>>(
+		messageKeys.all(conversationId),
+		(existingData) =>
+			updateInfinitePaginatedData<CompleteMessage>({
+				existingData,
+				updateFn: (data, pagination) => {
+					const items = data?.items ?? [];
+
+					const updatedItems = items.map((msg) => {
+						if (msg.id !== message?.id) return msg;
+						return { ...message, isStarred: !msg.isStarred };
+					});
+
+					return { data, pagination, items: updatedItems };
+				},
+			})
+	);
+};
+
+const appendStarredMessage = ({
+	conversationId,
+	message,
+	queryClient,
+}: {
+	conversationId: string;
+	message?: CompleteMessage;
+	queryClient: QueryClient;
+}) => {
+	queryClient.setQueryData<InfiniteData<APIResponse<PaginatedResponse<CompleteMessage>>>>(
+		messageKeys.starred(conversationId),
+		(existingData) =>
+			updateInfinitePaginatedData<CompleteMessage>({
+				existingData,
+				updateFn: (data, pagination) => addMessage({ message, data, pagination }),
+			})
+	);
+};
+
+const removeStarredMessage = ({
+	conversationId,
+	message,
+	queryClient,
+}: {
+	conversationId: string;
+	message?: CompleteMessage;
+	queryClient: QueryClient;
+}) => {
+	queryClient.setQueryData<InfiniteData<APIResponse<PaginatedResponse<CompleteMessage>>>>(
+		messageKeys.starred(conversationId),
+		(existingData) =>
+			updateInfinitePaginatedData<CompleteMessage>({
+				existingData,
+				updateFn: (data, pagination) => removeMessage({ message, data, pagination }),
+			})
+	);
+};
+
 export {
 	prependConversationMessage,
 	updateMessagesSeenMembers,
@@ -234,4 +329,7 @@ export {
 	appendMessageReaction,
 	updateMessageReaction,
 	removeMessageReaction,
+	toggleMessageStarStatus,
+	appendStarredMessage,
+	removeStarredMessage,
 };

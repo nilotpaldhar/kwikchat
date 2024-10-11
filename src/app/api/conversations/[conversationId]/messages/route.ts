@@ -8,13 +8,15 @@ import { pusherServer } from "@/lib/pusher/server";
 import { conversationEvents } from "@/constants/pusher-events";
 
 import { getCurrentUser } from "@/data/auth/session";
-import { getMessages } from "@/data/message";
+import { getMessages, MESSAGE_INCLUDE } from "@/data/message";
+import { getUserConversation } from "@/data/conversation";
 
 import { isBlocked } from "@/lib/block";
 import { areUsersFriends } from "@/lib/friendship";
 
 import { MAX_MESSAGE_CHAR_LENGTH } from "@/constants/chat-input";
 import { generatePrivateChatChannelName } from "@/utils/pusher/generate-chat-channel-name";
+import transformMessageSeenAndStarStatus from "@/utils/messenger/transform-message-seen-and-star-status";
 
 type Params = { conversationId: string };
 
@@ -44,9 +46,7 @@ export async function GET(req: NextRequest, { params }: { params: Params }) {
 	}
 
 	// Check if the conversation exists and if the user is a member of it
-	const conversation = await prisma.conversation.findFirst({
-		where: { id: conversationId, members: { some: { userId: currentUser.id } } },
-	});
+	const conversation = await getUserConversation({ conversationId, userId: currentUser.id });
 
 	// If the conversation is not found or the user is not a member, respond with a 404 status
 	if (!conversation) {
@@ -62,6 +62,7 @@ export async function GET(req: NextRequest, { params }: { params: Params }) {
 	// Fetch paginated messages for the conversation
 	const data = await getMessages({
 		conversationId: conversation.id,
+		userId: currentUser.id,
 		page: page ? parseInt(page, 10) : undefined,
 		pageSize: pageSize ? parseInt(pageSize, 10) : undefined,
 	});
@@ -191,22 +192,13 @@ export async function POST(req: NextRequest, { params }: { params: Params }) {
 					create: { content: trimmedMessage },
 				},
 			},
-			include: {
-				textMessage: true,
-				imageMessage: true,
-				reactions: true,
-				seenByMembers: {
-					include: {
-						member: { select: { userId: true } },
-					},
-				},
-			},
+			include: MESSAGE_INCLUDE,
 		});
 
-		const data: CompleteMessage = {
-			...newMessage,
-			seenByMembers: newMessage.seenByMembers.map((seenBy) => seenBy.member.userId),
-		};
+		const data: CompleteMessage = transformMessageSeenAndStarStatus({
+			message: newMessage,
+			userId: currentUser.id,
+		});
 
 		// Trigger a Pusher event to notify the receiver about an incoming message
 		pusherServer.trigger(

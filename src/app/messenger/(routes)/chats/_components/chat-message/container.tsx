@@ -19,7 +19,8 @@ interface ChatMessageContainerProps {
 	isEdited?: boolean;
 	isStarred?: boolean;
 	onEdit?: () => void;
-	onReaction: (emoji: ReactionClickData) => void;
+	onReaction?: (emoji: ReactionClickData) => void;
+	onToggleStar?: () => void;
 	children: React.ReactNode;
 }
 
@@ -31,7 +32,8 @@ const ChatMessageContainer = ({
 	isEdited = false,
 	isStarred = false,
 	onEdit = () => {},
-	onReaction,
+	onReaction = () => {},
+	onToggleStar = () => {},
 	children,
 }: ChatMessageContainerProps) => {
 	const [isActionsOpen, setIsActionsOpen] = useState(false);
@@ -66,6 +68,8 @@ const ChatMessageContainer = ({
 				isSender={isSender}
 				onEdit={onEdit}
 				onReaction={onReaction}
+				isStarred={isStarred}
+				onToggleStar={onToggleStar}
 			/>
 		</div>
 	);

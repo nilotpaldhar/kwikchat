@@ -18,6 +18,7 @@ interface ChatMessageTextProps {
 	isEdited?: boolean;
 	isStarred?: boolean;
 	onReaction: (emoji: ReactionClickData) => void;
+	onToggleStar: () => void;
 }
 
 const ChatMessageText = ({
@@ -31,6 +32,7 @@ const ChatMessageText = ({
 	isEdited = false,
 	isStarred = false,
 	onReaction,
+	onToggleStar,
 }: ChatMessageTextProps) => {
 	const openEditMessageDialog = useMessengerDialogStore().onOpen;
 
@@ -50,6 +52,7 @@ const ChatMessageText = ({
 			isStarred={isStarred}
 			onEdit={handleEdit}
 			onReaction={onReaction}
+			onToggleStar={onToggleStar}
 		>
 			<div
 				className={cn(

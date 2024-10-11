@@ -11,8 +11,11 @@ import { prisma } from "@/lib/db";
 import { pusherServer } from "@/lib/pusher/server";
 import { conversationEvents } from "@/constants/pusher-events";
 
+import { MESSAGE_INCLUDE } from "@/data/message";
 import { getCurrentUser } from "@/data/auth/session";
+
 import { generatePrivateChatChannelName } from "@/utils/pusher/generate-chat-channel-name";
+import transformMessageSeenAndStarStatus from "@/utils/messenger/transform-message-seen-and-star-status";
 
 type Params = {
 	conversationId: string;
@@ -115,23 +118,14 @@ export async function PATCH(req: NextRequest, { params }: { params: Params }) {
 			data: {
 				textMessage: { update: { data: { content: messageContent } } },
 			},
-			include: {
-				textMessage: true,
-				imageMessage: true,
-				reactions: true,
-				seenByMembers: {
-					include: {
-						member: { select: { userId: true } },
-					},
-				},
-			},
+			include: MESSAGE_INCLUDE,
 		});
 
 		// Format the updated message with relevant data (including who has seen the message)
-		const data: CompleteMessage = {
-			...updatedMessage,
-			seenByMembers: updatedMessage.seenByMembers.map((seenBy) => seenBy.member.userId),
-		};
+		const data: CompleteMessage = transformMessageSeenAndStarStatus({
+			message: updatedMessage,
+			userId: currentUser.id,
+		});
 
 		// Trigger a Pusher event to notify the recipient that the message was updated
 		pusherServer.trigger(

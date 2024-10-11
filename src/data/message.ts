@@ -2,20 +2,26 @@ import "server-only";
 
 import type { PaginatedResponse, CompleteMessage, MessageWithUserID } from "@/types";
 
+import { Prisma } from "@prisma/client";
+import { DEFAULT_PAGE, DEFAULT_PAGE_SIZE } from "@/constants/pagination";
+
 import { prisma } from "@/lib/db";
 import { isBlocked } from "@/lib/block";
 import { areUsersFriends } from "@/lib/friendship";
+
 import { calculatePagination } from "@/utils/general/calculate-pagination";
+import transformMessageSeenAndStarStatus from "@/utils/messenger/transform-message-seen-and-star-status";
 
-import { DEFAULT_PAGE, DEFAULT_PAGE_SIZE } from "@/constants/pagination";
-
-interface Params {
+// Parameters required to fetch messages with pagination.
+interface GetMessagesParams {
 	conversationId: string;
+	userId: string;
 	page?: number;
 	pageSize?: number;
 }
 
-export enum GetUserMessageError {
+// Enumeration for potential errors that can occur when fetching a user message.
+export enum UserMessageError {
 	MessageNotFound = "MessageNotFound",
 	NotMember = "NotMember",
 	NoRecipient = "NoRecipient",
@@ -23,20 +29,36 @@ export enum GetUserMessageError {
 	UnknownError = "UnknownError",
 }
 
+// The result of attempting to fetch a message by ID for a specific user, including any errors.
 export interface GetUserMessageResponse {
 	message: MessageWithUserID | null;
 	receiverId: string | null;
-	error: GetUserMessageError | null;
+	error: UserMessageError | null;
 }
+
+// Prisma include statement for fetching a complete message with associated data.
+export const MESSAGE_INCLUDE = {
+	textMessage: true,
+	imageMessage: true,
+	sender: { omit: { password: true, image: true } },
+	reactions: { orderBy: { createdAt: "asc" } },
+	starred: { select: { userId: true } },
+	seenByMembers: {
+		include: {
+			member: { select: { userId: true } },
+		},
+	},
+} satisfies Prisma.MessageInclude;
 
 /**
  * Fetches messages from the database with pagination.
  */
 const getMessagesFromDB = async ({
 	conversationId,
+	userId,
 	page = DEFAULT_PAGE,
 	pageSize = DEFAULT_PAGE_SIZE,
-}: Params) => {
+}: GetMessagesParams) => {
 	// Calculate the offset for pagination
 	const skip = (page - 1) * pageSize;
 	const take = pageSize;
@@ -46,16 +68,7 @@ const getMessagesFromDB = async ({
 		const [messageList, totalItems] = await Promise.all([
 			prisma.message.findMany({
 				where: { conversationId },
-				include: {
-					textMessage: true,
-					imageMessage: true,
-					reactions: { orderBy: { createdAt: "asc" } },
-					seenByMembers: {
-						include: {
-							member: { select: { userId: true } },
-						},
-					},
-				},
+				include: MESSAGE_INCLUDE,
 				skip,
 				take,
 				orderBy: { createdAt: "desc" },
@@ -66,10 +79,9 @@ const getMessagesFromDB = async ({
 		]);
 
 		return {
-			messageList: messageList.map((message) => ({
-				...message,
-				seenByMembers: message.seenByMembers.map((seenBy) => seenBy.member.userId),
-			})),
+			messageList: messageList.map((message) =>
+				transformMessageSeenAndStarStatus({ message, userId })
+			),
 			totalItems,
 		};
 	} catch (error) {
@@ -82,10 +94,16 @@ const getMessagesFromDB = async ({
  */
 const getMessages = async ({
 	conversationId,
+	userId,
 	page = DEFAULT_PAGE,
 	pageSize = DEFAULT_PAGE_SIZE,
-}: Params): Promise<PaginatedResponse<CompleteMessage>> => {
-	const { messageList, totalItems } = await getMessagesFromDB({ conversationId, page, pageSize });
+}: GetMessagesParams): Promise<PaginatedResponse<CompleteMessage>> => {
+	const { messageList, totalItems } = await getMessagesFromDB({
+		conversationId,
+		userId,
+		page,
+		pageSize,
+	});
 	const paginationMetadata = calculatePagination({ page, pageSize, totalItems });
 
 	return {
@@ -125,7 +143,7 @@ const getUserMessage = async ({
 			return {
 				message: null,
 				receiverId: null,
-				error: GetUserMessageError.MessageNotFound,
+				error: UserMessageError.MessageNotFound,
 			};
 		}
 
@@ -135,7 +153,7 @@ const getUserMessage = async ({
 			return {
 				message: null,
 				receiverId: null,
-				error: GetUserMessageError.NotMember,
+				error: UserMessageError.NotMember,
 			};
 		}
 
@@ -149,7 +167,7 @@ const getUserMessage = async ({
 			return {
 				message: null,
 				receiverId: null,
-				error: GetUserMessageError.NoRecipient,
+				error: UserMessageError.NoRecipient,
 			};
 		}
 
@@ -164,7 +182,7 @@ const getUserMessage = async ({
 			return {
 				message: null,
 				receiverId: null,
-				error: GetUserMessageError.NotAllowed,
+				error: UserMessageError.NotAllowed,
 			};
 		}
 
@@ -173,7 +191,7 @@ const getUserMessage = async ({
 		return {
 			message: null,
 			receiverId: null,
-			error: GetUserMessageError.UnknownError,
+			error: UserMessageError.UnknownError,
 		};
 	}
 };

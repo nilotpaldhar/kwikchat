@@ -37,7 +37,10 @@ export async function GET(req: NextRequest, { params }: { params: Params }) {
 					{ userId: friendId, friendId: currentUser.id },
 				],
 			},
-			include: { user: true, friend: true },
+			include: {
+				user: { omit: { password: true } },
+				friend: { omit: { password: true } },
+			},
 		});
 
 		// Check if the friendship exists.

@@ -58,5 +58,7 @@ export const conversationKeys = {
 };
 
 export const messageKeys = {
-	all: (conversationId: string) => ["conversations", conversationId] as const,
+	base: ["messages"] as const,
+	all: (conversationId: string) => [...messageKeys.base, "all", conversationId] as const,
+	starred: (conversationId: string) => [...messageKeys.base, "starred", conversationId] as const,
 };
