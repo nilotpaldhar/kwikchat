@@ -1,41 +1,50 @@
 "use client";
 
 import type { MessageReaction } from "@prisma/client";
-import type { ReactionClickData } from "@/app/messenger/(routes)/chats/_components/chat-message/reaction-trigger";
+import type { ReactionClickData } from "@/app/messenger/(routes)/chats/_components/chat-message/chat-message-reaction-button";
 
 import { useState } from "react";
 
-import ChatMessageMeta from "@/app/messenger/(routes)/chats/_components/chat-message/meta";
-import ChatMessageActions from "@/app/messenger/(routes)/chats/_components/chat-message/actions";
-import ChatMessageReactions from "@/app/messenger/(routes)/chats/_components/chat-message/reactions";
+import ChatMessageText from "@/app/messenger/(routes)/chats/_components/chat-message/chat-message-text";
+import ChatMessageImage from "@/app/messenger/(routes)/chats/_components/chat-message/chat-message-image";
+import ChatMessageDeleted from "@/app/messenger/(routes)/chats/_components/chat-message/chat-message-deleted";
+
+import ChatMessageMeta from "@/app/messenger/(routes)/chats/_components/chat-message/chat-message-meta";
+import ChatMessageReactions from "@/app/messenger/(routes)/chats/_components/chat-message/chat-message-reactions";
+import ChatMessageInteractionBar from "@/app/messenger/(routes)/chats/_components/chat-message/chat-message-interaction-bar";
 
 import { cn } from "@/utils/general/cn";
 
-interface ChatMessageContainerProps {
+interface ChatMessageProps extends React.HTMLAttributes<HTMLDivElement> {
 	timestamp: string;
 	reactions: MessageReaction[];
 	isSender: boolean;
 	isRead?: boolean;
 	isEdited?: boolean;
 	isStarred?: boolean;
+	isDeleted?: boolean;
 	onEdit?: () => void;
 	onReaction?: (emoji: ReactionClickData) => void;
 	onToggleStar?: () => void;
-	children: React.ReactNode;
+	onDelete?: () => void;
 }
 
-const ChatMessageContainer = ({
+const ChatMessage = ({
 	timestamp,
 	reactions,
 	isSender,
 	isRead = false,
 	isEdited = false,
 	isStarred = false,
+	isDeleted = false,
 	onEdit = () => {},
 	onReaction = () => {},
 	onToggleStar = () => {},
+	onDelete = () => {},
 	children,
-}: ChatMessageContainerProps) => {
+	className,
+	...props
+}: ChatMessageProps) => {
 	const [isActionsOpen, setIsActionsOpen] = useState(false);
 
 	return (
@@ -45,12 +54,14 @@ const ChatMessageContainer = ({
 			aria-label="Chat message with actions"
 			className={cn(
 				"flex focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neutral-500 dark:focus-visible:ring-neutral-600",
-				isSender ? "justify-end" : "justify-start"
+				isSender ? "justify-end" : "justify-start",
+				className
 			)}
 			onMouseEnter={() => setIsActionsOpen(true)}
 			onMouseLeave={() => setIsActionsOpen(false)}
 			onFocus={() => setIsActionsOpen(true)}
 			onBlur={() => setIsActionsOpen(false)}
+			{...props}
 		>
 			<div className={cn("relative flex flex-col space-y-2", isSender && "order-2")}>
 				{children}
@@ -60,19 +71,22 @@ const ChatMessageContainer = ({
 					isRead={isRead}
 					isEdited={isEdited}
 					isStarred={isStarred}
+					isDeleted={isDeleted}
 				/>
-				<ChatMessageReactions reactions={reactions} />
+				{!isDeleted && <ChatMessageReactions reactions={reactions} />}
 			</div>
-			<ChatMessageActions
+			<ChatMessageInteractionBar
 				isOpen={isActionsOpen}
 				isSender={isSender}
+				isDeleted={isDeleted}
 				onEdit={onEdit}
 				onReaction={onReaction}
 				isStarred={isStarred}
 				onToggleStar={onToggleStar}
+				onDelete={onDelete}
 			/>
 		</div>
 	);
 };
 
-export default ChatMessageContainer;
+export { ChatMessage, ChatMessageText, ChatMessageImage, ChatMessageDeleted };

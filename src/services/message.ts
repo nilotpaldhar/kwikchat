@@ -240,6 +240,36 @@ const toggleMessageStarStatus = async ({
 	}
 };
 
+/**
+ * Deletes a specific message in a conversation, with an option to delete it for everyone.
+ */
+const deleteMessage = async ({
+	conversationId,
+	message,
+	deleteForEveryone = false,
+}: {
+	conversationId: string;
+	message: CompleteMessage;
+	deleteForEveryone?: boolean;
+}) => {
+	// Create a new URLSearchParams object to hold query parameters.
+	const params = new URLSearchParams();
+
+	// If the deleteForEveryone flag is true, append it to the query parameters.
+	if (deleteForEveryone) params.append("delete_for_everyone", "true");
+
+	// Build the request URL with the conversation ID, message ID, and query parameters.
+	const url = `/conversations/${conversationId}/messages/${message.id}?${params.toString()}`;
+
+	try {
+		const res = await axios.delete<APIResponse<undefined>>(url);
+		return res.data;
+	} catch (error) {
+		const errMsg = handleAxiosError(error);
+		throw new Error(errMsg);
+	}
+};
+
 export {
 	fetchPrivateMessages,
 	fetchStarredMessages,
@@ -250,4 +280,5 @@ export {
 	updateMessageReaction,
 	deleteMessageReaction,
 	toggleMessageStarStatus,
+	deleteMessage,
 };

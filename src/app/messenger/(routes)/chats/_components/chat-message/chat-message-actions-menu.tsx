@@ -5,23 +5,27 @@ import { MoreVertical } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Popover, PopoverTrigger, PopoverContent } from "@/components/ui/popover";
 
-interface ActionsTriggerProps {
-	open?: boolean;
-	isSender?: boolean;
-	isStarred?: boolean;
+interface ChatMessageActionsMenuProps {
+	open: boolean;
+	isSender: boolean;
+	isStarred: boolean;
+	isDeleted: boolean;
 	onOpenChange?: (open: boolean) => void;
 	onEdit?: () => void;
 	onToggleStar?: () => void;
+	onDelete?: () => void;
 }
 
-const ActionsTrigger = ({
-	open = false,
-	isSender = false,
-	isStarred = false,
+const ChatMessageActionsMenu = ({
+	open,
+	isSender,
+	isStarred,
+	isDeleted,
 	onOpenChange = () => {},
 	onEdit = () => {},
 	onToggleStar = () => {},
-}: ActionsTriggerProps) => {
+	onDelete = () => {},
+}: ChatMessageActionsMenuProps) => {
 	const triggerClassNames =
 		"size-6 rounded-full bg-surface-light-100 text-neutral-500 shadow-md dark:bg-neutral-800 dark:text-neutral-400";
 	const actionsClassNames =
@@ -42,15 +46,17 @@ const ActionsTrigger = ({
 				align="center"
 				alignOffset={0}
 			>
-				<Button variant="outline" className={actionsClassNames} onClick={onToggleStar}>
-					<span className="font-semibold capitalize">{!isStarred ? "Star" : "Unstar"}</span>
-				</Button>
-				{isSender && (
+				{!isDeleted && (
+					<Button variant="outline" className={actionsClassNames} onClick={onToggleStar}>
+						<span className="font-semibold capitalize">{!isStarred ? "Star" : "Unstar"}</span>
+					</Button>
+				)}
+				{!isDeleted && isSender && (
 					<Button variant="outline" className={actionsClassNames} onClick={onEdit}>
 						<span className="font-semibold capitalize">Edit</span>
 					</Button>
 				)}
-				<Button variant="outline" className={actionsClassNames}>
+				<Button variant="outline" className={actionsClassNames} onClick={onDelete}>
 					<span className="font-semibold capitalize">Delete</span>
 				</Button>
 			</PopoverContent>
@@ -58,4 +64,4 @@ const ActionsTrigger = ({
 	);
 };
 
-export default ActionsTrigger;
+export default ChatMessageActionsMenu;

@@ -33,6 +33,7 @@ enum MemberRole {
 enum MessageType {
   text
   image
+  deleted
 }
 
 // Enum to represent the type of a message reaction.
@@ -102,10 +103,13 @@ model User {
   messages Message[]
 
   // One-to-many relationship representing reactions to the messages.
-  reactions MessageReaction[]
+  messageReactions MessageReaction[]
 
   // One-to-many relationship representing starred messages.
-  starred StarredMessage[]
+  starredMessages StarredMessage[]
+
+  // One-to-many relationship representing deleted messages.
+  deletedMessages DeletedMessage[]
 }
 
 // The Account model represents external accounts connected to a user.
@@ -281,8 +285,9 @@ model Member {
 
 // The Message model represents a message in a conversation.
 model Message {
-  id   String      @id @default(cuid())
-  type MessageType // e.g., 'text', 'image'
+  id        String      @id @default(cuid())
+  type      MessageType // e.g., 'text', 'image'
+  isDeleted Boolean     @default(false) // Indicates if the message is deleted for everyone
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -295,9 +300,6 @@ model Message {
   conversationId String
   conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
 
-  // Optional relation to an image message, if the message type is 'image'.
-  imageMessage ImageMessage?
-
   // Relation to the MessageSeenStatus model to track seen statuses.
   seenByMembers MessageSeenStatus[]
 
@@ -307,8 +309,14 @@ model Message {
   // Relation to the StarredMessage model to track starred messages.
   starred StarredMessage[]
 
+  // Relation to the DeletedMessage model to track deleted messages.
+  deleted DeletedMessage[]
+
   // Optional relation to a text message, if the message type is 'text'.
   textMessage TextMessage?
+
+  // Optional relation to an image message, if the message type is 'image'.
+  imageMessage ImageMessage?
 }
 
 // The MessageSeenStatus model represents the seen status of a message.
@@ -359,6 +367,22 @@ model StarredMessage {
   message   Message @relation(fields: [messageId], references: [id], onDelete: Cascade)
 
   // Relationship to the user.
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([messageId, userId]) // Ensures a unique entry for each message and user
+}
+
+// The DeletedMessage model represents the relationship between users and the messages they have deleted.
+model DeletedMessage {
+  id        String   @id @default(cuid())
+  deletedAt DateTime @default(now())
+
+  // Relationship to the message.
+  messageId String
+  message   Message @relation(fields: [messageId], references: [id], onDelete: Cascade)
+
+  // Relationship to the user who deleted the message.
   userId String
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 

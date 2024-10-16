@@ -6,9 +6,15 @@ import { PhoneCall, Video, Info, MoreVertical } from "lucide-react";
 
 import { cn } from "@/utils/general/cn";
 import useChatInfoStore from "@/store/chat-info-store";
+import useMessengerDialogStore from "@/store/use-messenger-dialog-store";
 
-const ChatHeaderActions = () => {
+interface ChatHeaderActionsProps {
+	conversationId: string;
+}
+
+const ChatHeaderActions = ({ conversationId }: ChatHeaderActionsProps) => {
 	const toggleContactInfo = useChatInfoStore().toggleOpen;
+	const openClearConversationDialog = useMessengerDialogStore().onOpen;
 
 	const btnClassNames = `border-transparent text-neutral-700 dark:border-transparent dark:text-neutral-300`;
 	const popoverBtnClassNames = `w-full justify-start border-transparent bg-transparent px-2.5 text-left hover:bg-surface-light-300 dark:border-transparent dark:hover:bg-surface-dark-500`;
@@ -59,7 +65,15 @@ const ChatHeaderActions = () => {
 					>
 						<span className="font-semibold">Contact Info</span>
 					</Button>
-					<Button variant="outline" className={popoverBtnClassNames}>
+					<Button
+						variant="outline"
+						className={popoverBtnClassNames}
+						onClick={() =>
+							openClearConversationDialog("CLEAR_CONVERSATION", {
+								conversationToClear: { conversationId },
+							})
+						}
+					>
 						<span className="font-semibold">Clear Chat</span>
 					</Button>
 					<Button variant="outline" className={popoverBtnClassNames}>

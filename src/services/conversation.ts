@@ -19,5 +19,19 @@ const fetchParticipantInConversation = async (conversationId: string) => {
 	}
 };
 
-// eslint-disable-next-line import/prefer-default-export
-export { fetchParticipantInConversation };
+/**
+ * Clears all messages in a specified conversation.
+ */
+const clearConversation = async ({ conversationId }: { conversationId: string }) => {
+	try {
+		const res = await axios.delete<APIResponse<undefined>>(
+			`/conversations/${conversationId}/clear`
+		);
+		return res.data;
+	} catch (error) {
+		const errMsg = handleAxiosError(error);
+		throw new Error(errMsg);
+	}
+};
+
+export { fetchParticipantInConversation, clearConversation };

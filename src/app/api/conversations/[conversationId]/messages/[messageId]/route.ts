@@ -1,5 +1,3 @@
-/* eslint-disable import/prefer-default-export */
-
 import type { CompleteMessage } from "@/types";
 
 import { type NextRequest, NextResponse } from "next/server";
@@ -13,6 +11,7 @@ import { conversationEvents } from "@/constants/pusher-events";
 
 import { MESSAGE_INCLUDE } from "@/data/message";
 import { getCurrentUser } from "@/data/auth/session";
+import { deleteMessage, DeleteMessageError } from "@/lib/message";
 
 import { generatePrivateChatChannelName } from "@/utils/pusher/generate-chat-channel-name";
 import transformMessageSeenAndStarStatus from "@/utils/messenger/transform-message-seen-and-star-status";
@@ -148,4 +147,78 @@ export async function PATCH(req: NextRequest, { params }: { params: Params }) {
 			{ status: 500 }
 		);
 	}
+}
+
+/**
+ * Handler function for the DELETE request to delete a message in a conversation.
+ *
+ * @returns A JSON response indicating the result of the message deletion operation.
+ */
+export async function DELETE(req: NextRequest, { params }: { params: Params }) {
+	// Extract query parameters from the request URL.
+	const searchParams = req.nextUrl.searchParams;
+
+	// Retrieve the current user from the session (with authentication required)
+	const currentUser = await getCurrentUser(true);
+
+	// Check if the current user is authenticated. If not, respond with an unauthorized status.
+	if (!currentUser) {
+		return NextResponse.json(
+			{ success: false, message: "Unauthorized! Access denied" },
+			{ status: 401 }
+		);
+	}
+
+	// Extract the user's ID, conversation ID, and message ID from the request parameters.
+	const userId = currentUser.id;
+	const { conversationId, messageId } = params;
+
+	// Check if the request includes the flag to delete the message for everyone.
+	const deleteForEveryone = searchParams.get("delete_for_everyone") === "true";
+
+	// Attempt to delete the message based on the specified parameters.
+	const { error } = await deleteMessage({
+		conversationId,
+		messageId,
+		userId,
+		deleteForEveryone,
+	});
+
+	// Handle any errors that occurred during the message deletion process.
+	if (error) {
+		switch (error) {
+			case DeleteMessageError.MessageNotFound: {
+				return NextResponse.json(
+					{ success: false, message: "Message not found." },
+					{ status: 404 }
+				);
+			}
+
+			case DeleteMessageError.MessageAlreadyDeleted: {
+				return NextResponse.json(
+					{ success: false, message: "This message has already been deleted." },
+					{ status: 400 }
+				);
+			}
+
+			case DeleteMessageError.UserNotAuthorized: {
+				return NextResponse.json(
+					{ success: false, message: "You are not authorized to delete this message." },
+					{ status: 400 }
+				);
+			}
+
+			default: {
+				return NextResponse.json(
+					{ success: false, message: "An unexpected error occurred. Please try again later" },
+					{ status: 500 }
+				);
+			}
+		}
+	}
+
+	return NextResponse.json({
+		success: true,
+		message: "Message deleted successfully.",
+	});
 }

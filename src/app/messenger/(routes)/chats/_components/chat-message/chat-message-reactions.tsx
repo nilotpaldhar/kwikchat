@@ -1,5 +1,3 @@
-/* eslint-disable @next/next/no-img-element */
-
 "use client";
 
 import type { MessageReaction } from "@prisma/client";
@@ -13,7 +11,7 @@ interface ChatMessageReactionsProps {
 	reactions: MessageReaction[];
 }
 
-const ChatMessageReactions = ({ reactions }: ChatMessageReactionsProps) => {
+const ChatMessageReactions = ({ reactions = [] }: ChatMessageReactionsProps) => {
 	const groupedReactions = useMemo(() => groupReactionsByType(reactions), [reactions]);
 
 	return (
@@ -31,6 +29,7 @@ const ChatMessageReactions = ({ reactions }: ChatMessageReactionsProps) => {
 							{groupedReactions.map((reaction) => (
 								<li key={reaction.type}>
 									<div className="size-4 overflow-hidden rounded-full">
+										{/* eslint-disable-next-line @next/next/no-img-element */}
 										<img
 											src={reaction.emojiImageUrl}
 											alt={reaction.type}

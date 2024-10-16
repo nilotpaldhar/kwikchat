@@ -44,7 +44,7 @@ const ChatHeader = ({ conversationId, conversationType }: ChatHeaderProps) => {
 						<div>Group Chat</div>
 					)}
 				</div>
-				<ChatHeaderActions />
+				<ChatHeaderActions conversationId={conversationId} />
 			</header>
 			<ChatContactInfo
 				conversationId={conversationId}

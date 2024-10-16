@@ -15,7 +15,7 @@ interface StarredMessageDirectoryProps {
 const StarredMessageDirectory = ({ conversationId }: StarredMessageDirectoryProps) => {
 	const { data, isSuccess, isLoading, isError, error, refetch, fetchNextPage, isFetchingNextPage } =
 		useStarredMessagesQuery({ conversationId });
-	const isEmpty = isSuccess && (data?.pages[0].data?.items.length ?? 0) <= 0;
+	const isEmpty = isSuccess && (data?.pages[0]?.data?.items.length ?? 0) <= 0;
 
 	if (isLoading) {
 		return (

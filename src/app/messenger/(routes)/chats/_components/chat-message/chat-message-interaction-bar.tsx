@@ -3,30 +3,34 @@
 import { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 
-import ActionsTrigger from "@/app/messenger/(routes)/chats/_components/chat-message/actions-trigger";
-import ReactionTrigger, {
+import ChatMessageActionsMenu from "@/app/messenger/(routes)/chats/_components/chat-message/chat-message-actions-menu";
+import ChatMessageReactionButton, {
 	type ReactionClickData,
-} from "@/app/messenger/(routes)/chats/_components/chat-message/reaction-trigger";
+} from "@/app/messenger/(routes)/chats/_components/chat-message/chat-message-reaction-button";
 
 import { cn } from "@/utils/general/cn";
 
-interface ChatMessageActionsProps {
-	isOpen?: boolean;
-	isSender?: boolean;
+interface ChatMessageInteractionBarProps {
+	isOpen: boolean;
+	isSender: boolean;
 	isStarred: boolean;
+	isDeleted: boolean;
 	onEdit?: () => void;
 	onReaction?: (emoji: ReactionClickData) => void;
 	onToggleStar?: () => void;
+	onDelete?: () => void;
 }
 
-const ChatMessageActions = ({
-	isOpen = false,
-	isSender = false,
+const ChatMessageInteractionBar = ({
+	isOpen,
+	isSender,
 	isStarred,
+	isDeleted,
 	onEdit = () => {},
 	onReaction = () => {},
 	onToggleStar = () => {},
-}: ChatMessageActionsProps) => {
+	onDelete = () => {},
+}: ChatMessageInteractionBarProps) => {
 	const [openActionsTrigger, setOpenActionsTrigger] = useState(false);
 	const [openReactionTrigger, setOpenReactionTrigger] = useState(false);
 
@@ -54,6 +58,11 @@ const ChatMessageActions = ({
 		onToggleStar();
 	};
 
+	const handleDelete = () => {
+		setOpenActionsTrigger(false);
+		onDelete();
+	};
+
 	useEffect(() => {
 		if (!isOpen) {
 			setOpenActionsTrigger(false);
@@ -75,29 +84,34 @@ const ChatMessageActions = ({
 						isSender && "order-1"
 					)}
 				>
-					<motion.div
-						key="reaction-trigger"
-						variants={childVariants}
-						className={cn("h-max", isSender && "order-2")}
-					>
-						<ReactionTrigger
-							open={isOpen && openReactionTrigger}
-							onOpenChange={setOpenReactionTrigger}
-							onReaction={onReaction}
-						/>
-					</motion.div>
+					{!isDeleted && (
+						<motion.div
+							key="reaction-trigger"
+							variants={childVariants}
+							className={cn("h-max", isSender && "order-2")}
+						>
+							<ChatMessageReactionButton
+								open={isOpen && openReactionTrigger}
+								onOpenChange={setOpenReactionTrigger}
+								onReaction={onReaction}
+							/>
+						</motion.div>
+					)}
+
 					<motion.div
 						key="actions-trigger"
 						variants={childVariants}
 						className={cn("h-max", isSender && "order-1")}
 					>
-						<ActionsTrigger
+						<ChatMessageActionsMenu
 							isSender={isSender}
 							isStarred={isStarred}
+							isDeleted={isDeleted}
 							open={isOpen && openActionsTrigger}
 							onOpenChange={setOpenActionsTrigger}
 							onEdit={onEdit}
 							onToggleStar={handleToggleStar}
+							onDelete={handleDelete}
 						/>
 					</motion.div>
 				</motion.div>
@@ -106,4 +120,4 @@ const ChatMessageActions = ({
 	);
 };
 
-export default ChatMessageActions;
+export default ChatMessageInteractionBar;

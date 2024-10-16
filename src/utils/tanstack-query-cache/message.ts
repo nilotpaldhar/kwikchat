@@ -1,9 +1,9 @@
 import "client-only";
 
+import { MessageType, type MessageReaction } from "@prisma/client";
 import type { InfiniteData, QueryClient } from "@tanstack/react-query";
 import type { APIResponse, PaginatedResponse, CompleteMessage, MessageSeenMembers } from "@/types";
 import type { PaginationMetadata } from "@/utils/general/calculate-pagination";
-import type { MessageReaction } from "@prisma/client";
 
 import { messageKeys } from "@/constants/tanstack-query";
 
@@ -322,6 +322,46 @@ const removeStarredMessage = ({
 	);
 };
 
+const deleteMessage = ({
+	conversationId,
+	message,
+	deleteForEveryone = false,
+	queryClient,
+}: {
+	conversationId: string;
+	message?: CompleteMessage;
+	deleteForEveryone?: boolean;
+	queryClient: QueryClient;
+}) => {
+	queryClient.setQueryData<InfiniteData<APIResponse<PaginatedResponse<CompleteMessage>>>>(
+		messageKeys.all(conversationId),
+		(existingData) =>
+			updateInfinitePaginatedData<CompleteMessage>({
+				existingData,
+				updateFn: (data, pagination) => {
+					if (!deleteForEveryone) return removeMessage({ data, message, pagination });
+
+					const items = data?.items ?? [];
+
+					const updatedItems = items.map((msg) => {
+						if (msg.id !== message?.id) return msg;
+						return { ...message, isDeleted: true, type: MessageType.deleted };
+					});
+
+					return { data, pagination, items: updatedItems };
+				},
+			})
+	);
+	queryClient.setQueryData<InfiniteData<APIResponse<PaginatedResponse<CompleteMessage>>>>(
+		messageKeys.starred(conversationId),
+		(existingData) =>
+			updateInfinitePaginatedData<CompleteMessage>({
+				existingData,
+				updateFn: (data, pagination) => removeMessage({ data, message, pagination }),
+			})
+	);
+};
+
 export {
 	prependConversationMessage,
 	updateMessagesSeenMembers,
@@ -332,4 +372,5 @@ export {
 	toggleMessageStarStatus,
 	appendStarredMessage,
 	removeStarredMessage,
+	deleteMessage,
 };

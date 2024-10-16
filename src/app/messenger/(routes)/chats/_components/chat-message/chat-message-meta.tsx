@@ -1,7 +1,8 @@
 "use client";
 
-import { cn } from "@/utils/general/cn";
 import { CheckCheck, Star } from "lucide-react";
+
+import { cn } from "@/utils/general/cn";
 
 interface ChatMessageMetaProps {
 	timestamp: string;
@@ -9,6 +10,7 @@ interface ChatMessageMetaProps {
 	isRead: boolean;
 	isEdited: boolean;
 	isStarred: boolean;
+	isDeleted: boolean;
 }
 
 const ChatMessageMeta = ({
@@ -17,6 +19,7 @@ const ChatMessageMeta = ({
 	isRead,
 	isEdited,
 	isStarred,
+	isDeleted,
 }: ChatMessageMetaProps) => (
 	<div
 		className={cn(
@@ -35,8 +38,10 @@ const ChatMessageMeta = ({
 			</div>
 		)}
 		<div className={cn("lowercase", isSender && "order-3")}>{timestamp}</div>
-		{isEdited && <div className={cn("capitalize", isSender && "order-2")}>Edited</div>}
-		{isStarred && (
+		{!isDeleted && isEdited && (
+			<div className={cn("capitalize", isSender && "order-2")}>Edited</div>
+		)}
+		{!isDeleted && isStarred && (
 			<div className={cn(isSender && "order-1")}>
 				<Star size={12} />
 				<span className="sr-only">Starred</span>

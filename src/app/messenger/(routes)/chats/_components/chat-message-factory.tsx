@@ -1,13 +1,17 @@
 "use client";
 
 import type { CompleteMessage } from "@/types";
-import type { ReactionClickData } from "@/app/messenger/(routes)/chats/_components/chat-message/reaction-trigger";
+import type { ReactionClickData } from "@/app/messenger/(routes)/chats/_components/chat-message/chat-message-reaction-button";
 
 import { useMemo } from "react";
 import { format } from "date-fns";
 
-import ChatMessageText from "@/app/messenger/(routes)/chats/_components/chat-message/text";
-import ChatMessageImage from "@/app/messenger/(routes)/chats/_components/chat-message/image";
+import {
+	ChatMessage,
+	ChatMessageText,
+	ChatMessageImage,
+	ChatMessageDeleted,
+} from "@/app/messenger/(routes)/chats/_components/chat-message";
 
 import {
 	useCreateMessageReaction,
@@ -15,6 +19,8 @@ import {
 	useDeleteMessageReaction,
 	useToggleMessageStarStatus,
 } from "@/hooks/tanstack-query/use-message";
+
+import useMessengerDialogStore from "@/store/use-messenger-dialog-store";
 
 import isMessageEdited from "@/utils/messenger/is-message-edited";
 
@@ -24,6 +30,7 @@ interface ChatMessageFactoryProps {
 }
 
 const ChatMessageFactory = ({ message, currentUserId }: ChatMessageFactoryProps) => {
+	// Destructure message properties for readability
 	const content = message.textMessage?.content ?? "";
 	const reactions = message.reactions;
 	const isSender = currentUserId === message.senderId;
@@ -31,6 +38,10 @@ const ChatMessageFactory = ({ message, currentUserId }: ChatMessageFactoryProps)
 	const isEdited = isMessageEdited(message);
 	const formattedTime = useMemo(() => format(message.createdAt, "hh:mm a"), [message.createdAt]);
 
+	// Dialog store for opening popups like edit or delete message
+	const openMessageDialog = useMessengerDialogStore().onOpen;
+
+	// Message reaction mutations
 	const { mutate: createMessageReactionMutation } = useCreateMessageReaction();
 	const { mutate: updateMessageReactionMutation } = useUpdateMessageReaction();
 	const { mutate: deleteMessageReactionMutation } = useDeleteMessageReaction();
@@ -84,40 +95,51 @@ const ChatMessageFactory = ({ message, currentUserId }: ChatMessageFactoryProps)
 		toggleMessageStarStatusMutation({ conversationId: message.conversationId, message });
 	};
 
-	if (message.type === "image") {
-		return (
-			<ChatMessageImage
-				timestamp={formattedTime}
-				reactions={message.reactions}
-				isSender={isSender}
-				isRead={isRead}
-				isEdited={isEdited}
-				isStarred={message.isStarred}
-				onReaction={handleReaction}
-				onToggleStar={handleToggleStarStatus}
-			/>
-		);
-	}
+	/**
+	 * Opens the edit message dialog with the current message data.
+	 */
+	const handleEdit = () => {
+		openMessageDialog("EDIT_MESSAGE", {
+			messageToEdit: {
+				messageId: message.id,
+				conversationId: message.conversationId,
+				content,
+				timestamp: formattedTime,
+			},
+		});
+	};
 
-	if (message.type === "text") {
-		return (
-			<ChatMessageText
-				id={message.id}
-				conversationId={message.conversationId}
-				content={content}
-				reactions={message.reactions}
-				timestamp={formattedTime}
-				isSender={isSender}
-				isRead={isRead}
-				isEdited={isEdited}
-				isStarred={message.isStarred}
-				onReaction={handleReaction}
-				onToggleStar={handleToggleStarStatus}
-			/>
-		);
-	}
+	/**
+	 * Opens the delete message dialog with the current message data.
+	 */
+	const handleDelete = () => {
+		openMessageDialog("DELETE_MESSAGE", {
+			messageToDelete: {
+				message,
+				showDeleteForEveryone: isSender && !message.isDeleted,
+			},
+		});
+	};
 
-	return null;
+	return (
+		<ChatMessage
+			timestamp={formattedTime}
+			reactions={reactions}
+			isSender={isSender}
+			isRead={isRead}
+			isEdited={isEdited}
+			isStarred={message.isStarred}
+			isDeleted={message.isDeleted}
+			onReaction={handleReaction}
+			onToggleStar={handleToggleStarStatus}
+			onEdit={handleEdit}
+			onDelete={handleDelete}
+		>
+			{message.type === "text" && <ChatMessageText isSender={isSender} content={content} />}
+			{message.type === "image" && <ChatMessageImage isSender={isSender} />}
+			{message.type === "deleted" && <ChatMessageDeleted isSender={isSender} />}
+		</ChatMessage>
+	);
 };
 
 export default ChatMessageFactory;

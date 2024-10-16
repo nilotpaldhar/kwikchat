@@ -20,6 +20,7 @@ import {
 	updateMessageReaction,
 	deleteMessageReaction,
 	toggleMessageStarStatus,
+	deleteMessage,
 } from "@/services/message";
 
 import {
@@ -30,8 +31,9 @@ import {
 	optimisticDeleteMessageReaction,
 	optimisticToggleMessageStarStatus,
 	optimisticPrivateMessageError,
+	optimisticDeleteMessage,
 	refetchOptimisticPrivateMessages,
-	optimisticToggleMessageStarStatusError,
+	optimisticStarredMessageError,
 } from "@/utils/optimistic-updates/message";
 import {
 	prependConversationMessage,
@@ -354,12 +356,45 @@ const useToggleMessageStarStatus = () => {
 		// Rolls back the optimistic update if the mutation fails
 		onError: (error, { conversationId }, context) => {
 			optimisticPrivateMessageError({ conversationId, context, queryClient });
-			optimisticToggleMessageStarStatusError({ conversationId, context, queryClient });
+			optimisticStarredMessageError({ conversationId, context, queryClient });
 			toast.error(error.message);
 		},
 
 		// Called once the mutation is either successful or fails
 		// Ensures the cache is refetched and up to date after the mutation settles
+		onSettled: (_data, _error, { conversationId }) => {
+			refetchOptimisticPrivateMessages({
+				conversationId,
+				queryClient,
+			});
+		},
+	});
+};
+
+/**
+ * Custom hook to handle the deletion of a message using optimistic updates.
+ * It provides mutation functionality to delete a message and manages the state
+ * of the conversation and starred messages with React Query's query client.
+ */
+const useDeleteMessage = () => {
+	const queryClient = useQueryClient();
+
+	return useMutation({
+		// Function that performs the mutation to delete a message
+		mutationFn: deleteMessage,
+
+		// Called before the mutation function is triggered to handle optimistic updates
+		onMutate: ({ conversationId, message, deleteForEveryone }) =>
+			optimisticDeleteMessage({ conversationId, message, deleteForEveryone, queryClient }),
+
+		// Called if the mutation fails, rolling back optimistic updates and showing an error message
+		onError: (error, { conversationId }, context) => {
+			optimisticPrivateMessageError({ conversationId, context, queryClient });
+			optimisticStarredMessageError({ conversationId, context, queryClient });
+			toast.error(error.message);
+		},
+
+		// Called when the mutation either succeeds or fails, to refetch the conversation messages
 		onSettled: (_data, _error, { conversationId }) => {
 			refetchOptimisticPrivateMessages({
 				conversationId,
@@ -379,4 +414,5 @@ export {
 	useUpdateMessageReaction,
 	useDeleteMessageReaction,
 	useToggleMessageStarStatus,
+	useDeleteMessage,
 };

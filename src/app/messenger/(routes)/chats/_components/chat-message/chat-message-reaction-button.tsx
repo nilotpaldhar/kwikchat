@@ -19,17 +19,17 @@ export interface ReactionClickData {
 	emojiImageUrl: string;
 }
 
-interface ReactionTriggerProps {
-	open?: boolean;
+interface ChatMessageReactionButtonProps {
+	open: boolean;
 	onOpenChange?: (open: boolean) => void;
 	onReaction?: (emoji: ReactionClickData) => void;
 }
 
-const ReactionTrigger = ({
-	open = false,
+const ChatMessageReactionButton = ({
+	open,
 	onOpenChange = () => {},
 	onReaction = () => {},
-}: ReactionTriggerProps) => {
+}: ChatMessageReactionButtonProps) => {
 	const handleReactionClick = (emojiData: EmojiClickData) => {
 		const reactionType = mapMessageReactionType(emojiData.unified as EmojiUnified);
 		const { emoji, imageUrl: emojiImageUrl } = emojiData;
@@ -66,4 +66,4 @@ const ReactionTrigger = ({
 	);
 };
 
-export default ReactionTrigger;
+export default ChatMessageReactionButton;

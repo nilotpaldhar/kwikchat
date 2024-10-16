@@ -41,7 +41,7 @@ const EditMessageDialog = () => {
 
 		mutate({
 			conversationId: message.conversationId,
-			messageId: message.messageid,
+			messageId: message.messageId,
 			message: updatedMsg,
 		});
 		onClose();

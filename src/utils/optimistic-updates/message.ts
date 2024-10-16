@@ -17,6 +17,7 @@ import {
 	toggleMessageStarStatus,
 	appendStarredMessage,
 	removeStarredMessage,
+	deleteMessage,
 } from "@/utils/tanstack-query-cache/message";
 
 import { getInfiniteQueryData } from "@/utils/tanstack-query-cache/helpers";
@@ -49,6 +50,7 @@ const createCompleteMessage = ({
 		imageMessage: null,
 		reactions: [],
 		isStarred: false,
+		isDeleted: false,
 	};
 
 	return newMessage;
@@ -254,6 +256,36 @@ const optimisticToggleMessageStarStatus = async ({
 	return { messagesData, starredMessagesData };
 };
 
+const optimisticDeleteMessage = async ({
+	conversationId,
+	message,
+	deleteForEveryone = false,
+	queryClient,
+}: {
+	conversationId: string;
+	message?: CompleteMessage;
+	deleteForEveryone?: boolean;
+	queryClient: QueryClient;
+}) => {
+	// Cancel ongoing queries related to messages to ensure cache consistency
+	await queryClient.cancelQueries({ queryKey: messageKeys.all(conversationId) });
+	await queryClient.cancelQueries({ queryKey: messageKeys.starred(conversationId) });
+
+	const messagesData = getInfiniteQueryData<CompleteMessage>({
+		keys: messageKeys.all(conversationId),
+		queryClient,
+	});
+
+	const starredMessagesData = getInfiniteQueryData<CompleteMessage>({
+		keys: messageKeys.starred(conversationId),
+		queryClient,
+	});
+
+	deleteMessage({ conversationId, message, deleteForEveryone, queryClient });
+
+	return { messagesData, starredMessagesData };
+};
+
 const optimisticPrivateMessageError = async ({
 	conversationId,
 	context,
@@ -269,7 +301,7 @@ const optimisticPrivateMessageError = async ({
 	queryClient.setQueryData(messageKeys.all(conversationId), context.messagesData);
 };
 
-const optimisticToggleMessageStarStatusError = async ({
+const optimisticStarredMessageError = async ({
 	conversationId,
 	context,
 	queryClient,
@@ -302,7 +334,8 @@ export {
 	optimisticUpdateMessageReaction,
 	optimisticDeleteMessageReaction,
 	optimisticToggleMessageStarStatus,
+	optimisticDeleteMessage,
 	optimisticPrivateMessageError,
-	optimisticToggleMessageStarStatusError,
+	optimisticStarredMessageError,
 	refetchOptimisticPrivateMessages,
 };

@@ -63,18 +63,26 @@ const getMessagesFromDB = async ({
 	const skip = (page - 1) * pageSize;
 	const take = pageSize;
 
+	// Base where clause to filter messages
+	const baseWhereClause: Prisma.MessageWhereInput = {
+		conversationId,
+		NOT: {
+			deleted: { some: { userId } },
+		},
+	};
+
 	try {
 		// Fetch messages and total count from the database
 		const [messageList, totalItems] = await Promise.all([
 			prisma.message.findMany({
-				where: { conversationId },
+				where: baseWhereClause,
 				include: MESSAGE_INCLUDE,
 				skip,
 				take,
 				orderBy: { createdAt: "desc" },
 			}),
 			prisma.message.count({
-				where: { conversationId },
+				where: baseWhereClause,
 			}),
 		]);
 
