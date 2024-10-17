@@ -1,3 +1,21 @@
+# [0.6.0](https://github.com/nilotpaldhar/storekeeper/compare/v0.5.0...v0.6.0) (2024-10-17)
+
+
+### Features
+
+* **messenger-chat:** add chat screen ([40af9c4](https://github.com/nilotpaldhar/storekeeper/commit/40af9c476808b34433c0e9d4253b9732615e8ed0))
+* **messenger-chat:** add ChatInput component with dynamic resizing and message handling ([1d8996f](https://github.com/nilotpaldhar/storekeeper/commit/1d8996ffcca199c87b7afa747331ae64feac6104))
+* **messenger-chat:** add New Chat Dialog component with friend selection functionality ([11f2613](https://github.com/nilotpaldhar/storekeeper/commit/11f261306cc8a8b3a948099795b9eb92fc9fe1f4))
+* **messenger-chat:** add real-time message updates for seamless user interaction ([5e499e1](https://github.com/nilotpaldhar/storekeeper/commit/5e499e108c8f951db98802dd38162f9c95e63ec0))
+* **messenger-chat:** add support for displaying message reactions in chat messages ([da51203](https://github.com/nilotpaldhar/storekeeper/commit/da51203b5256f278f7ec46937025d7021eb91b17))
+* **messenger-chat:** add support for starring messages in chat ([72de18d](https://github.com/nilotpaldhar/storekeeper/commit/72de18d198c571bb092c53f7126a848c8f8a0e46))
+* **messenger-chat:** implement clear chat functionality and add message deletion feature ([ab6030c](https://github.com/nilotpaldhar/storekeeper/commit/ab6030c18373e4cb25e3076e8a30f53cdc4d7956))
+* **messenger-chat:** implement functionality to open chat screen for user conversations ([7f024f9](https://github.com/nilotpaldhar/storekeeper/commit/7f024f94c4b2b9abe02e4a81f5b94b4285ae7e18))
+* **messenger-chat:** implement private one-to-one chat with real-time messaging functionality ([8424d12](https://github.com/nilotpaldhar/storekeeper/commit/8424d12b3eeb25a21e9023440ddc309b87f04f6e))
+* **messenger-chat:** implement real-time message seen status tracking ([2757ec9](https://github.com/nilotpaldhar/storekeeper/commit/2757ec9245de0ba1c8403c4a9cf296a67ca8ca80))
+
+
+
 # [0.5.0](https://github.com/nilotpaldhar/storekeeper/compare/v0.4.0...v0.5.0) (2024-09-11)
 
 
