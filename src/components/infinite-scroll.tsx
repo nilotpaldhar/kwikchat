@@ -23,7 +23,7 @@ const InfiniteScroll = ({ children, loading = false, next, className }: Infinite
 	return (
 		<>
 			<div className={className}>{children}</div>
-			<div ref={ref}>{true && <Loader loading={loading} />}</div>
+			<div ref={ref}>{loading && <Loader />}</div>
 		</>
 	);
 };

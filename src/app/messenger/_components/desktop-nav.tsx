@@ -44,10 +44,14 @@ const DesktopNav = () => {
 		<ul className="flex flex-col space-y-6">
 			<li>
 				<DesktopNavLink
-					href="/messenger/chats"
+					href="/messenger"
 					icon={MessagesSquare}
 					srText="Chats"
-					active={pathname.startsWith("/messenger/chats") || pathname === "/messenger"}
+					active={
+						pathname.startsWith("/messenger/chats") ||
+						pathname === "/messenger/open-chat" ||
+						pathname === "/messenger"
+					}
 				/>
 			</li>
 			<li>

@@ -1,29 +1,21 @@
 import { cn } from "@/utils/general/cn";
-import PulseLoader from "react-spinners/PulseLoader";
 
 interface LoaderProps {
-	color?: string;
-	loading?: boolean;
-	size?: number;
 	containerClassName?: string;
 	className?: string;
 }
 
-const Loader = ({
-	color = "#27AE80",
-	loading = false,
-	size = 8,
-	containerClassName,
-	className,
-}: LoaderProps) => (
-	<div className={cn("flex items-center justify-center py-2", containerClassName)}>
-		<PulseLoader
-			color={color}
-			loading={loading}
-			size={size}
-			aria-label="Loading Spinner"
-			className={className}
-		/>
+const Loader = ({ containerClassName, className }: LoaderProps) => (
+	<div
+		className={cn("flex items-center justify-center py-2", containerClassName)}
+		role="status"
+		aria-label="Loading, please wait..."
+	>
+		<div className={cn("flex max-w-max items-center justify-center space-x-1.5", className)}>
+			<div className="animate-big-bounce size-2.5 rounded-full bg-primary-400" />
+			<div className="animate-big-bounce animation-delay-200 size-2.5 rounded-full bg-primary-400" />
+			<div className="animate-big-bounce animation-delay-400 size-2.5 rounded-full bg-primary-400" />
+		</div>
 	</div>
 );
 

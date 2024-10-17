@@ -88,7 +88,7 @@ const FriendsPane = () => {
 								</div>
 							</InfiniteScroll>
 							<UIBlocker
-								isBlocking={!isLoading && isFetching}
+								isBlocking={!isLoading && isFetching && !isFetchingNextPage}
 								spinnerClassName="text-neutral-500 dark:text-neutral-400"
 							/>
 						</>

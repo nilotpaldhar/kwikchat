@@ -21,11 +21,14 @@ const usePusher = <T>(
 	useEffect(() => {
 		if (!channelId) return;
 
-		pusherClient.subscribe(channelId);
-		pusherClient.bind(eventName, stableCallback);
+		const channel = pusherClient.subscribe(channelId);
+		channel.bind(eventName, stableCallback);
 
 		// Cleanup on unmount or when channelId changes
-		return () => pusherClient.unsubscribe(channelId);
+		return () => {
+			channel.unbind(eventName);
+			pusherClient.unsubscribe(channelId);
+		};
 	}, [channelId, eventName, stableCallback]);
 };
 

@@ -1,6 +1,7 @@
-/* eslint-disable import/prefer-default-export */
-
 import * as z from "zod";
+
+import { MAX_MESSAGE_CHAR_LENGTH } from "@/constants/chat-input";
+import { MessageReactionType } from "@prisma/client";
 
 export const SigninSchema = z.object({
 	email: z.string().email({ message: "Please enter a valid email address" }),
@@ -76,4 +77,25 @@ export const ProfileSchema = z.object({
 	bannerColor: z.string().nullable().optional(),
 	bio: z.string().max(190, "Bio must be 190 characters or fewer").nullable().optional(),
 	avatar: z.string().nullable().optional(),
+});
+
+export const TextMessageSchema = z.object({
+	message: z
+		.string()
+		.trim()
+		.min(1, { message: "Message content cannot be empty." })
+		.max(
+			MAX_MESSAGE_CHAR_LENGTH,
+			`Your message is too long (over ${MAX_MESSAGE_CHAR_LENGTH} characters). Please shorten it and try again.`
+		),
+});
+
+export const SeenMessageSchema = z.object({
+	messageIds: z.array(z.string()),
+});
+
+export const MessageReactionSchema = z.object({
+	reactionType: z.nativeEnum(MessageReactionType),
+	emoji: z.string().emoji().min(1, "Emoji is required"),
+	emojiImageUrl: z.string().url("Emoji image URL is not valid "),
 });

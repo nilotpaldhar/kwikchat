@@ -27,12 +27,20 @@ const ProfileBanner = ({ color = "#27ae80", className, ...props }: ProfileBanner
 ProfileBanner.displayName = "ProfileBanner";
 
 interface ProfileAvatarProps extends UserAvatarProps {}
-const ProfileAvatar = ({ ...props }: ProfileAvatarProps) => (
+const ProfileAvatar = ({
+	className,
+	wrapperClassName,
+	indicatorClassName,
+	...props
+}: ProfileAvatarProps) => (
 	<div className="absolute left-5 top-[56%]">
 		<UserAvatar
-			className="size-[68px]"
-			wrapperClassName="size-20 bg-white dark:bg-surface-dark-500"
-			indicatorClassName="bottom-2 right-2 size-3 ring-4 dark:ring-surface-dark-500"
+			className={cn("size-[68px]", className)}
+			wrapperClassName={cn("size-20 bg-white dark:bg-surface-dark-500", wrapperClassName)}
+			indicatorClassName={cn(
+				"bottom-2 right-2 size-3 ring-4 dark:ring-surface-dark-500",
+				indicatorClassName
+			)}
 			{...props}
 		/>
 	</div>

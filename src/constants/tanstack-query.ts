@@ -1,4 +1,9 @@
 /**
+ * Refetch interval for polling online friends data in milliseconds (30 seconds).
+ */
+export const ONLINE_FRIENDS_REFETCH_INTERVAL = 30000; // 3 seconds
+
+/**
  * User query keys
  *
  * Contains keys used to uniquely identify queries related to user data.
@@ -43,6 +48,17 @@ export const blockedUserKeys = {
 };
 
 /**
- * Refetch interval for polling online friends data in milliseconds (30 seconds).
+ * Conversation query keys
+ *
+ * Contains keys used to uniquely identify queries related to conversations.
  */
-export const ONLINE_FRIENDS_REFETCH_INTERVAL = 30000; // 3 seconds
+export const conversationKeys = {
+	all: ["conversations"] as const,
+	participant: (id: string) => [...conversationKeys.all, "participant", id] as const,
+};
+
+export const messageKeys = {
+	base: ["messages"] as const,
+	all: (conversationId: string) => [...messageKeys.base, "all", conversationId] as const,
+	starred: (conversationId: string) => [...messageKeys.base, "starred", conversationId] as const,
+};

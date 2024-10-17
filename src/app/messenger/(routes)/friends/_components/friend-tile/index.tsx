@@ -2,6 +2,8 @@
 
 import type { FriendWithFriendship } from "@/types";
 
+import { useRouter, usePathname } from "next/navigation";
+
 import { MessageCircle, MoreVertical } from "lucide-react";
 
 import UserAvatar from "@/components/user/user-avatar";
@@ -12,6 +14,7 @@ import {
 } from "@/app/messenger/(routes)/friends/_components/action-button";
 
 import { cn } from "@/utils/general/cn";
+import buildOpenChatUrl from "@/utils/messenger/build-open-chat-url";
 import { useBlock } from "@/hooks/tanstack-query/use-block";
 import { useUnfriend } from "@/hooks/tanstack-query/use-friend";
 
@@ -20,12 +23,20 @@ interface FriendTileProps extends FriendWithFriendship {
 }
 
 const FriendTile = ({ className, ...friend }: FriendTileProps) => {
+	const router = useRouter();
+	const pathname = usePathname();
+
 	const { avatar, displayName, username } = friend;
 
 	const blockMutation = useBlock();
 	const unfriendMutation = useUnfriend();
 
 	const fallback = displayName ? displayName.charAt(0) : username?.charAt(0);
+
+	const handleInitChat = () => {
+		const url = buildOpenChatUrl(friend.id, pathname);
+		router.push(url);
+	};
 
 	return (
 		<div
@@ -50,6 +61,7 @@ const FriendTile = ({ className, ...friend }: FriendTileProps) => {
 					icon={MessageCircle}
 					tooltipText="Message"
 					srText={`Message ${username}`}
+					onClick={handleInitChat}
 				/>
 				<MoreActions
 					username={username as string}

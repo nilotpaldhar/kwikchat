@@ -36,7 +36,7 @@ Wrapper.displayName = "WrapperContentZone";
 const WrapperHeader: React.FC<React.HTMLAttributes<HTMLDivElement>> = ({ children, className }) => (
 	<div
 		className={cn(
-			"absolute top-0 z-10 h-16 w-full overflow-hidden border-b border-transparent bg-surface-light-100 shadow-header dark:border-neutral-900 dark:bg-surface-dark-600",
+			"absolute top-0 z-50 h-16 w-full overflow-hidden border-b border-transparent bg-surface-light-100 shadow-header dark:border-neutral-900 dark:bg-surface-dark-600",
 			className
 		)}
 	>
@@ -60,7 +60,7 @@ Wrapper.displayName = "WrapperContent";
 const WrapperFooter: React.FC<React.HTMLAttributes<HTMLDivElement>> = ({ children, className }) => (
 	<div
 		className={cn(
-			"absolute bottom-0 z-10 h-20 w-full overflow-hidden border-t border-transparent bg-surface-light-100 shadow-mobile-nav dark:border-neutral-900 dark:bg-surface-dark-600",
+			"absolute bottom-0 z-50 h-20 w-full overflow-hidden border-t border-transparent bg-surface-light-100 shadow-mobile-nav dark:border-neutral-900 dark:bg-surface-dark-600",
 			className
 		)}
 	>
