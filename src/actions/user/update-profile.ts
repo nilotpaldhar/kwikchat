@@ -13,12 +13,20 @@ import { getCurrentUser } from "@/data/auth/session";
 import { AVATAR_UPLOAD_MESSAGE, PROFILE_UPDATE_MESSAGE } from "@/constants/user";
 
 // Uploads an avatar image to the server.
-async function uploadAvatar({ avatar, username }: { avatar: string; username: string }) {
+async function uploadAvatar({
+	avatar,
+	username,
+	userId,
+}: {
+	avatar: string;
+	username: string;
+	userId: string;
+}) {
 	try {
 		const res = await uploadImage({
 			image: avatar,
 			imageName: `${username}-avatar`,
-			folder: "avatars",
+			folder: `${userId}/avatars`,
 		});
 		return res.url;
 	} catch (error) {
@@ -49,6 +57,7 @@ async function updateProfile(values: z.infer<typeof ProfileSchema>) {
 		avatarUrl = await uploadAvatar({
 			avatar,
 			username: currentUser?.username as string,
+			userId: currentUser?.id,
 		});
 		if (!avatarUrl) return { error: AVATAR_UPLOAD_MESSAGE.error.failedToUpload };
 	}

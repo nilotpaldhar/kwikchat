@@ -32,6 +32,13 @@ const ChatPage = async ({ params: { id } }: ChatPageProps) => {
 	const conversation = await getConversationByIdAndUserId({ id, userId: user.id });
 	if (!conversation) notFound();
 
+	if (conversation.isGroup)
+		return (
+			<div className="flex h-full w-full items-center justify-center text-2xl font-semibold">
+				Group Conversation
+			</div>
+		);
+
 	return (
 		<Wrapper className="overflow-hidden">
 			<WrapperSidePanel className="bg-surface-light-100 dark:bg-surface-dark-600">

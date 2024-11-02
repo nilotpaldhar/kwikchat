@@ -6,11 +6,13 @@ import type {
 	TextMessage,
 	ImageMessage,
 	MessageReaction,
+	Media,
 } from "@prisma/client";
 import { PaginationMetadata } from "@/utils/general/calculate-pagination";
 
 export interface UserProfile extends Omit<User, "password" | "image"> {}
 export interface UserWithoutPassword extends Omit<User, "password"> {}
+export interface MediaWithoutId extends Omit<Media, "id"> {}
 
 export enum AuthError {
 	Configuration = "Configuration",

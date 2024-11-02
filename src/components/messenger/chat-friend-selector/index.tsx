@@ -17,10 +17,15 @@ import { useFriendsQuery } from "@/hooks/tanstack-query/use-friend";
 
 interface ChatFriendSelectorProps {
 	isGroup?: boolean;
+	defaultSelectedIds?: string[];
 	onSelect?: (friendId: string, selected: boolean) => void;
 }
 
-const ChatFriendSelector = ({ isGroup = false, onSelect }: ChatFriendSelectorProps) => {
+const ChatFriendSelector = ({
+	isGroup = false,
+	defaultSelectedIds = [],
+	onSelect,
+}: ChatFriendSelectorProps) => {
 	const [searchQuery, setSearchQuery] = useState("");
 	const [isOnline, setIsOnline] = useState(false);
 
@@ -82,6 +87,7 @@ const ChatFriendSelector = ({ isGroup = false, onSelect }: ChatFriendSelectorPro
 															<FriendTile
 																{...friend}
 																className="px-4 sm:px-5 lg:px-6"
+																defaultSelected={defaultSelectedIds.includes(friend.id)}
 																showCheckbox={isGroup}
 																onChange={onSelect}
 															/>

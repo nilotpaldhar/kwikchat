@@ -82,7 +82,7 @@ const ForgotPasswordForm = () => {
 									/>
 								</FormControl>
 								<FormMessage />
-								<FormDescription>Enter the email with which you’ve registered</FormDescription>
+								<FormDescription>Enter the email with which you&apos;ve registered</FormDescription>
 							</FormItem>
 						)}
 					/>

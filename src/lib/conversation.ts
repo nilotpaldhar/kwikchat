@@ -1,3 +1,5 @@
+import type { MediaWithoutId } from "@/types";
+
 import { prisma } from "@/lib/db";
 
 /**
@@ -21,6 +23,53 @@ const createPrivateConversation = async ({
 	});
 
 	return conversation;
+};
+
+/**
+ *
+ */
+const createGroupConversation = async ({
+	groupName,
+	groupDescription,
+	groupMemberIds,
+	groupIcon,
+	createdBy,
+}: {
+	groupName: string;
+	groupDescription: string | null;
+	groupMemberIds: string[];
+	groupIcon: MediaWithoutId | null;
+	createdBy: string;
+}) => {
+	const groupConversation = await prisma.$transaction(async (prismaClient) => {
+		// Create the Group Conversation
+		const conversation = await prismaClient.conversation.create({
+			data: {
+				isGroup: true,
+				createdBy,
+				groupDetails: {
+					create: {
+						name: groupName,
+						description: groupDescription,
+						icon: groupIcon ? { create: groupIcon } : undefined,
+					},
+				},
+			},
+		});
+
+		// Create Member entries for each user
+		await prismaClient.member.createMany({
+			data: [...groupMemberIds, createdBy].map((memberId) => ({
+				conversationId: conversation.id,
+				userId: memberId,
+				role: memberId === createdBy ? "admin" : "member",
+			})),
+		});
+
+		return conversation;
+	});
+
+	return groupConversation;
 };
 
 /**
@@ -77,4 +126,4 @@ const clearConversation = async ({
 	}
 };
 
-export { createPrivateConversation, clearConversation };
+export { createPrivateConversation, createGroupConversation, clearConversation };

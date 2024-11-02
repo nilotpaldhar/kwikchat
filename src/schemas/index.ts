@@ -99,3 +99,18 @@ export const MessageReactionSchema = z.object({
 	emoji: z.string().emoji().min(1, "Emoji is required"),
 	emojiImageUrl: z.string().url("Emoji image URL is not valid "),
 });
+
+export const NewGroupSchema = z.object({
+	groupName: z
+		.string()
+		.min(1, { message: "Group name is required" })
+		.max(100, { message: "Group name must be at most 100 characters long" }),
+	groupDescription: z
+		.string()
+		.max(200, { message: "Group description must be at most 200 characters long" })
+		.optional(),
+	groupIcon: z.string().optional(),
+	groupMemberIds: z
+		.array(z.string())
+		.min(1, { message: "Please select at least one group member." }),
+});

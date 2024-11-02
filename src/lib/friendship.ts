@@ -25,6 +25,41 @@ const areUsersFriends = async ({
 };
 
 /**
+ * Checks if a user has a friendship with any of the specified friend IDs.
+ */
+const hasAnyFriendshipWithUser = async ({
+	userId,
+	friendIds,
+}: {
+	userId: string;
+	friendIds: string[];
+}) => {
+	const friendshipExists = await prisma.friendship.findMany({
+		where: {
+			OR: [
+				{ userId: userId, friendId: { in: friendIds } },
+				{ friendId: userId, userId: { in: friendIds } },
+			],
+		},
+		select: { userId: true, friendId: true },
+	});
+
+	const friendStatuses = friendIds.reduce<Record<string, boolean>>((acc, friendId) => {
+		const isFriend = friendshipExists.some(
+			(friendship) =>
+				(friendship.userId === userId && friendship.friendId === friendId) ||
+				(friendship.friendId === userId && friendship.userId === friendId)
+		);
+		acc[friendId] = isFriend;
+		return acc;
+	}, {});
+
+	const hasNoFriends = Object.values(friendStatuses).some((status) => !status);
+
+	return { friendStatuses, hasNoFriends };
+};
+
+/**
  * Removes duplicate friends from an array based on the friend ID.
  */
 const removeDuplicateFriends = (friends: FriendWithFriendship[]): FriendWithFriendship[] => {
@@ -76,4 +111,4 @@ const deleteFriendship = async ({ userId, friendId }: { userId: string; friendId
 	}
 };
 
-export { areUsersFriends, removeDuplicateFriends, deleteFriendship };
+export { areUsersFriends, hasAnyFriendshipWithUser, removeDuplicateFriends, deleteFriendship };
