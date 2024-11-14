@@ -38,6 +38,7 @@ export interface GetUserMessageResponse {
 
 // Prisma include statement for fetching a complete message with associated data.
 export const MESSAGE_INCLUDE = {
+	conversation: true,
 	textMessage: true,
 	imageMessage: true,
 	sender: { omit: { password: true, image: true } },

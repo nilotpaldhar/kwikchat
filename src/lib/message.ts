@@ -1,6 +1,14 @@
-import type { MessageSeenMembers } from "@/types";
+import type { CompleteMessage, ConversationWithMembers, MessageSeenMembers } from "@/types";
 
 import { prisma } from "@/lib/db";
+import { pusherServer } from "@/lib/pusher/server";
+
+import { isBlocked } from "@/lib/block";
+import { areUsersFriends } from "@/lib/friendship";
+import generateChatChannelName from "@/utils/pusher/generate-chat-channel-name";
+import { MESSAGE_INCLUDE } from "@/data/message";
+
+import transformMessageSeenAndStarStatus from "@/utils/messenger/transform-message-seen-and-star-status";
 
 export enum DeleteMessageError {
 	MessageNotFound = "MessageNotFound",
@@ -12,6 +20,30 @@ export enum DeleteMessageError {
 interface DeleteMessageResponse {
 	messageId: string | null;
 	error: DeleteMessageError | null;
+}
+
+export enum SendPrivateMessageError {
+	ReceiverNotFound = "ReceiverNotFound",
+	SenderBlocked = "SenderBlocked",
+	FriendshipNotFound = "FriendshipNotFound",
+	UnknownError = "UnknownError",
+}
+
+interface SendPrivateMessageResponse {
+	receiverId: string | null;
+	message: CompleteMessage | null;
+	error: SendPrivateMessageError | null;
+}
+
+export enum SendGroupMessageError {
+	NotGroupMember = "NotGroupMember",
+	UnknownError = "UnknownError",
+}
+
+interface SendGroupMessageResponse {
+	receiverIds: string[];
+	message: CompleteMessage | null;
+	error: SendGroupMessageError | null;
 }
 
 /**
@@ -178,4 +210,183 @@ const deleteMessage = async ({
 	}
 };
 
-export { updateMessageSeenStatus, deleteMessage };
+/**
+ * Sends a private message from one user to another within an existing conversation.
+ */
+const sendPrivateMessage = async ({
+	conversation,
+	senderId,
+	messageContent,
+}: {
+	conversation: ConversationWithMembers;
+	senderId: string;
+	messageContent: string;
+}): Promise<SendPrivateMessageResponse> => {
+	// Helper function to build an error response
+	const buildErrorResponse = (error: SendPrivateMessageError): SendPrivateMessageResponse => ({
+		receiverId: null,
+		message: null,
+		error,
+	});
+
+	try {
+		// Identify the receiver ID by finding the conversation member who isn't the sender.
+		const receiverId = conversation.members.find((member) => member.userId !== senderId)?.userId;
+		if (!receiverId) return buildErrorResponse(SendPrivateMessageError.ReceiverNotFound);
+
+		// Check if the sender is blocked by the receiver.
+		const blocked = await isBlocked({ blockerId: receiverId, blockedId: senderId });
+		if (blocked) return buildErrorResponse(SendPrivateMessageError.SenderBlocked);
+
+		// Verify if the sender and receiver are friends.
+		const isFriend = await areUsersFriends({ senderId, receiverId });
+		if (!isFriend) return buildErrorResponse(SendPrivateMessageError.FriendshipNotFound);
+
+		// Create and save the message in the database.
+		const message = await prisma.message.create({
+			data: {
+				conversationId: conversation.id,
+				senderId,
+				type: "text",
+				textMessage: {
+					create: { content: messageContent },
+				},
+			},
+			include: MESSAGE_INCLUDE,
+		});
+
+		// Return the message along with the transformed status for the sender.
+		return {
+			receiverId,
+			message: transformMessageSeenAndStarStatus({ message: message, userId: senderId }),
+			error: null,
+		};
+	} catch (error) {
+		return buildErrorResponse(SendPrivateMessageError.UnknownError);
+	}
+};
+
+/**
+ * Sends a message in a group conversation.
+ */
+const sendGroupMessage = async ({
+	conversation,
+	senderId,
+	messageContent,
+}: {
+	conversation: ConversationWithMembers;
+	senderId: string;
+	messageContent: string;
+}): Promise<SendGroupMessageResponse> => {
+	// Helper function to build an error response
+	const buildErrorResponse = (error: SendGroupMessageError): SendGroupMessageResponse => ({
+		receiverIds: [],
+		message: null,
+		error,
+	});
+
+	try {
+		// Check if the sender is a member of the conversation
+		const isMember = conversation.members.some((member) => member.userId === senderId);
+		if (!isMember) {
+			return buildErrorResponse(SendGroupMessageError.NotGroupMember);
+		}
+
+		// Collect IDs of all members except the sender to notify them of the new message
+		const receiverIds = conversation.members
+			.filter((member) => member.userId !== senderId)
+			.map((member) => member.userId);
+
+		// Create the message in the database, linking it to the conversation and sender
+		const message = await prisma.message.create({
+			data: {
+				conversationId: conversation.id,
+				senderId,
+				type: "text",
+				textMessage: {
+					create: { content: messageContent },
+				},
+			},
+			include: MESSAGE_INCLUDE,
+		});
+
+		// Transform the message for the sender with seen and star status
+		return {
+			receiverIds,
+			message: transformMessageSeenAndStarStatus({ message: message, userId: senderId }),
+			error: null,
+		};
+	} catch (error) {
+		return buildErrorResponse(SendGroupMessageError.UnknownError);
+	}
+};
+
+/**
+ * Broadcasts a private message to a specific user via a Pusher channel.
+ */
+const broadcastPrivateMessage = async <MessagePayload>({
+	conversationId,
+	eventName,
+	receiverId,
+	payload,
+}: {
+	conversationId: string;
+	eventName: string;
+	receiverId: string;
+	payload: MessagePayload;
+}) => {
+	try {
+		// Generate the private chat channel ID for the receiver based on the conversation and receiver IDs
+		const channelId = generateChatChannelName({
+			conversationId,
+			receiverId,
+		});
+
+		// Trigger the specified event on the generated channel with the payload
+		pusherServer.trigger(channelId, eventName, payload);
+	} catch (error) {
+		// eslint-disable-next-line no-console
+		console.error("Failed to broadcast private message.");
+	}
+};
+
+/**
+ * Broadcasts a group message to all specified receivers via Pusher channels.
+ */
+const broadcastGroupMessage = async <MessagePayload>({
+	conversationId,
+	eventName,
+	receiverIds,
+	payload,
+}: {
+	conversationId: string;
+	eventName: string;
+	receiverIds: string[];
+	payload: MessagePayload;
+}) => {
+	try {
+		// Generate group chat channel IDs for each receiver
+		const groupChatChannelIds = receiverIds.map((receiverId) =>
+			generateChatChannelName({
+				conversationId: conversationId,
+				conversationType: "group",
+				receiverId,
+			})
+		);
+
+		// Trigger the event on all channels with the message as payload
+		pusherServer.trigger(groupChatChannelIds, eventName, payload);
+	} catch (error) {
+		// eslint-disable-next-line no-console
+		console.error("Failed to broadcast group message.");
+	}
+};
+
+export {
+	updateMessageSeenStatus,
+	deleteMessage,
+	sendPrivateMessage,
+	sendGroupMessage,
+	broadcastPrivateMessage,
+	broadcastGroupMessage,
+};

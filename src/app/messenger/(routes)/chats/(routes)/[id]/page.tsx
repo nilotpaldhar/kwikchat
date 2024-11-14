@@ -32,13 +32,6 @@ const ChatPage = async ({ params: { id } }: ChatPageProps) => {
 	const conversation = await getConversationByIdAndUserId({ id, userId: user.id });
 	if (!conversation) notFound();
 
-	if (conversation.isGroup)
-		return (
-			<div className="flex h-full w-full items-center justify-center text-2xl font-semibold">
-				Group Conversation
-			</div>
-		);
-
 	return (
 		<Wrapper className="overflow-hidden">
 			<WrapperSidePanel className="bg-surface-light-100 dark:bg-surface-dark-600">
@@ -51,7 +44,11 @@ const ChatPage = async ({ params: { id } }: ChatPageProps) => {
 						conversationType={conversation.isGroup ? "group" : "private"}
 					/>
 				</WrapperHeader>
-				<ChatArea conversationId={conversation.id} currentUserId={user.id} />
+				<ChatArea
+					conversationId={conversation.id}
+					currentUserId={user.id}
+					isGroupConversation={conversation.isGroup}
+				/>
 				<WrapperFooter
 					className="flex h-auto min-h-20 items-center px-4 py-3 sm:px-8 md:px-5"
 					style={{ maxHeight: `${MAX_INPUT_CONTAINER_SIZE}px` }}

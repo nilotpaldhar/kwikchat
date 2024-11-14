@@ -55,6 +55,7 @@ export const blockedUserKeys = {
 export const conversationKeys = {
 	all: ["conversations"] as const,
 	participant: (id: string) => [...conversationKeys.all, "participant", id] as const,
+	groupDetails: (id: string) => [...conversationKeys.all, "group_details", id] as const,
 };
 
 export const messageKeys = {

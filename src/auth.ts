@@ -6,14 +6,11 @@ import { PrismaAdapter } from "@auth/prisma-adapter";
 import authConfig from "@/auth.config";
 
 import { prisma } from "@/lib/db";
-import { setUserOnlineStatus } from "@/lib/user";
-import { pusherServer } from "@/lib/pusher/server";
+import { setUserOnlineStatus, broadcastUserStatus } from "@/lib/user";
 
 import { getUserById } from "@/data/user";
-import { getFriendsOfUser } from "@/data/friendship";
 import { getTwoFactorConfirmationByUserId } from "@/data/auth/two-factor-confirmation";
 
-import { friendEvents } from "@/constants/pusher-events";
 import generateUniqueUsername from "@/utils/general/generate-unique-username";
 
 export const {
@@ -98,12 +95,8 @@ export const {
 			// Set the user's online status to true in the system
 			await setUserOnlineStatus({ userId: user.id, isOnline: true });
 
-			// Get the list of friends who are online and map their IDs
-			const friends = await getFriendsOfUser({ userId: user.id, isOnline: true });
-			const friendIds = friends.map((friend) => friend.id);
-
-			// Trigger a Pusher event to notify the user's friends that the user is now online
-			pusherServer.trigger(friendIds, friendEvents.online, user.id);
+			// Notifies friends of a user's status change
+			await broadcastUserStatus({ userId: user.id, action: "signin" });
 		},
 	},
 	adapter: PrismaAdapter(prisma),

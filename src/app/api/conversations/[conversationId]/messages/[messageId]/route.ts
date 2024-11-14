@@ -5,15 +5,17 @@ import { type NextRequest, NextResponse } from "next/server";
 import { TextMessageSchema } from "@/schemas";
 
 import { prisma } from "@/lib/db";
-
-import { pusherServer } from "@/lib/pusher/server";
-import { conversationEvents } from "@/constants/pusher-events";
+import {
+	deleteMessage,
+	broadcastPrivateMessage,
+	broadcastGroupMessage,
+	DeleteMessageError,
+} from "@/lib/message";
 
 import { MESSAGE_INCLUDE } from "@/data/message";
 import { getCurrentUser } from "@/data/auth/session";
-import { deleteMessage, DeleteMessageError } from "@/lib/message";
 
-import { generatePrivateChatChannelName } from "@/utils/pusher/generate-chat-channel-name";
+import { conversationEvents } from "@/constants/pusher-events";
 import transformMessageSeenAndStarStatus from "@/utils/messenger/transform-message-seen-and-star-status";
 
 type Params = {
@@ -126,15 +128,24 @@ export async function PATCH(req: NextRequest, { params }: { params: Params }) {
 			userId: currentUser.id,
 		});
 
-		// Trigger a Pusher event to notify the recipient that the message was updated
-		pusherServer.trigger(
-			generatePrivateChatChannelName({
+		// Check if the conversation is a group chat
+		if (message.conversation.isGroup) {
+			// If it's a group, broadcast the updated message to all members of the group
+			await broadcastGroupMessage({
 				conversationId: updatedMessage.conversationId,
+				eventName: conversationEvents.updateMessage,
+				receiverIds: message.conversation.members.map((member) => member.userId),
+				payload: data,
+			});
+		} else {
+			// If it's a private message, broadcast the updated message to the specific receiver
+			await broadcastPrivateMessage({
+				conversationId: updatedMessage.conversationId,
+				eventName: conversationEvents.updateMessage,
 				receiverId,
-			}),
-			conversationEvents.updateMessage,
-			data
-		);
+				payload: data,
+			});
+		}
 
 		return NextResponse.json({
 			success: true,

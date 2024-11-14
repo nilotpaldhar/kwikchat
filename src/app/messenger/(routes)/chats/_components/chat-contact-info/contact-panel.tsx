@@ -65,7 +65,7 @@ const ContactPanel = ({
 					<Loader />
 				</div>
 			) : (
-				<div className="flex flex-col space-y-5">
+				<div>
 					{!isError ? (
 						<ProfileOverview
 							user={participant as UserProfile}

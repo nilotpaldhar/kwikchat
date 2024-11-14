@@ -1,22 +1,25 @@
+import { type NextRequest, NextResponse } from "next/server";
 import type { CompleteMessage } from "@/types";
 
-import { type NextRequest, NextResponse } from "next/server";
+import { TextMessageSchema } from "@/schemas";
 
 import { prisma } from "@/lib/db";
+import {
+	sendPrivateMessage,
+	sendGroupMessage,
+	broadcastPrivateMessage,
+	broadcastGroupMessage,
+} from "@/lib/message";
 
-import { pusherServer } from "@/lib/pusher/server";
-import { conversationEvents } from "@/constants/pusher-events";
-
+import { getMessages } from "@/data/message";
 import { getCurrentUser } from "@/data/auth/session";
-import { getMessages, MESSAGE_INCLUDE } from "@/data/message";
 import { getUserConversation } from "@/data/conversation";
 
-import { isBlocked } from "@/lib/block";
-import { areUsersFriends } from "@/lib/friendship";
-
-import { MAX_MESSAGE_CHAR_LENGTH } from "@/constants/chat-input";
-import { generatePrivateChatChannelName } from "@/utils/pusher/generate-chat-channel-name";
-import transformMessageSeenAndStarStatus from "@/utils/messenger/transform-message-seen-and-star-status";
+import { conversationEvents } from "@/constants/pusher-events";
+import {
+	handleSendPrivateMessageError,
+	handleSendGroupMessageError,
+} from "@/utils/api/handle-send-message-error";
 
 type Params = { conversationId: string };
 
@@ -83,6 +86,20 @@ export async function POST(req: NextRequest, { params }: { params: Params }) {
 	// Parse the request body to extract the message content
 	const body = await req.json();
 
+	// Validate the incoming message content against the TextMessageSchema
+	const validatedFields = TextMessageSchema.safeParse(body);
+	if (!validatedFields.success) {
+		// If validation fails, return a 400 error with the first validation error or a default message
+		return NextResponse.json(
+			{
+				success: false,
+				// eslint-disable-next-line no-underscore-dangle
+				message: validatedFields.error.format().message?._errors[0] ?? "Invalid Fields",
+			},
+			{ status: 400 }
+		);
+	}
+
 	// Retrieve the current user from the session (with authentication required)
 	const currentUser = await getCurrentUser(true);
 
@@ -94,42 +111,19 @@ export async function POST(req: NextRequest, { params }: { params: Params }) {
 		);
 	}
 
-	// Set variables for sender and conversation details
+	// Set variables for the sender's ID, the conversation ID from params, and the validated message content
 	const senderId = currentUser.id;
 	const conversationId = params.conversationId;
-	const message = body?.message ?? "";
-	const trimmedMessage = typeof message === "string" ? message.trim() : "";
-
-	// Validate the message (ensure it's not empty or too long)
-	if (!trimmedMessage) {
-		return NextResponse.json(
-			{
-				success: false,
-				message: "The message cannot be empty or invalid. Please enter a valid message.",
-			},
-			{ status: 400 }
-		);
-	}
-
-	if (trimmedMessage.length > MAX_MESSAGE_CHAR_LENGTH) {
-		return NextResponse.json(
-			{
-				success: false,
-				message:
-					"Your message exceeds the maximum allowed length. Please shorten it and try again.",
-			},
-			{ status: 400 }
-		);
-	}
+	const messageContent = validatedFields.data.message;
 
 	try {
-		// Find the conversation, ensuring the current user is a member
+		// Attempt to find the conversation, ensuring that the current user is a member
 		const conversation = await prisma.conversation.findFirst({
 			where: { id: conversationId, members: { some: { userId: senderId } } },
 			include: { members: true },
 		});
 
-		// Respond with 404 if the conversation is not found or the user is not a member
+		// If the conversation is not found or the user is not a member, return a 404 error
 		if (!conversation) {
 			return NextResponse.json(
 				{
@@ -141,76 +135,60 @@ export async function POST(req: NextRequest, { params }: { params: Params }) {
 			);
 		}
 
-		// Find the receiver (the other member of the conversation)
-		const receiverId = conversation.members.find((member) => member.userId !== senderId)?.userId;
-
-		// If no receiver is found, respond with 404
-		if (!receiverId) {
-			return NextResponse.json(
-				{
-					success: false,
-					message:
-						"Unable to find a recipient for this conversation. Please ensure you're messaging a valid participant.",
-				},
-				{ status: 404 }
-			);
-		}
-
-		// Check if the sender is blocked by the receiver
-		const blocked = await isBlocked({ blockerId: receiverId, blockedId: senderId });
-		if (blocked) {
-			return NextResponse.json(
-				{
-					success: false,
-					message:
-						"You are unable to send a message to this recipient at the moment. Please check your connection or try again later.",
-				},
-				{ status: 422 }
-			);
-		}
-
-		// Check if the sender and receiver are friends
-		const isFriend = await areUsersFriends({ senderId, receiverId });
-		if (!isFriend) {
-			return NextResponse.json(
-				{
-					success: false,
-					message:
-						"You can only send messages to users who are your friends. Please add this user as a friend to start messaging.",
-				},
-				{ status: 422 }
-			);
-		}
-
-		// Create the new message in the conversation
-		const newMessage = await prisma.message.create({
-			data: {
-				conversationId,
+		// Handle sending a group message if the conversation is marked as a group
+		if (conversation.isGroup) {
+			const { message, receiverIds, error } = await sendGroupMessage({
+				conversation,
+				messageContent,
 				senderId,
-				type: "text",
-				textMessage: {
-					create: { content: trimmedMessage },
-				},
-			},
-			include: MESSAGE_INCLUDE,
+			});
+
+			// If there was an error while sending the message, handle it and respond accordingly
+			if (error) return handleSendGroupMessageError(error);
+
+			// Broadcast the new message to all group members except the sender, if there are valid recipients
+			if (message && receiverIds.length > 0) {
+				await broadcastGroupMessage<CompleteMessage>({
+					conversationId: message.conversationId,
+					eventName: conversationEvents.newMessage,
+					payload: message,
+					receiverIds,
+				});
+			}
+
+			// Respond with success and the sent message data
+			return NextResponse.json({
+				success: true,
+				message: "Your message has been sent successfully!",
+				data: message,
+			});
+		}
+
+		// Attempt to send a private message in non-group conversations
+		const { message, receiverId, error } = await sendPrivateMessage({
+			conversation,
+			messageContent,
+			senderId,
 		});
 
-		const data: CompleteMessage = transformMessageSeenAndStarStatus({
-			message: newMessage,
-			userId: currentUser.id,
-		});
+		// Handle any errors that occurred while sending the private message
+		if (error) return handleSendPrivateMessageError(error);
 
-		// Trigger a Pusher event to notify the receiver about an incoming message
-		pusherServer.trigger(
-			generatePrivateChatChannelName({ conversationId: newMessage.conversationId, receiverId }),
-			conversationEvents.newMessage,
-			data
-		);
+		// Broadcast the private message to the receiver if a valid receiver ID was provided
+		if (message && receiverId) {
+			await broadcastPrivateMessage<CompleteMessage>({
+				conversationId: message.conversationId,
+				eventName: conversationEvents.newMessage,
+				payload: message,
+				receiverId,
+			});
+		}
 
+		// Respond with success and the sent message data
 		return NextResponse.json({
 			success: true,
 			message: "Your message has been sent successfully!",
-			data,
+			data: message,
 		});
 	} catch (error) {
 		return NextResponse.json(

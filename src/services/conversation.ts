@@ -1,6 +1,6 @@
 import "client-only";
 
-import type { APIResponse, UserWithoutPassword } from "@/types";
+import type { APIResponse, UserWithoutPassword, GroupOverview } from "@/types";
 
 import axios, { handleAxiosError } from "@/lib/axios";
 
@@ -11,6 +11,21 @@ const fetchParticipantInConversation = async (conversationId: string) => {
 	try {
 		const res = await axios.get<APIResponse<UserWithoutPassword>>(
 			`/conversations/${conversationId}/participant`
+		);
+		return res.data;
+	} catch (error) {
+		const errMsg = handleAxiosError(error);
+		throw new Error(errMsg);
+	}
+};
+
+/**
+ * Fetches details for a specified group conversation.
+ */
+const fetchGroupConversationDetails = async (conversationId: string) => {
+	try {
+		const res = await axios.get<APIResponse<GroupOverview>>(
+			`/conversations/${conversationId}/group`
 		);
 		return res.data;
 	} catch (error) {
@@ -34,4 +49,4 @@ const clearConversation = async ({ conversationId }: { conversationId: string })
 	}
 };
 
-export { fetchParticipantInConversation, clearConversation };
+export { fetchParticipantInConversation, fetchGroupConversationDetails, clearConversation };

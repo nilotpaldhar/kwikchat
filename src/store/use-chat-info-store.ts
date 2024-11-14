@@ -1,6 +1,6 @@
 import { create } from "zustand";
 
-export type InfoType = "USER_INFO" | "GROUP_INFO";
+export type InfoType = "USER_INFO" | "GROUP_DETAILS";
 
 interface ChatInfoStore {
 	type: InfoType | null;

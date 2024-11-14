@@ -1,7 +1,7 @@
 import "client-only";
 
 import type { QueryClient } from "@tanstack/react-query";
-import type { APIResponse, UserWithoutPassword } from "@/types";
+import type { APIResponse, GroupOverview, UserWithoutPassword } from "@/types";
 
 import { conversationKeys } from "@/constants/tanstack-query";
 
@@ -40,5 +40,33 @@ const updateParticipantStatus = ({
 	);
 };
 
-// eslint-disable-next-line import/prefer-default-export
-export { updateParticipantStatus };
+/**
+ * Updates the members in a group conversation.
+ * This function modifies the member in the group overview data stored in the query cache.
+ */
+const updateGroupMembers = ({
+	conversationId,
+	members,
+	queryClient,
+}: {
+	conversationId: string;
+	members: { total: number; online: number };
+	queryClient: QueryClient;
+}) => {
+	queryClient.setQueryData<APIResponse<GroupOverview>>(
+		conversationKeys.groupDetails(conversationId),
+		(existingData) => {
+			if (!existingData) return existingData;
+
+			const groupOverview = { ...existingData.data };
+
+			if (groupOverview && groupOverview.members) {
+				groupOverview.members = members;
+			}
+
+			return { ...existingData, data: groupOverview as GroupOverview };
+		}
+	);
+};
+
+export { updateParticipantStatus, updateGroupMembers };

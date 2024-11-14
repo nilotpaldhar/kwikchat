@@ -5,14 +5,14 @@ import { Popover, PopoverTrigger, PopoverContent } from "@/components/ui/popover
 import { PhoneCall, Video, Info, MoreVertical } from "lucide-react";
 
 import { cn } from "@/utils/general/cn";
-import useChatInfoStore from "@/store/chat-info-store";
+import useChatInfoStore from "@/store/use-chat-info-store";
 import useMessengerDialogStore from "@/store/use-messenger-dialog-store";
 
-interface ChatHeaderActionsProps {
+interface PrivateChatHeaderActionsProps {
 	conversationId: string;
 }
 
-const ChatHeaderActions = ({ conversationId }: ChatHeaderActionsProps) => {
+const PrivateChatHeaderActions = ({ conversationId }: PrivateChatHeaderActionsProps) => {
 	const toggleContactInfo = useChatInfoStore().toggleOpen;
 	const openClearConversationDialog = useMessengerDialogStore().onOpen;
 
@@ -87,5 +87,4 @@ const ChatHeaderActions = ({ conversationId }: ChatHeaderActionsProps) => {
 		</div>
 	);
 };
-
-export default ChatHeaderActions;
+export default PrivateChatHeaderActions;

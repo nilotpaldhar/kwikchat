@@ -11,7 +11,7 @@ import { getCurrentUser } from "@/data/auth/session";
 import { getUserMessage } from "@/data/message";
 
 import handleUserMessageError from "@/utils/api/handle-user-message-error";
-import { generatePrivateChatChannelName } from "@/utils/pusher/generate-chat-channel-name";
+import generateChatChannelName from "@/utils/pusher/generate-chat-channel-name";
 
 type Params = {
 	conversationId: string;
@@ -69,7 +69,7 @@ export async function POST(req: NextRequest, { params }: { params: Params }) {
 
 		// Notify the other conversation member of the reaction using Pusher
 		pusherServer.trigger(
-			generatePrivateChatChannelName({
+			generateChatChannelName({
 				conversationId: message.conversationId,
 				receiverId,
 			}),
@@ -154,7 +154,7 @@ export async function PATCH(req: NextRequest, { params }: { params: Params }) {
 		});
 
 		pusherServer.trigger(
-			generatePrivateChatChannelName({
+			generateChatChannelName({
 				conversationId: message.conversationId,
 				receiverId,
 			}),
@@ -229,7 +229,7 @@ export async function DELETE(req: NextRequest, { params }: { params: Params }) {
 
 		// Notify the other conversation member about the reaction removal using Pusher
 		pusherServer.trigger(
-			generatePrivateChatChannelName({
+			generateChatChannelName({
 				conversationId: message.conversationId,
 				receiverId,
 			}),

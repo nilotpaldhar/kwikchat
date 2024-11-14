@@ -1,4 +1,11 @@
+import "server-only";
+
 import { prisma } from "@/lib/db";
+import { pusherServer } from "@/lib/pusher/server";
+import { getFriendsOfUser } from "@/data/friendship";
+import { getUserConversationList } from "@/data/conversation";
+
+import { friendEvents } from "@/constants/pusher-events";
 
 /**
  * Updates the online status of a user in the database.
@@ -18,5 +25,31 @@ const setUserOnlineStatus = async ({ userId, isOnline }: { userId: string; isOnl
 	}
 };
 
-// eslint-disable-next-line import/prefer-default-export
-export { setUserOnlineStatus };
+/**
+ * Notifies friends of a user's status change (signin or logout).
+ */
+const broadcastUserStatus = async ({
+	userId,
+	action,
+}: {
+	userId: string;
+	action: "signin" | "logout";
+}) => {
+	try {
+		const event = action === "signin" ? friendEvents.online : friendEvents.offline;
+
+		const [friends, conversations] = await Promise.all([
+			getFriendsOfUser({ userId, isOnline: true }),
+			getUserConversationList({ userId }),
+		]);
+		const friendIds = friends.map((friend) => friend.id);
+		const conversationIds = conversations.map((conversation) => conversation.id);
+
+		pusherServer.trigger([...friendIds, ...conversationIds], event, userId);
+	} catch (error) {
+		// eslint-disable-next-line no-console
+		console.error("Failed to notify friends of user status change.");
+	}
+};
+
+export { setUserOnlineStatus, broadcastUserStatus };

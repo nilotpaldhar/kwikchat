@@ -79,9 +79,29 @@ const getUserConversation = async ({
 	}
 };
 
+/**
+ * Retrieves a list of conversations for a specified user.
+ * This function queries the database for conversations in which the user is a member
+ * and returns all matching conversations.
+ */
+const getUserConversationList = async ({ userId }: { userId: string }) => {
+	try {
+		const conversations = await prisma.conversation.findMany({
+			where: {
+				members: { some: { userId } },
+			},
+		});
+
+		return conversations;
+	} catch (error) {
+		return [];
+	}
+};
+
 export {
 	getConversationBetweenUsers,
 	getConversationById,
 	getConversationByIdAndUserId,
 	getUserConversation,
+	getUserConversationList,
 };

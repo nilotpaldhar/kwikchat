@@ -79,14 +79,12 @@ const ProfileInfo = ({
 					<BlockTitle>Email</BlockTitle>
 					<BlockDescription className="text-xs leading-3">{email}</BlockDescription>
 				</Block>
-				{about && (
-					<Block className="space-y-0.5">
-						<BlockTitle>About Me</BlockTitle>
-						<BlockDescription className="text-xs leading-4">
-							<ProfileBio bio={about} />
-						</BlockDescription>
-					</Block>
-				)}
+				<Block className="space-y-0.5">
+					<BlockTitle>About Me</BlockTitle>
+					<BlockDescription className="text-xs leading-4">
+						{about ? <ProfileBio bio={about} /> : <span>N/A</span>}
+					</BlockDescription>
+				</Block>
 				<Block className="space-y-0.5">
 					<BlockTitle>Member Since</BlockTitle>
 					<BlockDescription className="flex items-center space-x-1 text-xs leading-3">

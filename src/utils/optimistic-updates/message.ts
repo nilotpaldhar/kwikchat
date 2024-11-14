@@ -34,6 +34,14 @@ const createCompleteMessage = ({
 	const newMessage: CompleteMessage = {
 		id: nanoid(),
 		conversationId,
+		// Temp
+		conversation: {
+			id: conversationId,
+			isGroup: false,
+			createdBy: sender.id,
+			createdAt: new Date(),
+			updatedAt: new Date(),
+		},
 		sender,
 		senderId: sender.id,
 		createdAt: new Date(),

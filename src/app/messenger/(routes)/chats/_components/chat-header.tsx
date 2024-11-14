@@ -5,13 +5,18 @@ import dynamic from "next/dynamic";
 import { ArrowLeft } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
+import GroupInfo from "@/app/messenger/(routes)/chats/_components/group-info";
 import ChatParticipant from "@/app/messenger/(routes)/chats/_components/chat-participant";
-import ChatHeaderActions from "@/app/messenger/(routes)/chats/_components/chat-header-actions";
-
-import { useParticipantInConversationQuery } from "@/hooks/tanstack-query/use-conversation";
+import {
+	PrivateChatHeaderActions,
+	GroupChatHeaderActions,
+} from "@/app/messenger/(routes)/chats/_components/chat-header-actions";
 
 const ChatContactInfo = dynamic(
 	() => import("@/app/messenger/(routes)/chats/_components/chat-contact-info")
+);
+const GroupChatDetails = dynamic(
+	() => import("@/app/messenger/(routes)/chats/_components/group-chat-details")
 );
 
 interface ChatHeaderProps {
@@ -19,43 +24,40 @@ interface ChatHeaderProps {
 	conversationType: "private" | "group";
 }
 
-const ChatHeader = ({ conversationId, conversationType }: ChatHeaderProps) => {
-	const { data, isLoading, isError, error, refetch } =
-		useParticipantInConversationQuery(conversationId);
+const ChatHeader = ({ conversationId, conversationType }: ChatHeaderProps) => (
+	<>
+		<header className="flex h-full items-center justify-between">
+			<div className="flex items-center">
+				<Button
+					variant="outline"
+					size="icon"
+					className="mr-2 size-6 border-transparent p-0 text-neutral-700 hover:bg-transparent dark:border-transparent dark:text-neutral-300 dark:hover:bg-transparent md:hidden"
+					asChild
+				>
+					<Link href="/messenger">
+						<ArrowLeft size={20} />
+						<span className="sr-only">Go Back</span>
+					</Link>
+				</Button>
+				{conversationType === "private" ? (
+					<ChatParticipant conversationId={conversationId} />
+				) : (
+					<GroupInfo conversationId={conversationId} />
+				)}
+			</div>
 
-	return (
-		<>
-			<header className="flex h-full items-center justify-between">
-				<div className="flex items-center">
-					<Button
-						variant="outline"
-						size="icon"
-						className="mr-2 size-6 border-transparent p-0 text-neutral-700 hover:bg-transparent dark:border-transparent dark:text-neutral-300 dark:hover:bg-transparent md:hidden"
-						asChild
-					>
-						<Link href="/messenger">
-							<ArrowLeft size={20} />
-							<span className="sr-only">Go Back</span>
-						</Link>
-					</Button>
-					{conversationType === "private" ? (
-						<ChatParticipant participant={data?.data} isLoading={isLoading} isError={isError} />
-					) : (
-						<div>Group Chat</div>
-					)}
-				</div>
-				<ChatHeaderActions conversationId={conversationId} />
-			</header>
-			<ChatContactInfo
-				conversationId={conversationId}
-				participant={data?.data}
-				isLoading={isLoading}
-				isError={isError}
-				error={error}
-				refetch={refetch}
-			/>
-		</>
-	);
-};
+			{conversationType === "private" ? (
+				<PrivateChatHeaderActions conversationId={conversationId} />
+			) : (
+				<GroupChatHeaderActions />
+			)}
+		</header>
+		{conversationType === "private" ? (
+			<ChatContactInfo conversationId={conversationId} />
+		) : (
+			<GroupChatDetails conversationId={conversationId} />
+		)}
+	</>
+);
 
 export default ChatHeader;

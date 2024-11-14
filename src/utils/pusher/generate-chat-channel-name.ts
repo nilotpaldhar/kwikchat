@@ -1,17 +1,16 @@
 /**
- * Generates a channel name for a private conversation.
+ * Generates a pusher channel name for conversation.
  * The channel name is constructed with the conversation type, ID, and receiver ID.
  */
-const generatePrivateChatChannelName = ({
+const generateChatChannelName = ({
 	conversationId,
+	conversationType = "private",
 	receiverId,
 }: {
 	conversationId: string;
+	conversationType?: "private" | "group";
 	receiverId: string;
-}) => {
-	const conversationType = "private";
-	return `@conversation_type=${conversationType}@conversation_id=${conversationId}@receiver_id=${receiverId}`;
-};
+}) =>
+	`@conversation_type=${conversationType}@conversation_id=${conversationId}@receiver_id=${receiverId}`;
 
-// eslint-disable-next-line import/prefer-default-export
-export { generatePrivateChatChannelName };
+export default generateChatChannelName;

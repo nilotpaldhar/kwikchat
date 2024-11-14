@@ -44,12 +44,18 @@ import {
 	removeMessageReaction as removeMessageReactionCache,
 } from "@/utils/tanstack-query-cache/message";
 
-import { generatePrivateChatChannelName } from "@/utils/pusher/generate-chat-channel-name";
+import generateChatChannelName from "@/utils/pusher/generate-chat-channel-name";
 
 /**
  * Custom hook for fetching private messages in a conversation using infinite scrolling.
  */
-const usePrivateMessagesQuery = ({ conversationId }: { conversationId: string }) => {
+const usePrivateMessagesQuery = ({
+	conversationId,
+	isGroup = false,
+}: {
+	conversationId: string;
+	isGroup?: boolean;
+}) => {
 	const queryClient = useQueryClient();
 	const { data } = useCurrentUser();
 
@@ -61,7 +67,11 @@ const usePrivateMessagesQuery = ({ conversationId }: { conversationId: string })
 	});
 
 	const conversationChannel = data?.data?.id
-		? generatePrivateChatChannelName({ conversationId, receiverId: data.data.id })
+		? generateChatChannelName({
+				conversationId,
+				conversationType: isGroup ? "group" : "private",
+				receiverId: data.data.id,
+			})
 		: undefined;
 
 	// Subscribe to Pusher events
