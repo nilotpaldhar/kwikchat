@@ -1,7 +1,7 @@
 import * as z from "zod";
 
 import { MAX_MESSAGE_CHAR_LENGTH } from "@/constants/chat-input";
-import { MessageReactionType } from "@prisma/client";
+import { MemberRole, MessageReactionType } from "@prisma/client";
 
 export const SigninSchema = z.object({
 	email: z.string().email({ message: "Please enter a valid email address" }),
@@ -113,4 +113,14 @@ export const NewGroupSchema = z.object({
 	groupMemberIds: z
 		.array(z.string())
 		.min(1, { message: "Please select at least one group member." }),
+});
+
+export const AddGroupMemberSchema = z.object({
+	userIdsToAdd: z
+		.array(z.string())
+		.min(1, { message: "Please provide at least one valid user ID." }),
+});
+
+export const UpdateMemberRoleSchema = z.object({
+	memberRole: z.nativeEnum(MemberRole, { message: "Invalid member role" }),
 });

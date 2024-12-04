@@ -1,6 +1,6 @@
 import "client-only";
 
-import type { APIResponse, UserWithoutPassword, GroupOverview } from "@/types";
+import type { APIResponse, UserWithoutPassword, GroupOverview, GroupMember } from "@/types";
 
 import axios, { handleAxiosError } from "@/lib/axios";
 
@@ -35,6 +35,21 @@ const fetchGroupConversationDetails = async (conversationId: string) => {
 };
 
 /**
+ * Fetches membership details of the current user in a specific conversation.
+ */
+const fetchGroupConversationMembership = async (conversationId: string) => {
+	try {
+		const res = await axios.get<APIResponse<GroupMember>>(
+			`/conversations/${conversationId}/group/membership`
+		);
+		return res.data;
+	} catch (error) {
+		const errMsg = handleAxiosError(error);
+		throw new Error(errMsg);
+	}
+};
+
+/**
  * Clears all messages in a specified conversation.
  */
 const clearConversation = async ({ conversationId }: { conversationId: string }) => {
@@ -49,4 +64,9 @@ const clearConversation = async ({ conversationId }: { conversationId: string })
 	}
 };
 
-export { fetchParticipantInConversation, fetchGroupConversationDetails, clearConversation };
+export {
+	fetchParticipantInConversation,
+	fetchGroupConversationDetails,
+	fetchGroupConversationMembership,
+	clearConversation,
+};

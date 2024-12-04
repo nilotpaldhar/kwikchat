@@ -65,6 +65,10 @@ export interface FriendWithFriendship extends UserWithoutPassword {
 	friendship: Friendship;
 }
 
+export interface ConversationWithMembers extends Conversation {
+	members: Member[];
+}
+
 export interface CompleteMessage extends Message {
 	conversation: Conversation;
 	textMessage: TextMessage | null;
@@ -81,7 +85,7 @@ export interface MessageSeenMembers {
 }
 
 export interface MessageWithUserID extends Message {
-	conversation: {
+	conversation: Conversation & {
 		members: { userId: string }[];
 	};
 }
@@ -99,6 +103,10 @@ export interface GroupOverview {
 	};
 }
 
-export interface ConversationWithMembers extends Conversation {
-	members: Member[];
+export interface GroupMember extends Member {
+	user: UserWithoutPassword;
+}
+
+export interface GroupConversationWithMembers extends Conversation {
+	members: GroupMember[];
 }

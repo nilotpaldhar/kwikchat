@@ -6,7 +6,6 @@ import { Prisma } from "@prisma/client";
 import { DEFAULT_PAGE, DEFAULT_PAGE_SIZE } from "@/constants/pagination";
 
 import { prisma } from "@/lib/db";
-import { isBlocked } from "@/lib/block";
 import { areUsersFriends } from "@/lib/friendship";
 
 import { calculatePagination } from "@/utils/general/calculate-pagination";
@@ -33,6 +32,7 @@ export enum UserMessageError {
 export interface GetUserMessageResponse {
 	message: MessageWithUserID | null;
 	receiverId: string | null;
+	receiverIds: string[];
 	error: UserMessageError | null;
 }
 
@@ -123,7 +123,7 @@ const getMessages = async ({
 
 /**
  * Fetches a message by its ID and conversation ID, ensuring the user is a member
- * of the conversation and verifying other conditions like blocking and friendship.
+ * of the conversation and verifying other conditions like friendship, etc.
  */
 const getUserMessage = async ({
 	messageId,
@@ -134,8 +134,11 @@ const getUserMessage = async ({
 	conversationId: string;
 	userId: string;
 }): Promise<GetUserMessageResponse> => {
+	let receiverId = null;
+	let receiverIds: string[] = [];
+
 	try {
-		// Fetch the message and include the members of the conversation to check user membership
+		// Fetch the message, including conversation members to validate user membership
 		const message = await prisma.message.findFirst({
 			where: { id: messageId, conversationId },
 			include: {
@@ -147,59 +150,65 @@ const getUserMessage = async ({
 			},
 		});
 
-		// Return an error if the message is not found
+		// Handle case where the message is not found
 		if (!message) {
 			return {
 				message: null,
 				receiverId: null,
+				receiverIds: [],
 				error: UserMessageError.MessageNotFound,
 			};
 		}
 
-		// Check if the user is a member of the conversation
+		// Verify if the requesting user is a member of the conversation
 		const isMember = message.conversation.members.some((members) => members.userId === userId);
 		if (!isMember) {
 			return {
 				message: null,
 				receiverId: null,
+				receiverIds: [],
 				error: UserMessageError.NotMember,
 			};
 		}
 
-		// Identify the recipient of the message (the other member of the conversation)
-		const receiverId = message.conversation.members.find(
-			(member) => member.userId !== userId
-		)?.userId;
+		// Handle direct messages (non-group conversations)
+		if (!message.conversation.isGroup) {
+			// Identify the recipient in the conversation (not the requester)
+			receiverId = message.conversation.members.find((member) => member.userId !== userId)?.userId;
 
-		// Return an error if no recipient is found
-		if (!receiverId) {
-			return {
-				message: null,
-				receiverId: null,
-				error: UserMessageError.NoRecipient,
-			};
+			// Ensure a recipient is found
+			if (!receiverId) {
+				return {
+					message: null,
+					receiverId: null,
+					receiverIds: [],
+					error: UserMessageError.NoRecipient,
+				};
+			}
+
+			// Check if the requester and recipient are friends
+			const isFriend = await areUsersFriends({ senderId: userId, receiverId });
+			if (!isFriend) {
+				return {
+					message: null,
+					receiverId: null,
+					receiverIds: [],
+					error: UserMessageError.NotAllowed,
+				};
+			}
+		} else {
+			// Handle group conversations by collecting all other member IDs
+			receiverIds = message.conversation.members
+				.filter((m) => m.userId !== userId)
+				.map((m) => m.userId);
 		}
 
-		// Check if the user is blocked by the recipient or if they are friends
-		const [isUserBlocked, isFriend] = await Promise.all([
-			isBlocked({ blockedId: userId, blockerId: receiverId }),
-			areUsersFriends({ senderId: userId, receiverId }),
-		]);
-
-		// Return an error if the user is blocked or not a friend
-		if (isUserBlocked || !isFriend) {
-			return {
-				message: null,
-				receiverId: null,
-				error: UserMessageError.NotAllowed,
-			};
-		}
-
-		return { message, receiverId, error: null };
+		return { message, receiverId, receiverIds, error: null };
 	} catch (error) {
 		return {
 			message: null,
 			receiverId: null,
+			receiverIds: [],
 			error: UserMessageError.UnknownError,
 		};
 	}

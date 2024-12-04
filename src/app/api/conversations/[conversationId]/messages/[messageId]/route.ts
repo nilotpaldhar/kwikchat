@@ -16,11 +16,53 @@ import { MESSAGE_INCLUDE } from "@/data/message";
 import { getCurrentUser } from "@/data/auth/session";
 
 import { conversationEvents } from "@/constants/pusher-events";
+import isGroupAdmin from "@/utils/messenger/is-group-admin";
 import transformMessageSeenAndStarStatus from "@/utils/messenger/transform-message-seen-and-star-status";
 
 type Params = {
 	conversationId: string;
 	messageId: string;
+};
+
+/**
+ * Broadcasts a message to members of a conversation.
+ * This function determines whether the conversation is a group or private chat
+ * and broadcasts the message accordingly.
+ */
+const broadcastMessage = async ({
+	conversationId,
+	isGroupConversation,
+	members,
+	currentUserId,
+	payload,
+}: {
+	conversationId: string;
+	isGroupConversation: boolean;
+	members: { userId: string }[];
+	currentUserId: string;
+	payload: CompleteMessage;
+}) => {
+	// Define the event name to be broadcasted
+	const eventName = conversationEvents.updateMessage;
+
+	if (isGroupConversation) {
+		// For group conversations, broadcast the message to all members
+		const receiverIds = members.map((member) => member.userId);
+		await broadcastGroupMessage({ conversationId, eventName, receiverIds, payload });
+
+		return true;
+	}
+
+	// For private conversations, find the recipient user ID (excluding the current user)
+	const receiverId = members.find((member) => member.userId !== currentUserId)?.userId;
+
+	// If no valid recipient is found, return false (e.g., if the conversation has no other members)
+	if (!receiverId) return false;
+
+	// Call the broadcasting function for private messages
+	await broadcastPrivateMessage({ conversationId, eventName, receiverId, payload });
+
+	return true;
 };
 
 /**
@@ -56,19 +98,16 @@ export async function PATCH(req: NextRequest, { params }: { params: Params }) {
 		);
 	}
 
-	// Extract necessary parameters and data from the request
-	const senderId = currentUser.id;
+	// Extract conversationId and messageId from route parameters
 	const { conversationId, messageId } = params;
 	const messageContent = validatedFields.data.message;
 
 	try {
-		// Find the message in the database that matches the conversation, message, and sender
+		// Find the target message in the database, including its conversation and members
 		const message = await prisma.message.findFirst({
-			where: { id: messageId, conversationId, senderId },
+			where: { id: messageId, conversationId },
 			include: {
-				conversation: {
-					include: { members: { select: { userId: true } } },
-				},
+				conversation: { include: { members: true } },
 			},
 		});
 
@@ -84,36 +123,37 @@ export async function PATCH(req: NextRequest, { params }: { params: Params }) {
 			);
 		}
 
-		// Ensure the message is of type 'text'; if not, return a 422 error (only text messages can be updated)
+		// Permission check: Ensure the user is allowed to edit the message
+		if (!message.conversation.isGroup && message.senderId !== currentUser.id) {
+			return NextResponse.json(
+				{ success: false, message: "You are not allowed to update this message." },
+				{ status: 403 }
+			);
+		}
+
+		if (
+			message.conversation.isGroup &&
+			message.senderId !== currentUser.id &&
+			!isGroupAdmin({ userId: currentUser.id, members: message.conversation.members })
+		) {
+			return NextResponse.json(
+				{ success: false, message: "Only group admins can update this message." },
+				{ status: 403 }
+			);
+		}
+
+		// Only text messages are editable; reject updates to other message types
 		if (message.type !== "text") {
 			return NextResponse.json(
 				{
 					success: false,
-					message:
-						"Only text messages can be updated. This message type is not supported for edits.",
+					message: "Only text messages can be updated. Other message types are not editable.",
 				},
 				{ status: 422 }
 			);
 		}
 
-		// Find the receiver (the other member of the conversation)
-		const receiverId = message.conversation.members.find(
-			(member) => member.userId !== senderId
-		)?.userId;
-
-		// If no receiver is found, respond with 422
-		if (!receiverId) {
-			return NextResponse.json(
-				{
-					success: false,
-					message:
-						"Unable to find a recipient for this conversation. Please ensure you're messaging a valid participant.",
-				},
-				{ status: 422 }
-			);
-		}
-
-		// Update the text message content in the database
+		// Update the message content in the database
 		const updatedMessage = await prisma.message.update({
 			where: { id: message.id },
 			data: {
@@ -122,30 +162,20 @@ export async function PATCH(req: NextRequest, { params }: { params: Params }) {
 			include: MESSAGE_INCLUDE,
 		});
 
-		// Format the updated message with relevant data (including who has seen the message)
+		// Transform the updated message to include seen and starred status for the current user
 		const data: CompleteMessage = transformMessageSeenAndStarStatus({
 			message: updatedMessage,
 			userId: currentUser.id,
 		});
 
-		// Check if the conversation is a group chat
-		if (message.conversation.isGroup) {
-			// If it's a group, broadcast the updated message to all members of the group
-			await broadcastGroupMessage({
-				conversationId: updatedMessage.conversationId,
-				eventName: conversationEvents.updateMessage,
-				receiverIds: message.conversation.members.map((member) => member.userId),
-				payload: data,
-			});
-		} else {
-			// If it's a private message, broadcast the updated message to the specific receiver
-			await broadcastPrivateMessage({
-				conversationId: updatedMessage.conversationId,
-				eventName: conversationEvents.updateMessage,
-				receiverId,
-				payload: data,
-			});
-		}
+		// Notify all conversation members about the updated message
+		await broadcastMessage({
+			conversationId: updatedMessage.conversationId,
+			members: message.conversation.members,
+			isGroupConversation: message.conversation.isGroup,
+			currentUserId: currentUser.id,
+			payload: data,
+		});
 
 		return NextResponse.json({
 			success: true,

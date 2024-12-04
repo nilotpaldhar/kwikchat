@@ -49,7 +49,7 @@ const ChatHeader = ({ conversationId, conversationType }: ChatHeaderProps) => (
 			{conversationType === "private" ? (
 				<PrivateChatHeaderActions conversationId={conversationId} />
 			) : (
-				<GroupChatHeaderActions />
+				<GroupChatHeaderActions conversationId={conversationId} />
 			)}
 		</header>
 		{conversationType === "private" ? (

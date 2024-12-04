@@ -10,6 +10,7 @@ import { conversationKeys } from "@/constants/tanstack-query";
 import {
 	fetchParticipantInConversation,
 	fetchGroupConversationDetails,
+	fetchGroupConversationMembership,
 	clearConversation,
 } from "@/services/conversation";
 
@@ -94,6 +95,22 @@ const useGroupConversationDetailsQuery = (conversationId: string) => {
 };
 
 /**
+ * Custom hook to fetch the membership details of the current user in a specific conversation.
+ */
+const useGroupConversationMembershipQuery = (
+	conversationId: string,
+	{ enabled = true }: { enabled?: boolean } = {}
+) => {
+	const query = useQuery({
+		queryKey: conversationKeys.groupMembership(conversationId),
+		queryFn: () => fetchGroupConversationMembership(conversationId),
+		enabled,
+	});
+
+	return query;
+};
+
+/**
  * Custom hook to handle the clearing of a conversation using optimistic updates.
  * It provides mutation functionality to clear a conversation and manages the state
  * of the conversation with React Query's query client.
@@ -127,5 +144,6 @@ const useClearConversation = () => {
 export {
 	useParticipantInConversationQuery,
 	useGroupConversationDetailsQuery,
+	useGroupConversationMembershipQuery,
 	useClearConversation,
 };

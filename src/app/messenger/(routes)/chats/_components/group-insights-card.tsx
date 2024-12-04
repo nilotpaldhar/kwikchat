@@ -95,7 +95,7 @@ const GroupInsightsCard = ({
 							</BlockDescription>
 						</Block>
 						<Block className="space-y-0.5">
-							<BlockTitle>Owner</BlockTitle>
+							<BlockTitle>Created By</BlockTitle>
 							<BlockDescription className="flex items-center space-x-1 text-xs leading-3">
 								<User size={12} />
 								<span>{creatorName}</span>
@@ -103,8 +103,8 @@ const GroupInsightsCard = ({
 						</Block>
 						<Block className="space-y-2">
 							<BlockTitle>{totalMembers}</BlockTitle>
-							<BlockDescription className="">
-								<GroupMembers total={members.total} />
+							<BlockDescription>
+								<GroupMembers conversationId={overview.id} total={members.total} />
 							</BlockDescription>
 						</Block>
 					</div>

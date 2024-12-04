@@ -1,9 +1,12 @@
 "use client";
 
+import { MemberRole } from "@prisma/client";
 import { MoreVertical } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Popover, PopoverTrigger, PopoverContent } from "@/components/ui/popover";
+
+import useGroupMembershipStore from "@/store/use-group-membership-store";
 
 interface ChatMessageActionsMenuProps {
 	open: boolean;
@@ -26,6 +29,9 @@ const ChatMessageActionsMenu = ({
 	onToggleStar = () => {},
 	onDelete = () => {},
 }: ChatMessageActionsMenuProps) => {
+	const isGroupAdmin = useGroupMembershipStore().membership?.role === MemberRole.admin;
+	const editable = (isSender || isGroupAdmin) && !isDeleted;
+
 	const triggerClassNames =
 		"size-6 rounded-full bg-surface-light-100 text-neutral-500 shadow-md dark:bg-neutral-800 dark:text-neutral-400";
 	const actionsClassNames =
@@ -51,7 +57,7 @@ const ChatMessageActionsMenu = ({
 						<span className="font-semibold capitalize">{!isStarred ? "Star" : "Unstar"}</span>
 					</Button>
 				)}
-				{!isDeleted && isSender && (
+				{editable && (
 					<Button variant="outline" className={actionsClassNames} onClick={onEdit}>
 						<span className="font-semibold capitalize">Edit</span>
 					</Button>

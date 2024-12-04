@@ -1,6 +1,18 @@
 import type { MediaWithoutId } from "@/types";
 
+import { MemberRole } from "@prisma/client";
 import { prisma } from "@/lib/db";
+import { hasAnyFriendshipWithUser } from "./friendship";
+
+export enum AddGroupConversationMemberError {
+	InvalidFriendship = "InvalidFriendship",
+	UnknownError = "UnknownError",
+}
+
+interface AddGroupConversationMemberResponse {
+	success: boolean;
+	error: AddGroupConversationMemberError | null;
+}
 
 /**
  *  Creates a new private one-on-one conversation between two users.
@@ -26,7 +38,7 @@ const createPrivateConversation = async ({
 };
 
 /**
- *
+ * Creates a new group conversation, including the group details and members.
  */
 const createGroupConversation = async ({
 	groupName,
@@ -41,12 +53,13 @@ const createGroupConversation = async ({
 	groupIcon: MediaWithoutId | null;
 	createdBy: string;
 }) => {
+	// Use a database transaction to ensure atomicity for creating the group conversation and its members
 	const groupConversation = await prisma.$transaction(async (prismaClient) => {
-		// Create the Group Conversation
+		// Step 1: Create the group conversation record
 		const conversation = await prismaClient.conversation.create({
 			data: {
-				isGroup: true,
-				createdBy,
+				isGroup: true, // Flag to indicate this is a group conversation
+				createdBy, // The user who created the group
 				groupDetails: {
 					create: {
 						name: groupName,
@@ -57,12 +70,13 @@ const createGroupConversation = async ({
 			},
 		});
 
-		// Create Member entries for each user
+		// Step 2: Add members to the group conversation
 		await prismaClient.member.createMany({
-			data: [...groupMemberIds, createdBy].map((memberId) => ({
+			data: [createdBy, ...groupMemberIds].map((memberId) => ({
 				conversationId: conversation.id,
 				userId: memberId,
-				role: memberId === createdBy ? "admin" : "member",
+				// Assign admin role to the creator
+				role: memberId === createdBy ? MemberRole.admin : MemberRole.member,
 			})),
 		});
 
@@ -126,4 +140,62 @@ const clearConversation = async ({
 	}
 };
 
-export { createPrivateConversation, createGroupConversation, clearConversation };
+/**
+ * Adds users as members to a group conversation.
+ */
+const addGroupConversationMembers = async ({
+	conversationId,
+	userId,
+	userIdsToAdd,
+}: {
+	conversationId: string;
+	userId: string;
+	userIdsToAdd: string[];
+}): Promise<AddGroupConversationMemberResponse> => {
+	try {
+		// Check if the initiating user has any valid friendships with the users being added
+		const { hasNoFriends } = await hasAnyFriendshipWithUser({
+			userId,
+			friendIds: userIdsToAdd,
+		});
+
+		// If there are no valid friendships, return an error indicating invalid friendship
+		if (hasNoFriends) {
+			return {
+				success: false,
+				error: AddGroupConversationMemberError.InvalidFriendship,
+			};
+		}
+
+		// Add the users as members to the group conversation in bulk
+		const members = await prisma.member.createMany({
+			data: userIdsToAdd.map((id) => ({
+				conversationId,
+				userId: id,
+				role: MemberRole.member,
+			})),
+		});
+
+		// If no members were added (unexpected scenario), return an unknown error
+		if (members.count === 0) {
+			return {
+				success: false,
+				error: AddGroupConversationMemberError.UnknownError,
+			};
+		}
+
+		return { success: true, error: null };
+	} catch (error) {
+		return {
+			success: false,
+			error: AddGroupConversationMemberError.UnknownError,
+		};
+	}
+};
+
+export {
+	createPrivateConversation,
+	createGroupConversation,
+	clearConversation,
+	addGroupConversationMembers,
+};
