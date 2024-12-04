@@ -3,15 +3,22 @@ import { toast } from "sonner";
 import { useCallback } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import usePusher from "@/hooks/use-pusher";
-import useCurrentUser from "@/hooks/tanstack-query/use-current-user";
 
 import { friendEvents } from "@/constants/pusher-events";
 import { conversationKeys } from "@/constants/tanstack-query";
 
-import { fetchParticipantInConversation, clearConversation } from "@/services/conversation";
+import {
+	fetchParticipantInConversation,
+	fetchGroupConversationDetails,
+	fetchGroupConversationMembership,
+	clearConversation,
+} from "@/services/conversation";
 
 import { fetchFriendDetails } from "@/services/friendship";
-import { updateParticipantStatus } from "@/utils/tanstack-query-cache/conversation";
+import {
+	updateParticipantStatus,
+	updateGroupMembers,
+} from "@/utils/tanstack-query-cache/conversation";
 import {
 	optimisticClearConversation,
 	optimisticConversationError,
@@ -23,7 +30,6 @@ import {
  * It listens to Pusher events for real-time updates on the participant's online status.
  */
 const useParticipantInConversationQuery = (conversationId: string) => {
-	const { data } = useCurrentUser();
 	const queryClient = useQueryClient();
 
 	// Fetch participant details for the conversation using the conversation ID
@@ -49,9 +55,57 @@ const useParticipantInConversationQuery = (conversationId: string) => {
 		[conversationId, queryClient]
 	);
 
-	// Subscribe to Pusher events for online and offline status updates using the current user ID
-	usePusher<string>(data?.data?.id, friendEvents.online, handleParticipantStatus);
-	usePusher<string>(data?.data?.id, friendEvents.offline, handleParticipantStatus);
+	// Subscribe to Pusher events for online and offline status of user
+	usePusher<string>(conversationId, friendEvents.online, handleParticipantStatus);
+	usePusher<string>(conversationId, friendEvents.offline, handleParticipantStatus);
+
+	return query;
+};
+
+/**
+ * Custom hook to fetch and subscribe to group conversation details.
+ * This hook retrieves group conversation details via a query and subscribes to online/offline
+ * status updates for group members, updating the online members count in real-time.
+ */
+const useGroupConversationDetailsQuery = (conversationId: string) => {
+	const queryClient = useQueryClient();
+
+	const query = useQuery({
+		queryKey: conversationKeys.groupDetails(conversationId),
+		queryFn: () => fetchGroupConversationDetails(conversationId),
+	});
+
+	const handleUpdateGroupeMembers = useCallback(
+		(friendId?: string) => {
+			if (!friendId) return;
+			fetchGroupConversationDetails(conversationId).then((res) => {
+				if (!res.data) return;
+				const { members } = res.data;
+				updateGroupMembers({ conversationId, members, queryClient });
+			});
+		},
+		[conversationId, queryClient]
+	);
+
+	// Subscribe to Pusher events for online and offline status of user
+	usePusher<string>(conversationId, friendEvents.online, handleUpdateGroupeMembers);
+	usePusher<string>(conversationId, friendEvents.offline, handleUpdateGroupeMembers);
+
+	return query;
+};
+
+/**
+ * Custom hook to fetch the membership details of the current user in a specific conversation.
+ */
+const useGroupConversationMembershipQuery = (
+	conversationId: string,
+	{ enabled = true }: { enabled?: boolean } = {}
+) => {
+	const query = useQuery({
+		queryKey: conversationKeys.groupMembership(conversationId),
+		queryFn: () => fetchGroupConversationMembership(conversationId),
+		enabled,
+	});
 
 	return query;
 };
@@ -87,4 +141,9 @@ const useClearConversation = () => {
 	});
 };
 
-export { useParticipantInConversationQuery, useClearConversation };
+export {
+	useParticipantInConversationQuery,
+	useGroupConversationDetailsQuery,
+	useGroupConversationMembershipQuery,
+	useClearConversation,
+};

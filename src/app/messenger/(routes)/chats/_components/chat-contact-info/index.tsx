@@ -1,8 +1,5 @@
 "use client";
 
-import type { RefetchOptions } from "@tanstack/react-query";
-import type { UserWithoutPassword } from "@/types";
-
 import { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 
@@ -16,28 +13,21 @@ import {
 import ContactPanel from "@/app/messenger/(routes)/chats/_components/chat-contact-info/contact-panel";
 import StarredMessagesPanel from "@/app/messenger/(routes)/chats/_components/chat-contact-info/starred-messages-panel";
 
-import useChatInfoStore from "@/store/chat-info-store";
+import useChatInfoStore from "@/store/use-chat-info-store";
+import { useParticipantInConversationQuery } from "@/hooks/tanstack-query/use-conversation";
 
 interface ChatContactInfoProps {
 	conversationId: string;
-	participant?: UserWithoutPassword;
-	isLoading?: boolean;
-	isError?: boolean;
-	error: Error | null;
-	refetch: (options?: RefetchOptions) => void;
 }
 
 type ViewMode = "default" | "starred_messages";
 
-const ChatContactInfo = ({
-	conversationId,
-	participant,
-	isLoading,
-	isError,
-	error,
-	refetch,
-}: ChatContactInfoProps) => {
+const ChatContactInfo = ({ conversationId }: ChatContactInfoProps) => {
 	const [viewMode, setViewMode] = useState<ViewMode>("default");
+
+	const { data, isLoading, isError, error, refetch } =
+		useParticipantInConversationQuery(conversationId);
+	const participant = data?.data;
 
 	const { isOpen, type, onClose } = useChatInfoStore();
 	const isContactInfoOpen = isOpen && type === "USER_INFO";

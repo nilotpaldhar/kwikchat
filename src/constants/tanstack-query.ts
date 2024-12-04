@@ -55,10 +55,27 @@ export const blockedUserKeys = {
 export const conversationKeys = {
 	all: ["conversations"] as const,
 	participant: (id: string) => [...conversationKeys.all, "participant", id] as const,
+	groupDetails: (id: string) => [...conversationKeys.all, "group_details", id] as const,
+	groupMembership: (id: string) => [...conversationKeys.all, "group_Membership", id] as const,
 };
 
+/**
+ * Message query keys
+ *
+ * Contains keys used to uniquely identify queries related to messages.
+ */
 export const messageKeys = {
 	base: ["messages"] as const,
 	all: (conversationId: string) => [...messageKeys.base, "all", conversationId] as const,
 	starred: (conversationId: string) => [...messageKeys.base, "starred", conversationId] as const,
+};
+
+/**
+ * Group member query keys
+ *
+ * Contains keys used to uniquely identify queries related to group members.
+ */
+export const groupMemberKeys = {
+	base: ["group_members"] as const,
+	all: (conversationId: string) => [...groupMemberKeys.base, "all", conversationId] as const,
 };

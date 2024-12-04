@@ -1,21 +1,55 @@
+import type { MessageReaction } from "@prisma/client";
 import { type NextRequest, NextResponse } from "next/server";
 
 import { MessageReactionSchema } from "@/schemas";
 
 import { prisma } from "@/lib/db";
+import { broadcastGroupMessage, broadcastPrivateMessage } from "@/lib/message";
 
-import { pusherServer } from "@/lib/pusher/server";
-import { conversationEvents } from "@/constants/pusher-events";
-
-import { getCurrentUser } from "@/data/auth/session";
 import { getUserMessage } from "@/data/message";
+import { getCurrentUser } from "@/data/auth/session";
 
+import { conversationEvents } from "@/constants/pusher-events";
 import handleUserMessageError from "@/utils/api/handle-user-message-error";
-import { generatePrivateChatChannelName } from "@/utils/pusher/generate-chat-channel-name";
 
 type Params = {
 	conversationId: string;
 	messageId: string;
+};
+
+/**
+ * Broadcasts a message reaction event to the appropriate recipients, handling both
+ * group and private conversations.
+ */
+const broadcastMessageReaction = async ({
+	conversationId,
+	isGroupConversation,
+	receiverId,
+	receiverIds,
+	eventName,
+	payload,
+}: {
+	conversationId: string;
+	isGroupConversation: boolean;
+	receiverId: string | null;
+	receiverIds: string[];
+	eventName: string;
+	payload: MessageReaction;
+}) => {
+	// Handle group conversations
+	if (isGroupConversation) {
+		await broadcastGroupMessage({ conversationId, eventName, receiverIds, payload });
+		return true;
+	}
+
+	// Handle private conversations
+	// If no valid recipient is found, return false (e.g., if the conversation has no other members)
+	if (!receiverId) return false;
+
+	// Call the broadcasting function for private messages
+	await broadcastPrivateMessage({ conversationId, eventName, receiverId, payload });
+
+	return true;
 };
 
 /**
@@ -51,14 +85,14 @@ export async function POST(req: NextRequest, { params }: { params: Params }) {
 
 	try {
 		// Fetch the message and verify the user's permission to interact with it
-		const { message, receiverId, error } = await getUserMessage({
+		const { message, receiverId, receiverIds, error } = await getUserMessage({
 			messageId,
 			conversationId,
 			userId,
 		});
 
 		// Handle possible errors based on the returned error type
-		if (error || !message || !receiverId) {
+		if (error || !message) {
 			return handleUserMessageError(error!);
 		}
 
@@ -67,15 +101,15 @@ export async function POST(req: NextRequest, { params }: { params: Params }) {
 			data: { type: reactionType, emoji, emojiImageUrl, messageId: message.id, userId },
 		});
 
-		// Notify the other conversation member of the reaction using Pusher
-		pusherServer.trigger(
-			generatePrivateChatChannelName({
-				conversationId: message.conversationId,
-				receiverId,
-			}),
-			conversationEvents.createReaction,
-			newMessageReaction
-		);
+		// Broadcast a message reaction event to the appropriate recipients
+		await broadcastMessageReaction({
+			conversationId: message.conversationId,
+			isGroupConversation: message.conversation.isGroup,
+			receiverId,
+			receiverIds,
+			eventName: conversationEvents.createReaction,
+			payload: newMessageReaction,
+		});
 
 		return NextResponse.json({
 			success: true,
@@ -91,9 +125,9 @@ export async function POST(req: NextRequest, { params }: { params: Params }) {
 }
 
 /**
- * Handler function for
+ * Handler function for updating the reaction of a message in a conversation.
  *
- * @returns A JSON response
+ * @returns A JSON response with the result of the reaction update process.
  */
 export async function PATCH(req: NextRequest, { params }: { params: Params }) {
 	// Parse the request body to extract the message reaction details
@@ -123,14 +157,14 @@ export async function PATCH(req: NextRequest, { params }: { params: Params }) {
 
 	try {
 		// Fetch the message and verify the user's permission to remove the reaction
-		const { message, receiverId, error } = await getUserMessage({
+		const { message, receiverId, receiverIds, error } = await getUserMessage({
 			messageId,
 			conversationId,
 			userId,
 		});
 
 		// Fetch the message and verify the user's permission to remove the reaction
-		if (error || !message || !receiverId) {
+		if (error || !message) {
 			return handleUserMessageError(error!);
 		}
 
@@ -153,14 +187,15 @@ export async function PATCH(req: NextRequest, { params }: { params: Params }) {
 			data: { type: reactionType, emoji, emojiImageUrl },
 		});
 
-		pusherServer.trigger(
-			generatePrivateChatChannelName({
-				conversationId: message.conversationId,
-				receiverId,
-			}),
-			conversationEvents.updateReaction,
-			updatedMessageReaction
-		);
+		// Broadcast a message reaction event to the appropriate recipients
+		await broadcastMessageReaction({
+			conversationId: message.conversationId,
+			isGroupConversation: message.conversation.isGroup,
+			receiverId,
+			receiverIds,
+			eventName: conversationEvents.updateReaction,
+			payload: updatedMessageReaction,
+		});
 
 		return NextResponse.json({
 			success: true,
@@ -198,14 +233,14 @@ export async function DELETE(req: NextRequest, { params }: { params: Params }) {
 
 	try {
 		// Fetch the message and verify the user's permission to remove the reaction
-		const { message, receiverId, error } = await getUserMessage({
+		const { message, receiverId, receiverIds, error } = await getUserMessage({
 			messageId,
 			conversationId,
 			userId,
 		});
 
 		// Fetch the message and verify the user's permission to remove the reaction
-		if (error || !message || !receiverId) {
+		if (error || !message) {
 			return handleUserMessageError(error!);
 		}
 
@@ -227,15 +262,15 @@ export async function DELETE(req: NextRequest, { params }: { params: Params }) {
 			where: { id: messageReaction.id },
 		});
 
-		// Notify the other conversation member about the reaction removal using Pusher
-		pusherServer.trigger(
-			generatePrivateChatChannelName({
-				conversationId: message.conversationId,
-				receiverId,
-			}),
-			conversationEvents.removeReaction,
-			messageReaction
-		);
+		// Broadcast a message reaction event to the appropriate recipients
+		await broadcastMessageReaction({
+			conversationId: message.conversationId,
+			isGroupConversation: message.conversation.isGroup,
+			receiverId,
+			receiverIds,
+			eventName: conversationEvents.removeReaction,
+			payload: messageReaction,
+		});
 
 		return NextResponse.json({
 			success: true,

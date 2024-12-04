@@ -17,10 +17,17 @@ import { useFriendsQuery } from "@/hooks/tanstack-query/use-friend";
 
 interface ChatFriendSelectorProps {
 	isGroup?: boolean;
+	defaultSelectedIds?: string[];
+	hiddenFriendIds?: string[];
 	onSelect?: (friendId: string, selected: boolean) => void;
 }
 
-const ChatFriendSelector = ({ isGroup = false, onSelect }: ChatFriendSelectorProps) => {
+const ChatFriendSelector = ({
+	isGroup = false,
+	defaultSelectedIds = [],
+	hiddenFriendIds = [],
+	onSelect,
+}: ChatFriendSelectorProps) => {
 	const [searchQuery, setSearchQuery] = useState("");
 	const [isOnline, setIsOnline] = useState(false);
 
@@ -77,16 +84,19 @@ const ChatFriendSelector = ({ isGroup = false, onSelect }: ChatFriendSelectorPro
 										{data.pages.map((page) =>
 											page.data?.items ? (
 												<ul key={page.data?.pagination.page} className="flex flex-col">
-													{page.data?.items.map((friend) => (
-														<li key={friend.id} className="">
-															<FriendTile
-																{...friend}
-																className="px-4 sm:px-5 lg:px-6"
-																showCheckbox={isGroup}
-																onChange={onSelect}
-															/>
-														</li>
-													))}
+													{page.data?.items.map((friend) =>
+														!hiddenFriendIds.includes(friend.id) ? (
+															<li key={friend.id}>
+																<FriendTile
+																	{...friend}
+																	className="px-4 sm:px-5 lg:px-6"
+																	defaultSelected={defaultSelectedIds.includes(friend.id)}
+																	showCheckbox={isGroup}
+																	onChange={onSelect}
+																/>
+															</li>
+														) : null
+													)}
 												</ul>
 											) : null
 										)}

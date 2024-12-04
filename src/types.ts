@@ -2,15 +2,19 @@ import type {
 	User,
 	FriendRequest,
 	Friendship,
+	Conversation,
 	Message,
 	TextMessage,
 	ImageMessage,
 	MessageReaction,
+	Member,
+	Media,
 } from "@prisma/client";
 import { PaginationMetadata } from "@/utils/general/calculate-pagination";
 
 export interface UserProfile extends Omit<User, "password" | "image"> {}
 export interface UserWithoutPassword extends Omit<User, "password"> {}
+export interface MediaWithoutId extends Omit<Media, "id"> {}
 
 export enum AuthError {
 	Configuration = "Configuration",
@@ -61,7 +65,12 @@ export interface FriendWithFriendship extends UserWithoutPassword {
 	friendship: Friendship;
 }
 
+export interface ConversationWithMembers extends Conversation {
+	members: Member[];
+}
+
 export interface CompleteMessage extends Message {
+	conversation: Conversation;
 	textMessage: TextMessage | null;
 	imageMessage: ImageMessage | null;
 	seenByMembers: string[];
@@ -76,7 +85,28 @@ export interface MessageSeenMembers {
 }
 
 export interface MessageWithUserID extends Message {
-	conversation: {
+	conversation: Conversation & {
 		members: { userId: string }[];
 	};
+}
+
+export interface GroupOverview {
+	id: string;
+	name: string;
+	description?: string | null;
+	icon?: string | null;
+	createdAt: Date;
+	creator: UserWithoutPassword;
+	members: {
+		total: number;
+		online: number;
+	};
+}
+
+export interface GroupMember extends Member {
+	user: UserWithoutPassword;
+}
+
+export interface GroupConversationWithMembers extends Conversation {
+	members: GroupMember[];
 }

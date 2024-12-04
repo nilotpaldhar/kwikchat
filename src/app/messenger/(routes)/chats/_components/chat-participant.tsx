@@ -1,20 +1,17 @@
 "use client";
 
-import type { UserWithoutPassword } from "@/types";
-
 import { Button } from "@/components/ui/button";
 import Skeleton from "@/components/ui/skeleton";
 import UserAvatar from "@/components/user/user-avatar";
 
-import useChatInfoStore from "@/store/chat-info-store";
+import useChatInfoStore from "@/store/use-chat-info-store";
+import { useParticipantInConversationQuery } from "@/hooks/tanstack-query/use-conversation";
 
 import { cn } from "@/utils/general/cn";
 import formatDateBasedOnRecency from "@/utils/general/format-date-based-on-recency";
 
 interface ChatParticipantProps {
-	participant?: UserWithoutPassword;
-	isLoading?: boolean;
-	isError?: boolean;
+	conversationId: string;
 }
 
 const LoadingSkeleton = () => (
@@ -27,12 +24,10 @@ const LoadingSkeleton = () => (
 	</div>
 );
 
-const ChatParticipant = ({
-	participant,
-	isLoading = false,
-	isError = false,
-}: ChatParticipantProps) => {
+const ChatParticipant = ({ conversationId }: ChatParticipantProps) => {
 	const toggleContactInfo = useChatInfoStore().toggleOpen;
+	const { data, isLoading, isError } = useParticipantInConversationQuery(conversationId);
+	const participant = data?.data;
 
 	if (isLoading) return <LoadingSkeleton />;
 

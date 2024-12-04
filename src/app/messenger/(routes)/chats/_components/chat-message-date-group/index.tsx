@@ -5,6 +5,7 @@ import type { CompleteMessage } from "@/types";
 import { useEffect } from "react";
 
 import ChatMessageFactory from "@/app/messenger/(routes)/chats/_components/chat-message-factory";
+import SenderInfo from "@/app/messenger/(routes)/chats/_components/chat-message-date-group/sender-info";
 
 import { useMessagesSeenStatus } from "@/hooks/tanstack-query/use-message";
 import { cn } from "@/utils/general/cn";
@@ -52,11 +53,20 @@ const ChatMessageDateGroup = ({
 				<div className="absolute left-0 right-0 top-1/2 z-10 h-px -translate-y-1/2 transform border-t border-dashed border-neutral-300 dark:border-neutral-800" />
 			</div>
 			<ul className="flex flex-col-reverse gap-y-8">
-				{messages.map((message) => (
-					<li key={message.id}>
-						<ChatMessageFactory message={message} currentUserId={currentUserId} />
-					</li>
-				))}
+				{messages.map((message, index) => {
+					const { sender, conversation, id: messageId } = message;
+					const showAvatar = conversation.isGroup && sender.id !== currentUserId;
+					const shouldDisplayAvatar = showAvatar && sender.id !== messages[index + 1]?.senderId;
+
+					return (
+						<li key={messageId}>
+							{shouldDisplayAvatar && <SenderInfo sender={sender} />}
+							<div className={cn(showAvatar && "pl-[52px]")}>
+								<ChatMessageFactory message={message} currentUserId={currentUserId} />
+							</div>
+						</li>
+					);
+				})}
 			</ul>
 		</div>
 	);

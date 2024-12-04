@@ -13,13 +13,20 @@ import UserAvatar from "@/components/user/user-avatar";
 import { cn } from "@/utils/general/cn";
 
 interface FriendTileProps extends FriendWithFriendship {
+	defaultSelected?: boolean;
 	showCheckbox?: boolean;
 	className?: string;
 	onChange?: (friendId: string, selected: boolean) => void;
 }
 
-const FriendTile = ({ showCheckbox = true, className, onChange, ...friend }: FriendTileProps) => {
-	const [selected, setSelected] = useState(false);
+const FriendTile = ({
+	defaultSelected = false,
+	showCheckbox = true,
+	className,
+	onChange,
+	...friend
+}: FriendTileProps) => {
+	const [selected, setSelected] = useState(defaultSelected);
 
 	const { avatar, displayName, username } = friend;
 	const fallback = displayName ? displayName.charAt(0) : username?.charAt(0);

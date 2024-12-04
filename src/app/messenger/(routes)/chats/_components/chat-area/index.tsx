@@ -17,6 +17,7 @@ import { usePrivateMessagesQuery } from "@/hooks/tanstack-query/use-message";
 
 interface ChatAreaProps {
 	conversationId: string;
+	isGroupConversation: boolean;
 	currentUserId: string;
 }
 
@@ -31,7 +32,7 @@ const combineMessages = (data?: InfiniteData<APIResponse<PaginatedResponse<Compl
 	return messages;
 };
 
-const ChatArea = ({ currentUserId, conversationId }: ChatAreaProps) => {
+const ChatArea = ({ conversationId, currentUserId, isGroupConversation }: ChatAreaProps) => {
 	const chatAreaRef = useRef<ElementRef<"div">>(null);
 	const chatAreaEndRef = useRef<ElementRef<"div">>(null);
 
@@ -47,6 +48,7 @@ const ChatArea = ({ currentUserId, conversationId }: ChatAreaProps) => {
 		isFetchingNextPage,
 	} = usePrivateMessagesQuery({
 		conversationId,
+		isGroup: isGroupConversation,
 	});
 
 	const totalMessages = data?.pages[0]?.data?.pagination.totalItems ?? 0;

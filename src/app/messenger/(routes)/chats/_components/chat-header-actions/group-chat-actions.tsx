@@ -1,18 +1,19 @@
 "use client";
 
+import { Info, MoreVertical } from "lucide-react";
+
 import { Button } from "@/components/ui/button";
 import { Popover, PopoverTrigger, PopoverContent } from "@/components/ui/popover";
-import { PhoneCall, Video, Info, MoreVertical } from "lucide-react";
 
 import { cn } from "@/utils/general/cn";
-import useChatInfoStore from "@/store/chat-info-store";
+import useChatInfoStore from "@/store/use-chat-info-store";
 import useMessengerDialogStore from "@/store/use-messenger-dialog-store";
 
-interface ChatHeaderActionsProps {
+interface GroupChatHeaderActionsProps {
 	conversationId: string;
 }
 
-const ChatHeaderActions = ({ conversationId }: ChatHeaderActionsProps) => {
+const GroupChatHeaderActions = ({ conversationId }: GroupChatHeaderActionsProps) => {
 	const toggleContactInfo = useChatInfoStore().toggleOpen;
 	const openClearConversationDialog = useMessengerDialogStore().onOpen;
 
@@ -21,22 +22,14 @@ const ChatHeaderActions = ({ conversationId }: ChatHeaderActionsProps) => {
 
 	return (
 		<div className="flex items-center space-x-5">
-			<Button variant="outline" size="icon" className={cn(btnClassNames, "hidden sm:flex")}>
-				<PhoneCall size={20} />
-				<span className="sr-only">Voice Call</span>
-			</Button>
-			<Button variant="outline" size="icon" className={cn(btnClassNames, "hidden sm:flex")}>
-				<Video size={20} />
-				<span className="sr-only">Video Call</span>
-			</Button>
 			<Button
 				variant="outline"
 				size="icon"
 				className={cn(btnClassNames, "hidden md:flex")}
-				onClick={() => toggleContactInfo("USER_INFO")}
+				onClick={() => toggleContactInfo("GROUP_DETAILS")}
 			>
 				<Info size={20} />
-				<span className="sr-only">Contact Info</span>
+				<span className="sr-only">Group Info</span>
 			</Button>
 			<Popover>
 				<PopoverTrigger asChild>
@@ -52,18 +45,12 @@ const ChatHeaderActions = ({ conversationId }: ChatHeaderActionsProps) => {
 					align="end"
 					alignOffset={0}
 				>
-					<Button variant="outline" className={cn(popoverBtnClassNames, "sm:hidden")}>
-						<span className="font-semibold">Voice Call</span>
-					</Button>
-					<Button variant="outline" className={cn(popoverBtnClassNames, "sm:hidden")}>
-						<span className="font-semibold">Video Call</span>
-					</Button>
 					<Button
 						variant="outline"
 						className={cn(popoverBtnClassNames, "md:hidden")}
-						onClick={() => toggleContactInfo("USER_INFO")}
+						onClick={() => toggleContactInfo("GROUP_DETAILS")}
 					>
-						<span className="font-semibold">Contact Info</span>
+						<span className="font-semibold">Group Info</span>
 					</Button>
 					<Button
 						variant="outline"
@@ -79,13 +66,10 @@ const ChatHeaderActions = ({ conversationId }: ChatHeaderActionsProps) => {
 					<Button variant="outline" className={popoverBtnClassNames}>
 						<span className="font-semibold">Delete Chat</span>
 					</Button>
-					<Button variant="outline" className={popoverBtnClassNames}>
-						<span className="font-semibold">Block</span>
-					</Button>
 				</PopoverContent>
 			</Popover>
 		</div>
 	);
 };
 
-export default ChatHeaderActions;
+export default GroupChatHeaderActions;

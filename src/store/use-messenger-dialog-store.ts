@@ -5,6 +5,7 @@ import { create } from "zustand";
 export type ModalType =
 	| "NEW_CHAT"
 	| "NEW_GROUP_CHAT"
+	| "ADD_NEW_GROUP_MEMBERS"
 	| "EDIT_MESSAGE"
 	| "DELETE_MESSAGE"
 	| "CLEAR_CONVERSATION";
@@ -21,6 +22,9 @@ interface DialogData {
 		showDeleteForEveryone: boolean;
 	};
 	conversationToClear?: {
+		conversationId: string;
+	};
+	conversationToAddMembers?: {
 		conversationId: string;
 	};
 }

@@ -11,9 +11,9 @@ interface UploadResponse {
 	filePath: string;
 	url: string;
 	fileType: string;
-	height: number;
-	width: number;
-	thumbnailUrl: string;
+	height?: number;
+	width?: number;
+	thumbnailUrl?: string;
 }
 
 async function uploadImage({
@@ -21,7 +21,7 @@ async function uploadImage({
 	imageName,
 	folder,
 }: {
-	image: string; //Base64 string
+	image: string; // Base64 string
 	imageName: string;
 	folder?: string;
 }): Promise<UploadResponse> {
@@ -34,13 +34,30 @@ async function uploadImage({
 
 		return res;
 	} catch (error) {
-		throw new Error("Image upload Failed");
+		throw new Error("Image upload failed");
 	}
 }
 
-async function uploadFile() {
-	// eslint-disable-next-line no-console
-	console.log("TODO: IMPLEMENT FILE UPLOAD");
+async function uploadFile({
+	file,
+	fileName,
+	folder,
+}: {
+	file: string; // Base64 string
+	fileName: string;
+	folder?: string;
+}) {
+	try {
+		const res = await media.upload({
+			file: file,
+			fileName: `${fileName}-${nanoid()}`,
+			folder: folder ? `${ROOT_MEDIA_FOLDER}/${folder}` : ROOT_MEDIA_FOLDER,
+		});
+
+		return res;
+	} catch (error) {
+		throw new Error("File upload failed");
+	}
 }
 
 export { uploadImage, uploadFile };

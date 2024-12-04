@@ -5,13 +5,14 @@ import { type NextRequest, NextResponse } from "next/server";
 import { SeenMessageSchema } from "@/schemas";
 
 import { prisma } from "@/lib/db";
-
-import { pusherServer } from "@/lib/pusher/server";
-import { conversationEvents } from "@/constants/pusher-events";
-
+import {
+	updateMessageSeenStatus,
+	broadcastPrivateMessage,
+	broadcastGroupMessage,
+} from "@/lib/message";
 import { getCurrentUser } from "@/data/auth/session";
-import { updateMessageSeenStatus } from "@/lib/message";
-import { generatePrivateChatChannelName } from "@/utils/pusher/generate-chat-channel-name";
+
+import { conversationEvents } from "@/constants/pusher-events";
 
 type Params = { conversationId: string };
 
@@ -81,16 +82,32 @@ export async function POST(req: NextRequest, { params }: { params: Params }) {
 		// Update the seen status of the messages for the current member
 		const data = await updateMessageSeenStatus({ messageIds, memberId: currentMember.id });
 
-		// If any messages were updated, trigger an event to notify the other member
+		// If any messages were updated, proceed with broadcasting seen status
 		if (data.length > 0) {
-			pusherServer.trigger(
-				generatePrivateChatChannelName({
+			// Set the event name for broadcasting a seen message
+			const eventName = conversationEvents.seenMessage;
+
+			// Collect the IDs of all members in the conversation to use as recipients for the broadcast
+			const receiverIds = conversation.members.map((member) => member.userId);
+
+			// Check if the conversation is a group chat
+			if (conversation.isGroup) {
+				// Broadcast the seen message event to all group members with relevant payload
+				await broadcastGroupMessage({
 					conversationId: conversation.id,
+					eventName,
+					receiverIds,
+					payload: data,
+				});
+			} else {
+				// For a private conversation, broadcast the seen message event to the other participant only
+				await broadcastPrivateMessage({
+					conversationId: conversation.id,
+					eventName,
 					receiverId: otherMember.userId,
-				}),
-				conversationEvents.seenMessage,
-				data
-			);
+					payload: data,
+				});
+			}
 		}
 
 		return NextResponse.json({
