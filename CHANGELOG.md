@@ -1,3 +1,14 @@
+# [0.7.0](https://github.com/nilotpaldhar/storekeeper/compare/v0.6.0...v0.7.0) (2024-12-04)
+
+
+### Features
+
+* **group-chat:** add functionality to update group member roles and remove members ([7e3eae1](https://github.com/nilotpaldhar/storekeeper/commit/7e3eae19cf1d4545558c86655dd835ffba934a6a))
+* **group-chat:** add group chat support, allowing users to create and join group conversations ([17a3e35](https://github.com/nilotpaldhar/storekeeper/commit/17a3e3520edc30ab43411ee2a32005770a88317c))
+* **group-chat:** add group creation dialog with server-side handling ([13d3752](https://github.com/nilotpaldhar/storekeeper/commit/13d3752593c2dd84081109fd9e0faa0e7d8483e5))
+
+
+
 # [0.6.0](https://github.com/nilotpaldhar/storekeeper/compare/v0.5.0...v0.6.0) (2024-10-17)
 
 
