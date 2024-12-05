@@ -1,12 +1,11 @@
 "use server";
 
-import bcrypt from "bcryptjs";
-
 import * as z from "zod";
 import { SignupSchema } from "@/schemas";
 
 import { prisma } from "@/lib/db";
 import { sendVerificationEmail } from "@/lib/mail";
+import { hashPassword } from "@/lib/auth/password-utils";
 import { generateVerificationToken } from "@/lib/auth/tokens";
 import { getUserByEmail, getUserByUsername } from "@/data/user";
 
@@ -34,7 +33,7 @@ async function signup(values: z.infer<typeof SignupSchema>) {
 	}
 
 	/** Hash password */
-	const hashedPassword = await bcrypt.hash(password, 10);
+	const hashedPassword = hashPassword(password);
 
 	try {
 		await prisma.user.create({

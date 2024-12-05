@@ -1,12 +1,11 @@
 "use server";
 
-import bcrypt from "bcryptjs";
-
 import * as z from "zod";
 import { ResetPasswordSchema } from "@/schemas";
 
 import { prisma } from "@/lib/db";
 import { getUserByEmail } from "@/data/user";
+import { hashPassword } from "@/lib/auth/password-utils";
 
 import { RESET_PASSWORD_MESSAGE as MESSAGE } from "@/constants/auth";
 
@@ -31,7 +30,7 @@ async function resetPassword({
 		return { error: MESSAGE.error.emailNotExist };
 	}
 
-	const hashedPassword = await bcrypt.hash(password, 10);
+	const hashedPassword = hashPassword(password);
 
 	try {
 		await prisma.user.update({
