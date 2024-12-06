@@ -22,7 +22,9 @@ const LogoutConfirm = ({ children }: { children: React.ReactNode }) => {
 	const [pending, startTransition] = useTransition();
 	const queryClient = useQueryClient();
 
-	const onLogout = () => {
+	const onLogout = (evt: React.FormEvent<HTMLFormElement>) => {
+		evt.preventDefault();
+
 		startTransition(() => {
 			logout().then(() => {
 				setOpen(false);
@@ -35,7 +37,7 @@ const LogoutConfirm = ({ children }: { children: React.ReactNode }) => {
 		<AlertDialog open={open} onOpenChange={setOpen}>
 			<AlertDialogTrigger asChild>{children}</AlertDialogTrigger>
 			<AlertDialogContent>
-				<form action={onLogout}>
+				<form onSubmit={onLogout}>
 					<div className="flex flex-col space-y-5">
 						<AlertDialogHeader>
 							<AlertDialogTitle>Log Out</AlertDialogTitle>
