@@ -19,7 +19,7 @@ async function sendVerificationEmail({
 	token: string;
 }) {
 	const confirmLink = `${DOMAIN}/verification?token=${token}`;
-	const body = render(VerificationEmail({ url: confirmLink, username }));
+	const body = await render(VerificationEmail({ url: confirmLink, username }));
 
 	await sendMail({
 		to: email,
@@ -38,7 +38,7 @@ async function sendPasswordResetEmail({
 	token: string;
 }) {
 	const resetLink = `${DOMAIN}/reset-password?token=${token}`;
-	const body = render(PasswordResetEmail({ url: resetLink, username }));
+	const body = await render(PasswordResetEmail({ url: resetLink, username }));
 
 	await sendMail({
 		to: email,
@@ -56,7 +56,7 @@ async function sendTwoFactorTokenEmail({
 	username: string;
 	otp: string;
 }) {
-	const body = render(TwoFactorTokenEmail({ username, otp }));
+	const body = await render(TwoFactorTokenEmail({ username, otp }));
 
 	await sendMail({
 		to: email,

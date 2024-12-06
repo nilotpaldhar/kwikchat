@@ -1,11 +1,10 @@
 "use server";
 
-import bcrypt from "bcryptjs";
-
 import * as z from "zod";
 import { UpdatePasswordSchema } from "@/schemas";
 
 import { prisma } from "@/lib/db";
+import { hashPassword } from "@/lib/auth/password-utils";
 
 import { getCurrentUser } from "@/data/auth/session";
 import validateCredentials from "@/lib/auth/validate-credentials";
@@ -39,7 +38,7 @@ async function updatePassword(values: z.infer<typeof UpdatePasswordSchema>) {
 	}
 
 	// Hash the new password using bcrypt
-	const hashedNewPassword = await bcrypt.hash(newPassword, 10);
+	const hashedNewPassword = hashPassword(newPassword);
 
 	// Update user password in the database
 	try {

@@ -1,7 +1,7 @@
 import "server-only";
 
-import bcrypt from "bcryptjs";
 import { getUserByEmail } from "@/data/user";
+import { verifyPassword } from "@/lib/auth/password-utils";
 
 export enum ValidationError {
 	UserNotFound = "UserNotFound",
@@ -16,7 +16,7 @@ async function validateCredentials({ email, password }: { email: string; passwor
 			return { user: null, error: ValidationError.UserNotFound };
 		}
 
-		const passwordsMatch = await bcrypt.compare(password, user.password);
+		const passwordsMatch = verifyPassword(password, user.password);
 		if (!passwordsMatch) {
 			return { user: null, error: ValidationError.PasswordMismatch };
 		}
