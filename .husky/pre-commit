@@ -1,6 +1,3 @@
-#!/bin/sh
-. "$(dirname "$0")/_/husky.sh"
-
 echo 'Check formating and building project before commiting'
 
 # Fix code style issues before check
