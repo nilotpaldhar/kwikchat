@@ -5,33 +5,11 @@ import type { MediaWithoutId } from "@/types";
 import * as z from "zod";
 import { NewGroupSchema } from "@/schemas";
 
-import { uploadImage } from "@/lib/upload";
 import { getCurrentUser } from "@/data/auth/session";
-import { createGroupConversation } from "@/lib/conversation";
 import { hasAnyFriendshipWithUser } from "@/lib/friendship";
+import { createGroupConversation, uploadGroupConversationIcon } from "@/lib/conversation";
 
 import { INIT_GROUP_CONVERSATION_MESSAGE as MESSAGE } from "@/constants/conversation";
-
-async function uploadGroupIcon({
-	icon,
-	groupName,
-	userId,
-}: {
-	icon: string;
-	groupName: string;
-	userId: string;
-}) {
-	try {
-		const res = await uploadImage({
-			image: icon,
-			imageName: `${groupName}-icon`,
-			folder: `${userId}/group-icons`,
-		});
-		return res;
-	} catch (error) {
-		return null;
-	}
-}
 
 const initGroupConversation = async (values: z.infer<typeof NewGroupSchema>) => {
 	const validatedFields = NewGroupSchema.safeParse(values);
@@ -56,9 +34,8 @@ const initGroupConversation = async (values: z.infer<typeof NewGroupSchema>) => 
 
 		// Upload group icon
 		if (groupIcon) {
-			const res = await uploadGroupIcon({
+			const res = await uploadGroupConversationIcon({
 				icon: groupIcon,
-				groupName,
 				userId: currentUser.id,
 			});
 

@@ -1,4 +1,4 @@
-import type { CompleteMessage } from "@/types";
+import type { CompleteMessage, GroupOverview } from "@/types";
 
 import { create } from "zustand";
 
@@ -8,7 +8,10 @@ export type ModalType =
 	| "ADD_NEW_GROUP_MEMBERS"
 	| "EDIT_MESSAGE"
 	| "DELETE_MESSAGE"
-	| "CLEAR_CONVERSATION";
+	| "CLEAR_CONVERSATION"
+	| "EDIT_GROUP_DETAILS"
+	| "EDIT_GROUP_BANNER"
+	| "EDIT_GROUP_ICON";
 
 interface DialogData {
 	messageToEdit?: {
@@ -27,6 +30,7 @@ interface DialogData {
 	conversationToAddMembers?: {
 		conversationId: string;
 	};
+	groupConversationToEdit?: GroupOverview;
 }
 
 interface MessengerDialogStore {
@@ -51,6 +55,8 @@ const useMessengerDialogStore = create<MessengerDialogStore>((set) => ({
 				messageToEdit: undefined,
 				messageToDelete: undefined,
 				conversationToClear: undefined,
+				conversationToAddMembers: undefined,
+				groupConversationToEdit: undefined,
 			},
 		}),
 }));

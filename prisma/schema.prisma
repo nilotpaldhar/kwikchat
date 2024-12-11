@@ -426,6 +426,7 @@ model GroupDetails {
   id          String  @id @default(cuid())
   name        String
   description String?
+  bannerColor String? @default("#27AE80")
 
   // Relationship to the conversation.
   conversationId String       @unique

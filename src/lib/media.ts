@@ -1,9 +1,28 @@
-/* eslint-disable import/prefer-default-export */
+import "server-only";
 
-import ImageKit from "imagekit";
+import { type Media, type Prisma } from "@prisma/client";
+import { prisma } from "@/lib/db";
 
-export const media = new ImageKit({
-	publicKey: process.env.IMAGE_KIT_PUBLIC_KEY as string,
-	privateKey: process.env.IMAGE_KIT_PRIVATE_KEY as string,
-	urlEndpoint: process.env.IMAGE_KIT_URL_ENDPOINT as string,
-});
+/**
+ * Function to save media to the database.
+ */
+const saveMedia = async ({
+	mediaId,
+	data,
+}: {
+	mediaId?: string;
+	data: Prisma.MediaCreateInput;
+}): Promise<Media> => {
+	// Update existing media with the given mediaId
+	if (mediaId) {
+		const updateMedia = await prisma.media.update({ where: { id: mediaId }, data });
+		return updateMedia;
+	}
+
+	// Create new media
+	const newMedia = await prisma.media.create({ data });
+	return newMedia;
+};
+
+// eslint-disable-next-line import/prefer-default-export
+export { saveMedia };

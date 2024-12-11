@@ -95,6 +95,7 @@ export interface GroupOverview {
 	name: string;
 	description?: string | null;
 	icon?: string | null;
+	bannerColor?: string | null;
 	createdAt: Date;
 	creator: UserWithoutPassword;
 	members: {

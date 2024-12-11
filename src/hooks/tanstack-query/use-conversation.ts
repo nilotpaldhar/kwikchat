@@ -10,6 +10,7 @@ import { conversationKeys } from "@/constants/tanstack-query";
 import {
 	fetchParticipantInConversation,
 	fetchGroupConversationDetails,
+	updateGroupConversationDetails,
 	fetchGroupConversationMembership,
 	clearConversation,
 } from "@/services/conversation";
@@ -95,6 +96,23 @@ const useGroupConversationDetailsQuery = (conversationId: string) => {
 };
 
 /**
+ * Custom hook to update group conversation details.
+ */
+const useUpdateGroupConversationDetails = () => {
+	const queryClient = useQueryClient();
+
+	return useMutation({
+		// Function that performs the mutation to update the group conversation details
+		mutationFn: updateGroupConversationDetails,
+
+		// Invalidate relevant queries after the mutation is settled (either success or failure)
+		onSettled: (_data, _error, { conversationId }) => {
+			queryClient.invalidateQueries({ queryKey: conversationKeys.groupDetails(conversationId) });
+		},
+	});
+};
+
+/**
  * Custom hook to fetch the membership details of the current user in a specific conversation.
  */
 const useGroupConversationMembershipQuery = (
@@ -144,6 +162,7 @@ const useClearConversation = () => {
 export {
 	useParticipantInConversationQuery,
 	useGroupConversationDetailsQuery,
+	useUpdateGroupConversationDetails,
 	useGroupConversationMembershipQuery,
 	useClearConversation,
 };

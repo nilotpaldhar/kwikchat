@@ -35,6 +35,34 @@ const fetchGroupConversationDetails = async (conversationId: string) => {
 };
 
 /**
+ * Function to update group conversation details.
+ */
+const updateGroupConversationDetails = async ({
+	conversationId,
+	groupName,
+	groupDescription,
+	groupBannerColor,
+	groupIcon,
+}: {
+	conversationId: string;
+	groupName?: string;
+	groupDescription?: string;
+	groupBannerColor?: string;
+	groupIcon?: string;
+}) => {
+	try {
+		const res = await axios.patch<APIResponse<GroupOverview>>(
+			`/conversations/${conversationId}/group`,
+			{ groupName, groupDescription, groupBannerColor, groupIcon }
+		);
+		return res.data;
+	} catch (error) {
+		const errMsg = handleAxiosError(error);
+		throw new Error(errMsg);
+	}
+};
+
+/**
  * Fetches membership details of the current user in a specific conversation.
  */
 const fetchGroupConversationMembership = async (conversationId: string) => {
@@ -67,6 +95,7 @@ const clearConversation = async ({ conversationId }: { conversationId: string })
 export {
 	fetchParticipantInConversation,
 	fetchGroupConversationDetails,
+	updateGroupConversationDetails,
 	fetchGroupConversationMembership,
 	clearConversation,
 };

@@ -1,8 +1,12 @@
+import "server-only";
+
+import { type Media, type Prisma, MemberRole } from "@prisma/client";
 import type { MediaWithoutId } from "@/types";
 
-import { MemberRole } from "@prisma/client";
 import { prisma } from "@/lib/db";
-import { hasAnyFriendshipWithUser } from "./friendship";
+import { saveMedia } from "@/lib/media";
+import { hasAnyFriendshipWithUser } from "@/lib/friendship";
+import { uploadImage, deleteImageOrFile } from "@/lib/upload";
 
 export enum AddGroupConversationMemberError {
 	InvalidFriendship = "InvalidFriendship",
@@ -193,9 +197,85 @@ const addGroupConversationMembers = async ({
 	}
 };
 
+/**
+ * Function to upload a group conversation icon.
+ */
+async function uploadGroupConversationIcon({
+	icon,
+	groupId,
+	userId,
+}: {
+	icon: string;
+	groupId?: string;
+	userId: string;
+}) {
+	try {
+		const res = await uploadImage({
+			image: icon,
+			imageName: groupId ? `${groupId}-icon` : `unknown-group-icon`,
+			folder: `${userId}/group-icons`,
+		});
+		return res;
+	} catch (error) {
+		return null;
+	}
+}
+
+/**
+ * Function to upload and update group conversation icon.
+ */
+const uploadAndUpdateGroupConversationIcon = async ({
+	userId,
+	conversationId,
+	groupIcon,
+	mediaId,
+	mediaExternalId,
+}: {
+	userId: string;
+	conversationId: string;
+	groupIcon: string;
+	mediaId?: string;
+	mediaExternalId?: string;
+}): Promise<Media | null> => {
+	try {
+		// Upload the group conversation icon
+		const res = await uploadGroupConversationIcon({
+			userId,
+			groupId: conversationId,
+			icon: groupIcon,
+		});
+		if (!res) return null;
+
+		// Prepare data for saving media
+		const data: Prisma.MediaCreateInput = {
+			externalId: res.fileId,
+			name: res.name,
+			size: res.size,
+			filePath: res.filePath,
+			url: res.url,
+			fileType: "image",
+			height: res.height ?? null,
+			width: res.width ?? null,
+			thumbnailUrl: res.thumbnailUrl ?? null,
+		};
+
+		// Save or update the media
+		const media = await saveMedia({ mediaId, data });
+
+		// If there's an existing media ID and external media ID, delete the previous image or file
+		if (mediaId && mediaExternalId) await deleteImageOrFile({ fileId: mediaExternalId });
+
+		return media;
+	} catch (error) {
+		return null;
+	}
+};
+
 export {
 	createPrivateConversation,
 	createGroupConversation,
 	clearConversation,
 	addGroupConversationMembers,
+	uploadGroupConversationIcon,
+	uploadAndUpdateGroupConversationIcon,
 };

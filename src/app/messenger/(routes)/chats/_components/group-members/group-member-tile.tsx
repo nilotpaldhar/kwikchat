@@ -39,7 +39,7 @@ const GroupMemberTile = ({
 
 	return (
 		<div className={cn("rounded-lg bg-white dark:bg-surface-dark-400", className)}>
-			<div className="flex items-center space-x-4 px-3 py-1.5">
+			<div className="flex flex-wrap items-center gap-x-4 gap-y-2 px-3 py-1.5">
 				<UserAvatar
 					src={avatar}
 					fallback={fallback?.toUpperCase() as string}
@@ -47,7 +47,7 @@ const GroupMemberTile = ({
 					indicatorClassName="dark:ring-surface-dark-400"
 				/>
 				<div className="flex flex-1 flex-col space-y-1">
-					<div className="flex max-w-40 items-center space-x-1 truncate text-sm font-medium leading-6 text-neutral-900 dark:text-neutral-300">
+					<div className="flex max-w-28 items-center space-x-1 truncate text-sm font-medium leading-6 text-neutral-900 dark:text-neutral-300 sm:max-w-40">
 						<span>{displayName ?? name ?? username}</span>
 						{isCurrentUser && <span>(You)</span>}
 					</div>
