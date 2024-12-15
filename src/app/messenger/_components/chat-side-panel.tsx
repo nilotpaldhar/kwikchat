@@ -10,6 +10,7 @@ import {
 	SidePanelContent,
 } from "@/app/messenger/_components/side-panel";
 import StartChatPopover from "@/app/messenger/_components/start-chat-popover";
+import OnlineFriendsList from "@/app/messenger/_components/online-friends-list";
 
 const ChatSidePanel = () => (
 	<SidePanel>
@@ -28,7 +29,16 @@ const ChatSidePanel = () => (
 				</StartChatPopover>
 			</div>
 		</SidePanelHeader>
-		<SidePanelContent className="px-5">Recent Chats</SidePanelContent>
+		<SidePanelContent>
+			<div className="flex flex-col space-y-10">
+				<OnlineFriendsList
+					classNames={{
+						skeleton: "max-w-52 lg:max-w-xs",
+						carousel: "max-w-52 lg:max-w-xs",
+					}}
+				/>
+			</div>
+		</SidePanelContent>
 	</SidePanel>
 );
 

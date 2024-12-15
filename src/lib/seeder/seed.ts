@@ -83,10 +83,12 @@ const seed = async () => {
 		// Create new users from the provided data
 		console.log(chalk.yellow("💾 Creating new users..."));
 		await Promise.all(
-			users.map((user) =>
+			users.map((user, idx) =>
 				prisma.user.create({
 					data: {
 						...user,
+						isOnline: idx % 2 === 0,
+						avatar: `/images/avatars/user-${idx + 1}.svg`,
 						createdAt: getRandomDateInLastYear().toISOString(),
 						updatedAt: getRandomDateInLastYear().toISOString(),
 						userSettings: { create: {} },
