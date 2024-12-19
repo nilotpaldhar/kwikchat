@@ -1,13 +1,16 @@
+import type { ConversationsFilterType } from "@/types";
+
 import { toast } from "sonner";
 
 import { useCallback } from "react";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useInfiniteQuery, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import usePusher from "@/hooks/use-pusher";
 
 import { friendEvents } from "@/constants/pusher-events";
 import { conversationKeys } from "@/constants/tanstack-query";
 
 import {
+	fetchConversationWithMetadata,
 	fetchParticipantInConversation,
 	fetchGroupConversationDetails,
 	updateGroupConversationDetails,
@@ -25,6 +28,29 @@ import {
 	optimisticConversationError,
 	refetchOptimisticConversation,
 } from "@/utils/optimistic-updates/conversation";
+
+/**
+ *
+ */
+const useConversationWithMetadataQuery = ({
+	filter = "all",
+}: {
+	filter?: ConversationsFilterType;
+} = {}) => {
+	const query = useInfiniteQuery({
+		queryKey: conversationKeys.filtered(filter),
+		queryFn: ({ pageParam }) =>
+			fetchConversationWithMetadata({
+				page: pageParam,
+				groupOnly: filter === "group",
+				includeUnreadOnly: filter === "unread",
+			}),
+		initialPageParam: 1,
+		getNextPageParam: (lastPage) => lastPage.data?.pagination.nextPage,
+	});
+
+	return query;
+};
 
 /**
  * Custom hook to fetch and manage the participant details in a conversation.
@@ -160,6 +186,7 @@ const useClearConversation = () => {
 };
 
 export {
+	useConversationWithMetadataQuery,
 	useParticipantInConversationQuery,
 	useGroupConversationDetailsQuery,
 	useUpdateGroupConversationDetails,

@@ -3,7 +3,7 @@
 import type { LucideIcon } from "lucide-react";
 
 import Link from "next/link";
-import StartChatPopover from "@/app/messenger/_components/start-chat-popover";
+import StartChatPopover from "@/app/messenger/(chat-features)/_components/start-chat-popover";
 
 import { usePathname } from "next/navigation";
 import { MessagesSquare, Users, PhoneCall, SunMoon, Plus } from "lucide-react";

@@ -1,6 +1,125 @@
 import "server-only";
 
+import type { ConversationWithMetadata, PaginatedResponse } from "@/types";
+
+import { Prisma } from "@prisma/client";
+
 import { prisma } from "@/lib/db";
+import { DEFAULT_PAGE, DEFAULT_PAGE_SIZE } from "@/constants/pagination";
+import { calculatePagination } from "@/utils/general/calculate-pagination";
+
+interface GetUserConversationsWithMetadataParams {
+	userId: string;
+	page?: number;
+	pageSize?: number;
+	groupOnly?: boolean;
+	includeUnreadOnly?: boolean;
+}
+
+/**
+ * Fetch user conversations with metadata from the database.
+ */
+const getUserConversationsWithMetadataFromDB = async ({
+	userId,
+	page = DEFAULT_PAGE,
+	pageSize = DEFAULT_PAGE_SIZE,
+	groupOnly = false,
+	includeUnreadOnly = false,
+}: GetUserConversationsWithMetadataParams) => {
+	// Calculate the offset for pagination
+	const skip = (page - 1) * pageSize;
+	const take = pageSize;
+
+	const baseWhereClauseForConversations: Prisma.ConversationWhereInput = {
+		members: { some: { userId } },
+		isGroup: groupOnly || undefined,
+	};
+
+	const baseWhereClauseForMessages: Prisma.MessageWhereInput = {
+		senderId: { not: userId },
+		seenByMembers: { none: { member: { userId } } },
+	};
+
+	if (includeUnreadOnly) {
+		baseWhereClauseForConversations.messages = {
+			some: { ...baseWhereClauseForMessages },
+		};
+	}
+
+	try {
+		const [conversations, totalItems] = await Promise.all([
+			prisma.conversation.findMany({
+				where: baseWhereClauseForConversations,
+				include: {
+					groupDetails: { include: { icon: true } },
+					members: { select: { user: { omit: { password: true } } } },
+					messages: {
+						take: 1,
+						orderBy: { createdAt: "desc" },
+						include: { textMessage: true, imageMessage: true },
+					},
+					_count: {
+						select: {
+							messages: {
+								where: baseWhereClauseForMessages,
+							},
+						},
+					},
+				},
+				skip,
+				take,
+			}),
+
+			prisma.conversation.count({
+				where: baseWhereClauseForConversations,
+			}),
+		]);
+
+		const conversationList: ConversationWithMetadata[] = conversations.map((conversation) => {
+			const { messages, members, _count: count, ...rest } = conversation;
+
+			const participant =
+				members.filter((member) => member.user.id !== userId).map((member) => member.user)[0] ??
+				null;
+
+			return {
+				...rest,
+				unreadMessages: count.messages,
+				recentMessage: messages[0] ?? null,
+				participant: !conversation.isGroup ? participant : null,
+			};
+		});
+
+		return { conversationList, totalItems };
+	} catch (error) {
+		return { conversationList: [], totalItems: 0 };
+	}
+};
+
+/**
+ * Fetch user conversations with metadata.
+ */
+const getUserConversationsWithMetadata = async ({
+	userId,
+	page = DEFAULT_PAGE,
+	pageSize = DEFAULT_PAGE_SIZE,
+	groupOnly = false,
+	includeUnreadOnly = false,
+}: GetUserConversationsWithMetadataParams): Promise<
+	PaginatedResponse<ConversationWithMetadata>
+> => {
+	const { conversationList, totalItems } = await getUserConversationsWithMetadataFromDB({
+		userId,
+		page,
+		pageSize,
+		groupOnly,
+		includeUnreadOnly,
+	});
+
+	const paginationMetadata = calculatePagination({ page, pageSize, totalItems });
+
+	return { pagination: paginationMetadata, items: conversationList };
+};
 
 /**
  * Retrieves an existing one-on-one conversation between two users.
@@ -101,6 +220,7 @@ const getUserConversationList = async ({ userId }: { userId: string }) => {
 };
 
 export {
+	getUserConversationsWithMetadata,
 	getConversationBetweenUsers,
 	getConversationById,
 	getConversationByIdAndUserId,
