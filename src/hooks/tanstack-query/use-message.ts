@@ -11,10 +11,10 @@ import { messageKeys } from "@/constants/tanstack-query";
 import { conversationEvents } from "@/constants/pusher-events";
 
 import {
-	fetchPrivateMessages,
+	fetchMessages,
 	fetchStarredMessages,
-	sendPrivateMessage,
-	updatePrivateMessage,
+	sendMessage,
+	updateMessage,
 	updateMessageSeenStatus,
 	createMessageReaction,
 	updateMessageReaction,
@@ -36,6 +36,11 @@ import {
 	optimisticStarredMessageError,
 } from "@/utils/optimistic-updates/message";
 import {
+	optimisticUpdateConversationRecentMsg,
+	optimisticUpdateConversationRecentMsgError,
+	refetchOptimisticConversation,
+} from "@/utils/optimistic-updates/conversation";
+import {
 	prependConversationMessage,
 	updateMessagesSeenMembers,
 	updateTextMessageContent,
@@ -44,12 +49,12 @@ import {
 	removeMessageReaction as removeMessageReactionCache,
 } from "@/utils/tanstack-query-cache/message";
 
-import generateChatChannelName from "@/utils/pusher/generate-chat-channel-name";
+import generateChatMessagingChannel from "@/utils/pusher/generate-chat-messaging-channel";
 
 /**
  * Custom hook for fetching private messages in a conversation using infinite scrolling.
  */
-const usePrivateMessagesQuery = ({
+const useMessagesQuery = ({
 	conversationId,
 	isGroup = false,
 }: {
@@ -61,13 +66,13 @@ const usePrivateMessagesQuery = ({
 
 	const query = useInfiniteQuery({
 		queryKey: messageKeys.all(conversationId),
-		queryFn: ({ pageParam }) => fetchPrivateMessages({ conversationId, page: pageParam }),
+		queryFn: ({ pageParam }) => fetchMessages({ conversationId, page: pageParam }),
 		initialPageParam: 1,
 		getNextPageParam: (lastPage) => lastPage.data?.pagination.nextPage,
 	});
 
-	const conversationChannel = data?.data?.id
-		? generateChatChannelName({
+	const chatMessagingChannel = data?.data?.id
+		? generateChatMessagingChannel({
 				conversationId,
 				conversationType: isGroup ? "group" : "private",
 				receiverId: data.data.id,
@@ -76,14 +81,14 @@ const usePrivateMessagesQuery = ({
 
 	// Subscribe to Pusher events
 	usePusher<CompleteMessage>(
-		conversationChannel,
+		chatMessagingChannel,
 		conversationEvents.newMessage,
 		(completeMessage) => {
 			prependConversationMessage({ conversationId, message: completeMessage, queryClient });
 		}
 	);
 	usePusher<CompleteMessage>(
-		conversationChannel,
+		chatMessagingChannel,
 		conversationEvents.updateMessage,
 		(completeMessage) => {
 			updateTextMessageContent({
@@ -95,28 +100,28 @@ const usePrivateMessagesQuery = ({
 		}
 	);
 	usePusher<MessageSeenMembers[]>(
-		conversationChannel,
+		chatMessagingChannel,
 		conversationEvents.seenMessage,
 		(messageSeenMembers) => {
 			updateMessagesSeenMembers({ conversationId, messageSeenMembers, queryClient });
 		}
 	);
 	usePusher<MessageReaction>(
-		conversationChannel,
+		chatMessagingChannel,
 		conversationEvents.createReaction,
 		(messageReaction) => {
 			appendMessageReaction({ conversationId, messageReaction, queryClient });
 		}
 	);
 	usePusher<MessageReaction>(
-		conversationChannel,
+		chatMessagingChannel,
 		conversationEvents.updateReaction,
 		(messageReaction) => {
 			updateMessageReactionCache({ conversationId, messageReaction, queryClient });
 		}
 	);
 	usePusher<MessageReaction>(
-		conversationChannel,
+		chatMessagingChannel,
 		conversationEvents.removeReaction,
 		(messageReaction) => {
 			removeMessageReactionCache({ conversationId, messageReaction, queryClient });
@@ -141,25 +146,37 @@ const useStarredMessagesQuery = ({ conversationId }: { conversationId: string })
 };
 
 /**
- * Custom hook for sending private messages with optimistic updates.
+ * Custom hook for sending messages with optimistic updates.
  *
- * This hook manages sending private messages using mutations, including optimistic updates,
+ * This hook manages sending messages using mutations, including optimistic updates,
  * handling errors, and refetching data after the mutation settles.
  */
-const useSendPrivateMessage = () => {
+const useSendMessage = () => {
 	const queryClient = useQueryClient();
 
 	return useMutation({
 		// Function that performs the actual message sending
-		mutationFn: sendPrivateMessage,
+		mutationFn: sendMessage,
 
 		// Optimistically updates the message list before the mutation occurs.
-		onMutate: ({ conversationId, sender, message }) =>
-			optimisticSendPrivateMessage({ conversationId, sender, message, queryClient }),
+		onMutate: async ({ conversationId, sender, message }) => {
+			const [messageData, conversationData] = await Promise.all([
+				optimisticSendPrivateMessage({ conversationId, sender, message, queryClient }),
+				optimisticUpdateConversationRecentMsg({
+					conversationId,
+					senderId: sender.id,
+					message,
+					queryClient,
+				}),
+			]);
+
+			return { ...messageData, ...conversationData };
+		},
 
 		//  Handles any error that occurs during the message sending mutation.
 		onError: (error, { conversationId }, context) => {
 			optimisticPrivateMessageError({ conversationId, context, queryClient });
+			optimisticUpdateConversationRecentMsgError({ context, queryClient });
 			toast.error(error.message);
 		},
 
@@ -169,22 +186,27 @@ const useSendPrivateMessage = () => {
 				conversationId,
 				queryClient,
 			});
+			refetchOptimisticConversation({
+				conversationId,
+				opsType: "send_message",
+				queryClient,
+			});
 		},
 	});
 };
 
 /**
- * Custom hook for updating a private message in a conversation.
+ * Custom hook for updating a message in a conversation.
  *
  * It uses React Query's `useMutation` to handle the mutation process
  * and provides optimistic updates for a better user experience.
  */
-const useUpdatePrivateMessage = () => {
+const useUpdateMessage = () => {
 	const queryClient = useQueryClient();
 
 	return useMutation({
 		// Function that performs the actual message update
-		mutationFn: updatePrivateMessage,
+		mutationFn: updateMessage,
 
 		// Optimistically updates the message in the cache before the mutation occurs on the server
 		// This ensures the UI is updated immediately, providing a faster response for the user
@@ -415,10 +437,10 @@ const useDeleteMessage = () => {
 };
 
 export {
-	usePrivateMessagesQuery,
+	useMessagesQuery,
 	useStarredMessagesQuery,
-	useSendPrivateMessage,
-	useUpdatePrivateMessage,
+	useSendMessage,
+	useUpdateMessage,
 	useMessagesSeenStatus,
 	useCreateMessageReaction,
 	useUpdateMessageReaction,

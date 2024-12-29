@@ -46,7 +46,7 @@ const ChatPage = async ({ params: { id } }: ChatPageProps) => {
 					isGroupConversation={conversation.isGroup}
 				/>
 				<WrapperFooter
-					className="flex h-auto min-h-20 items-center px-4 py-3 sm:px-8 md:px-5"
+					className="z-40 flex h-auto min-h-20 items-center px-4 py-3 sm:px-8 md:px-5"
 					style={{ maxHeight: `${MAX_INPUT_CONTAINER_SIZE}px` }}
 				>
 					<ChatMessageInput conversationId={conversation.id} />

@@ -4,10 +4,11 @@ import { prisma } from "@/lib/db";
 import { pusherServer } from "@/lib/pusher/server";
 
 import { isBlocked } from "@/lib/block";
-import { areUsersFriends } from "@/lib/friendship";
-import generateChatChannelName from "@/utils/pusher/generate-chat-channel-name";
 import { MESSAGE_INCLUDE } from "@/data/message";
+import { areUsersFriends } from "@/lib/friendship";
+import { updateConversationTimestamp } from "@/lib/conversation";
 
+import generateChatMessagingChannel from "@/utils/pusher/generate-chat-messaging-channel";
 import transformMessageSeenAndStarStatus from "@/utils/messenger/transform-message-seen-and-star-status";
 
 export enum DeleteMessageError {
@@ -255,6 +256,9 @@ const sendPrivateMessage = async ({
 			include: MESSAGE_INCLUDE,
 		});
 
+		// Update conversation timestamp
+		await updateConversationTimestamp({ conversationId: conversation.id });
+
 		// Return the message along with the transformed status for the sender.
 		return {
 			receiverId,
@@ -310,6 +314,9 @@ const sendGroupMessage = async ({
 			include: MESSAGE_INCLUDE,
 		});
 
+		// Update conversation timestamp
+		await updateConversationTimestamp({ conversationId: conversation.id });
+
 		// Transform the message for the sender with seen and star status
 		return {
 			receiverIds,
@@ -337,13 +344,13 @@ const broadcastPrivateMessage = async <MessagePayload>({
 }) => {
 	try {
 		// Generate the private chat channel ID for the receiver based on the conversation and receiver IDs
-		const channelId = generateChatChannelName({
+		const channelId = generateChatMessagingChannel({
 			conversationId,
 			receiverId,
 		});
 
 		// Trigger the specified event on the generated channel with the payload
-		pusherServer.trigger(channelId, eventName, payload);
+		await pusherServer.trigger(channelId, eventName, payload);
 	} catch (error) {
 		// eslint-disable-next-line no-console
 		console.error("Failed to broadcast private message.");
@@ -367,7 +374,7 @@ const broadcastGroupMessage = async <MessagePayload>({
 	try {
 		// Generate group chat channel IDs for each receiver
 		const groupChatChannelIds = receiverIds.map((receiverId) =>
-			generateChatChannelName({
+			generateChatMessagingChannel({
 				conversationId: conversationId,
 				conversationType: "group",
 				receiverId,
@@ -375,7 +382,7 @@ const broadcastGroupMessage = async <MessagePayload>({
 		);
 
 		// Trigger the event on all channels with the message as payload
-		pusherServer.trigger(groupChatChannelIds, eventName, payload);
+		await pusherServer.trigger(groupChatChannelIds, eventName, payload);
 	} catch (error) {
 		// eslint-disable-next-line no-console
 		console.error("Failed to broadcast group message.");

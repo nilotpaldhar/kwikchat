@@ -48,7 +48,7 @@ const ConversationsList = ({ className, classNames }: ConversationsListProps) =>
 		filter: activeFilter,
 	});
 
-	const isEmpty = isSuccess && (data?.pages[0].data?.pagination.totalItems ?? 0) <= 0;
+	const isEmpty = isSuccess && (data?.pages[0].data?.items.length ?? 0) <= 0;
 	const isEmptyAll = isEmpty && activeFilter === "all";
 	const isEmptyGroup = isEmpty && activeFilter === "group";
 	const isEmptyUnread = isEmpty && activeFilter === "unread";

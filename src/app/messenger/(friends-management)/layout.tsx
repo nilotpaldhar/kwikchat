@@ -12,11 +12,11 @@ import FriendsNav from "@/app/messenger/(friends-management)/_components/friends
 import MobileHeader from "@/app/messenger/(friends-management)/_components/mobile-header";
 import FriendsSidePanel from "@/app/messenger/(friends-management)/_components/friends-side-panel";
 
-interface MessengerLayoutProps {
+interface FriendsManagementLayoutProps {
 	children: React.ReactNode;
 }
 
-const FriendsManagementLayout = ({ children }: MessengerLayoutProps) => (
+const FriendsManagementLayout = ({ children }: FriendsManagementLayoutProps) => (
 	<Wrapper>
 		<WrapperSidePanel>
 			<FriendsSidePanel />

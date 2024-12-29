@@ -7,7 +7,7 @@ import ChatInput from "@/components/messenger/chat-input";
 import ErrorAlert from "@/app/messenger/_components/error-alert";
 
 import useCurrentUser from "@/hooks/tanstack-query/use-current-user";
-import { useSendPrivateMessage } from "@/hooks/tanstack-query/use-message";
+import { useSendMessage } from "@/hooks/tanstack-query/use-message";
 
 interface ChatMessageInputProps {
 	conversationId: string;
@@ -15,7 +15,7 @@ interface ChatMessageInputProps {
 
 const ChatMessageInput = ({ conversationId }: ChatMessageInputProps) => {
 	const { data, isLoading, isError, error, refetch } = useCurrentUser();
-	const { mutate } = useSendPrivateMessage();
+	const { mutate } = useSendMessage();
 
 	const sender = data?.data;
 

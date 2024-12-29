@@ -1,13 +1,12 @@
-import { type ImageMessage, type Message, type TextMessage, MessageType } from "@prisma/client";
+"use client";
+
+import type { RecentMessage } from "@/types";
+
+import { MessageType } from "@prisma/client";
 import { Image } from "lucide-react";
 
 interface RecentMsgPreviewProps {
-	message:
-		| (Message & {
-				textMessage: TextMessage | null;
-				imageMessage: ImageMessage | null;
-		  })
-		| null;
+	message: RecentMessage | null;
 }
 
 const RecentMsgPreview = ({ message }: RecentMsgPreviewProps) => {

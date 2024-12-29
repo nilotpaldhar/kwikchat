@@ -5,7 +5,10 @@ import type { APIResponse, CompleteMessage, PaginatedResponse } from "@/types";
 
 import { ElementRef, useMemo, useRef } from "react";
 
+import { Inbox } from "lucide-react";
+
 import ChatAreaSkeleton from "@/components/skeletons/chat-area-skeleton";
+import { Empty, EmptyIcon, EmptyTitle, EmptyDescription } from "@/components/ui/empty";
 
 import ErrorAlert from "@/app/messenger/_components/error-alert";
 
@@ -15,7 +18,7 @@ import ChatMessageDateGroup from "@/app/messenger/(chat-features)/_components/ch
 import groupMessagesByDate from "@/utils/messenger/group-messages-by-date";
 
 import useChatAreaScroll from "@/hooks/use-chat-area-scroll";
-import { usePrivateMessagesQuery } from "@/hooks/tanstack-query/use-message";
+import { useMessagesQuery } from "@/hooks/tanstack-query/use-message";
 
 interface ChatAreaProps {
 	conversationId: string;
@@ -48,7 +51,7 @@ const ChatArea = ({ conversationId, currentUserId, isGroupConversation }: ChatAr
 		hasNextPage,
 		fetchNextPage,
 		isFetchingNextPage,
-	} = usePrivateMessagesQuery({
+	} = useMessagesQuery({
 		conversationId,
 		isGroup: isGroupConversation,
 	});
@@ -93,7 +96,15 @@ const ChatArea = ({ conversationId, currentUserId, isGroupConversation }: ChatAr
 									</div>
 								</>
 							) : (
-								<div className="text-xl font-semibold">No messages yet</div>
+								<div className="pt-20 lg:pt-32 xl:pt-40">
+									<Empty>
+										<EmptyIcon icon={Inbox} size={64} />
+										<EmptyTitle>It&apos;s Quiet Here... For Now</EmptyTitle>
+										<EmptyDescription className="max-w-md">
+											Be the first to break the silence—send a message and start the conversation!
+										</EmptyDescription>
+									</Empty>
+								</div>
 							)}
 						</div>
 						<div ref={chatAreaEndRef} />

@@ -93,6 +93,11 @@ export interface MessageWithUserID extends Message {
 	};
 }
 
+export interface RecentMessage extends Message {
+	textMessage: TextMessage | null;
+	imageMessage: ImageMessage | null;
+}
+
 export interface GroupOverview {
 	id: string;
 	name: string;
@@ -120,12 +125,7 @@ export interface GroupDetailsWithIcon extends GroupDetails {
 }
 
 export interface ConversationWithMetadata extends Conversation {
-	recentMessage:
-		| (Message & {
-				textMessage: TextMessage | null;
-				imageMessage: ImageMessage | null;
-		  })
-		| null;
+	recentMessage: RecentMessage | null;
 	unreadMessages: number;
 	groupDetails: GroupDetailsWithIcon | null;
 	participant: UserWithoutPassword | null;

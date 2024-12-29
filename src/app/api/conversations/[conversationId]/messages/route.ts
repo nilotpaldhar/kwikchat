@@ -4,12 +4,14 @@ import type { CompleteMessage } from "@/types";
 import { TextMessageSchema } from "@/schemas";
 
 import { prisma } from "@/lib/db";
+
 import {
 	sendPrivateMessage,
 	sendGroupMessage,
 	broadcastPrivateMessage,
 	broadcastGroupMessage,
 } from "@/lib/message";
+import { broadcastConversation } from "@/lib/conversation";
 
 import { getMessages } from "@/data/message";
 import { getCurrentUser } from "@/data/auth/session";
@@ -148,12 +150,20 @@ export async function POST(req: NextRequest, { params }: { params: Params }) {
 
 			// Broadcast the new message to all group members except the sender, if there are valid recipients
 			if (message && receiverIds.length > 0) {
-				await broadcastGroupMessage<CompleteMessage>({
-					conversationId: message.conversationId,
-					eventName: conversationEvents.newMessage,
-					payload: message,
-					receiverIds,
-				});
+				await Promise.all([
+					broadcastGroupMessage<CompleteMessage>({
+						conversationId: message.conversationId,
+						eventName: conversationEvents.newMessage,
+						payload: message,
+						receiverIds,
+					}),
+					broadcastConversation<string>({
+						receiver: receiverIds,
+						eventType: "updated",
+						eventName: conversationEvents.updateConversation,
+						payload: message.conversationId,
+					}),
+				]);
 			}
 
 			// Respond with success and the sent message data
@@ -176,12 +186,20 @@ export async function POST(req: NextRequest, { params }: { params: Params }) {
 
 		// Broadcast the private message to the receiver if a valid receiver ID was provided
 		if (message && receiverId) {
-			await broadcastPrivateMessage<CompleteMessage>({
-				conversationId: message.conversationId,
-				eventName: conversationEvents.newMessage,
-				payload: message,
-				receiverId,
-			});
+			await Promise.all([
+				broadcastPrivateMessage<CompleteMessage>({
+					conversationId: message.conversationId,
+					eventName: conversationEvents.newMessage,
+					payload: message,
+					receiverId,
+				}),
+				broadcastConversation<string>({
+					receiver: receiverId,
+					eventType: "updated",
+					eventName: conversationEvents.updateConversation,
+					payload: message.conversationId,
+				}),
+			]);
 		}
 
 		// Respond with success and the sent message data

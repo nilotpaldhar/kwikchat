@@ -1,8 +1,7 @@
 /**
- * Generates a pusher channel name for conversation.
- * The channel name is constructed with the conversation type, ID, and receiver ID.
+ * Generates a unique channel name for real-time messaging in a chat application.
  */
-const generateChatChannelName = ({
+const generateChatMessagingChannel = ({
 	conversationId,
 	conversationType = "private",
 	receiverId,
@@ -13,4 +12,4 @@ const generateChatChannelName = ({
 }) =>
 	`@conversation_type=${conversationType}@conversation_id=${conversationId}@receiver_id=${receiverId}`;
 
-export default generateChatChannelName;
+export default generateChatMessagingChannel;

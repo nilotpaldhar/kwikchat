@@ -68,6 +68,7 @@ const getUserConversationsWithMetadataFromDB = async ({
 				},
 				skip,
 				take,
+				orderBy: { updatedAt: "desc" },
 			}),
 
 			prisma.conversation.count({

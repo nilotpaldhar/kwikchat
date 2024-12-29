@@ -41,7 +41,7 @@ const getStarredMessagesFromDB = async ({
 				},
 				skip,
 				take,
-				orderBy: { starredAt: "asc" },
+				orderBy: { starredAt: "desc" },
 			}),
 			prisma.starredMessage.count({
 				where: { userId, message: { conversationId } },

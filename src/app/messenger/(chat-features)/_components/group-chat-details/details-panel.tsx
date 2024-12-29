@@ -23,6 +23,8 @@ interface DetailsPanelProps {
 	error: Error | null;
 	refetch: (options?: RefetchOptions) => void;
 	onClose: () => void;
+	onSharedMedia?: () => void;
+	onStarredMessage?: () => void;
 }
 
 const DetailsPanel = ({
@@ -32,6 +34,8 @@ const DetailsPanel = ({
 	isError,
 	refetch,
 	onClose,
+	onSharedMedia = () => {},
+	onStarredMessage = () => {},
 }: DetailsPanelProps) => (
 	<SidePanel>
 		<SidePanelHeader>
@@ -65,6 +69,7 @@ const DetailsPanel = ({
 					<div className="flex flex-col space-y-3 px-5 pb-4">
 						<Button
 							variant="outline"
+							onClick={() => onSharedMedia()}
 							className="space-x-2 dark:border-neutral-700/50 dark:bg-transparent dark:hover:bg-transparent"
 						>
 							<ImageIcon size={16} />
@@ -73,6 +78,7 @@ const DetailsPanel = ({
 						</Button>
 						<Button
 							variant="outline"
+							onClick={() => onStarredMessage()}
 							className="space-x-2 dark:border-neutral-700/50 dark:bg-transparent dark:hover:bg-transparent"
 						>
 							<Star size={16} />

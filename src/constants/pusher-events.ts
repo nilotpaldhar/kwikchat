@@ -13,6 +13,9 @@ export const friendRequestEvents = {
 };
 
 export const conversationEvents = {
+	newConversation: "conversation_new" as const,
+	updateConversation: "conversation_updated" as const,
+	updateConversationUnreadMessages: "conversation_updated_unread_messages" as const,
 	newMessage: "new_message" as const,
 	updateMessage: "update_message" as const,
 	seenMessage: "seen_message" as const,

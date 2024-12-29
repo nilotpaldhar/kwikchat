@@ -2,11 +2,11 @@ import { Wrapper, WrapperSidePanel } from "@/app/messenger/_components/wrapper";
 import MessengerDialogProvider from "@/components/providers/messenger-dialog-provider";
 import ChatSidePanel from "@/app/messenger/(chat-features)/_components/chat-side-panel";
 
-interface MessengerLayoutProps {
+interface ChatFeaturesLayoutProps {
 	children: React.ReactNode;
 }
 
-const ChatFeaturesLayout = ({ children }: MessengerLayoutProps) => (
+const ChatFeaturesLayout = ({ children }: ChatFeaturesLayoutProps) => (
 	<>
 		<MessengerDialogProvider />
 		<Wrapper className="overflow-hidden">

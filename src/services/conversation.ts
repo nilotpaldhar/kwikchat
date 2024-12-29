@@ -14,7 +14,7 @@ import axios, { handleAxiosError } from "@/lib/axios";
 /**
  *
  */
-const fetchConversationWithMetadata = async ({
+const fetchConversationsWithMetadata = async ({
 	page,
 	groupOnly = false,
 	includeUnreadOnly = false,
@@ -34,6 +34,21 @@ const fetchConversationWithMetadata = async ({
 		const url = `/conversations?${params.toString()}`;
 
 		const res = await axios.get<APIResponse<PaginatedResponse<ConversationWithMetadata>>>(url);
+		return res.data;
+	} catch (error) {
+		const errMsg = handleAxiosError(error);
+		throw new Error(errMsg);
+	}
+};
+
+/**
+ * Fetches the details of a specific conversation, including its metadata.
+ */
+const fetchConversationDetails = async ({ conversationId }: { conversationId: string }) => {
+	try {
+		const res = await axios.get<APIResponse<ConversationWithMetadata>>(
+			`/conversations/${conversationId}`
+		);
 		return res.data;
 	} catch (error) {
 		const errMsg = handleAxiosError(error);
@@ -130,7 +145,8 @@ const clearConversation = async ({ conversationId }: { conversationId: string })
 };
 
 export {
-	fetchConversationWithMetadata,
+	fetchConversationsWithMetadata,
+	fetchConversationDetails,
 	fetchParticipantInConversation,
 	fetchGroupConversationDetails,
 	updateGroupConversationDetails,

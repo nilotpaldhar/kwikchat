@@ -1,3 +1,5 @@
+import type { ConversationsFilterType } from "@/types";
+
 /**
  * Refetch interval for polling online friends data in milliseconds (30 seconds).
  */
@@ -54,7 +56,7 @@ export const blockedUserKeys = {
  */
 export const conversationKeys = {
 	all: ["conversations"] as const,
-	filtered: (filters: string) =>
+	filtered: (filters: ConversationsFilterType) =>
 		[...conversationKeys.all, "filtered_conversations", filters] as const,
 	participant: (id: string) => [...conversationKeys.all, "participant", id] as const,
 	groupDetails: (id: string) => [...conversationKeys.all, "group_details", id] as const,

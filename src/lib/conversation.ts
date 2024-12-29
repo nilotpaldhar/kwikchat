@@ -4,9 +4,15 @@ import { type Media, type Prisma, MemberRole } from "@prisma/client";
 import type { MediaWithoutId } from "@/types";
 
 import { prisma } from "@/lib/db";
+import { pusherServer } from "@/lib/pusher/server";
+
 import { saveMedia } from "@/lib/media";
 import { hasAnyFriendshipWithUser } from "@/lib/friendship";
 import { uploadImage, deleteImageOrFile } from "@/lib/upload";
+
+import generateConversationLifecycleChannel, {
+	ConversationLifecycle,
+} from "@/utils/pusher/generate-conversation-lifecycle-channel";
 
 export enum AddGroupConversationMemberError {
 	InvalidFriendship = "InvalidFriendship",
@@ -271,6 +277,52 @@ const uploadAndUpdateGroupConversationIcon = async ({
 	}
 };
 
+/**
+ * Updates the `updatedAt` timestamp of a conversation in the database.
+ */
+const updateConversationTimestamp = async ({ conversationId }: { conversationId: string }) => {
+	try {
+		await prisma.conversation.update({
+			where: { id: conversationId },
+			data: { updatedAt: new Date() },
+		});
+
+		return true;
+	} catch (error) {
+		return false;
+	}
+};
+
+/**
+ * Broadcasts a conversation event to a specific receiver or multiple receivers.
+ */
+const broadcastConversation = async <ConversationPayload>({
+	receiver,
+	eventType,
+	eventName,
+	payload,
+}: {
+	receiver: string | string[];
+	eventType: ConversationLifecycle;
+	eventName: string;
+	payload: ConversationPayload;
+}) => {
+	// Determine the channel name(s) based on the receiver(s) and event type.
+	const channelName =
+		typeof receiver === "string"
+			? generateConversationLifecycleChannel({ receiverId: receiver, lifecycle: eventType })
+			: receiver.map((r) =>
+					generateConversationLifecycleChannel({ receiverId: r, lifecycle: eventType })
+				);
+
+	try {
+		await pusherServer.trigger(channelName, eventName, payload);
+	} catch (error) {
+		// eslint-disable-next-line no-console
+		console.error("Failed to broadcast conversation update.");
+	}
+};
+
 export {
 	createPrivateConversation,
 	createGroupConversation,
@@ -278,4 +330,6 @@ export {
 	addGroupConversationMembers,
 	uploadGroupConversationIcon,
 	uploadAndUpdateGroupConversationIcon,
+	updateConversationTimestamp,
+	broadcastConversation,
 };

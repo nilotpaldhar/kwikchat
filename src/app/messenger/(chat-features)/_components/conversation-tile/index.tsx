@@ -24,7 +24,7 @@ const ConversationTile = ({
 	onNavigate = () => {},
 	...conversation
 }: ConversationTileProps) => {
-	const { id, createdAt, isGroup, participant, groupDetails, recentMessage, unreadMessages } =
+	const { id, updatedAt, isGroup, participant, groupDetails, recentMessage, unreadMessages } =
 		conversation;
 
 	const actionRootHtmlId = `action-root-${id}`;
@@ -48,12 +48,7 @@ const ConversationTile = ({
 		return groupDetails?.name ?? "Unknown";
 	}, [isGroup, groupDetails?.name, participant]);
 
-	const timestamp = useMemo(() => {
-		if (recentMessage?.createdAt) {
-			return formatDateBasedOnRecency(recentMessage?.createdAt, false);
-		}
-		return formatDateBasedOnRecency(createdAt, false);
-	}, [createdAt, recentMessage?.createdAt]);
+	const timestamp = useMemo(() => formatDateBasedOnRecency(updatedAt, false), [updatedAt]);
 
 	const isInsideActionContainer = (evtTarget: HTMLElement): boolean =>
 		!!evtTarget.closest(`#${actionRootHtmlId}`) || !!evtTarget.closest(`#${actionPopoverHtmlId}`);
