@@ -15,6 +15,9 @@ import DetailsPanel from "@/app/messenger/(chat-features)/_components/group-chat
 import StarredMessagesPanel from "@/app/messenger/(chat-features)/_components/group-chat-details/starred-messages-panel";
 
 import useChatInfoStore from "@/store/use-chat-info-store";
+import useMessengerDialogStore from "@/store/use-messenger-dialog-store";
+
+import useCurrentUser from "@/hooks/tanstack-query/use-current-user";
 import { useGroupConversationDetailsQuery } from "@/hooks/tanstack-query/use-conversation";
 
 interface GroupChatDetailsProps {
@@ -25,7 +28,9 @@ type ViewMode = "default" | "starred_messages";
 
 const GroupChatDetails = ({ conversationId }: GroupChatDetailsProps) => {
 	const [viewMode, setViewMode] = useState<ViewMode>("default");
+	const openDialog = useMessengerDialogStore().onOpen;
 
+	const { data: { data: currentUser } = {} } = useCurrentUser();
 	const { data, isLoading, isError, error, refetch } =
 		useGroupConversationDetailsQuery(conversationId);
 	const overview = data?.data;
@@ -59,11 +64,28 @@ const GroupChatDetails = ({ conversationId }: GroupChatDetailsProps) => {
 						>
 							<DetailsPanel
 								overview={overview}
+								isGroupCreator={overview?.creator.id === currentUser?.id}
 								isLoading={isLoading}
 								isError={isError}
 								error={error}
 								refetch={refetch}
 								onClose={onClose}
+								onGroupExit={() =>
+									openDialog("EXIT_GROUP", {
+										groupConversationToExit: {
+											conversationId: overview?.id,
+											name: overview?.name,
+										},
+									})
+								}
+								onGroupDelete={() =>
+									openDialog("DELETE_GROUP", {
+										groupConversationToExit: {
+											conversationId: overview?.id,
+											name: overview?.name,
+										},
+									})
+								}
 								onSharedMedia={() => {}}
 								onStarredMessage={() => setViewMode("starred_messages")}
 							/>

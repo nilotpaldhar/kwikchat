@@ -3,7 +3,7 @@
 import type { GroupOverview } from "@/types";
 import type { RefetchOptions } from "@tanstack/react-query";
 
-import { XIcon, ImageIcon, ChevronRight, Star, LogOut } from "lucide-react";
+import { XIcon, ImageIcon, ChevronRight, Star, LogOut, Trash2 } from "lucide-react";
 
 import Loader from "@/components/ui/loader";
 import { Button } from "@/components/ui/button";
@@ -18,22 +18,28 @@ import GroupInsightsCard from "@/app/messenger/(chat-features)/_components/group
 
 interface DetailsPanelProps {
 	overview?: GroupOverview;
+	isGroupCreator?: boolean;
 	isLoading?: boolean;
 	isError?: boolean;
 	error: Error | null;
 	refetch: (options?: RefetchOptions) => void;
 	onClose: () => void;
+	onGroupExit?: () => void;
+	onGroupDelete?: () => void;
 	onSharedMedia?: () => void;
 	onStarredMessage?: () => void;
 }
 
 const DetailsPanel = ({
 	overview,
+	isGroupCreator = false,
 	isLoading,
 	error,
 	isError,
 	refetch,
 	onClose,
+	onGroupExit = () => {},
+	onGroupDelete = () => {},
 	onSharedMedia = () => {},
 	onStarredMessage = () => {},
 }: DetailsPanelProps) => (
@@ -88,9 +94,12 @@ const DetailsPanel = ({
 						<Button
 							variant="danger"
 							className="w-full items-center justify-start space-x-2 md:justify-center"
+							onClick={() => (isGroupCreator ? onGroupDelete() : onGroupExit())}
 						>
-							<LogOut size={16} />
-							<span className="font-semibold">Exit Group</span>
+							{isGroupCreator ? <Trash2 size={16} /> : <LogOut size={16} />}
+							<span className="font-semibold">
+								{isGroupCreator ? "Delete Group" : "Exit Group"}
+							</span>
 						</Button>
 					</div>
 				</div>

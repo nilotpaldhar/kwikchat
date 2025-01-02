@@ -10,6 +10,7 @@ import {
 	ChatMessage,
 	ChatMessageText,
 	ChatMessageImage,
+	ChatMessageSystem,
 	ChatMessageDeleted,
 } from "@/app/messenger/(chat-features)/_components/chat-message";
 
@@ -130,6 +131,7 @@ const ChatMessageFactory = ({ message, currentUserId }: ChatMessageFactoryProps)
 			isEdited={isEdited}
 			isStarred={message.isStarred}
 			isDeleted={message.isDeleted}
+			hideInteractionBar={message.type === "system"}
 			onReaction={handleReaction}
 			onToggleStar={handleToggleStarStatus}
 			onEdit={handleEdit}
@@ -137,6 +139,9 @@ const ChatMessageFactory = ({ message, currentUserId }: ChatMessageFactoryProps)
 		>
 			{message.type === "text" && <ChatMessageText isSender={isSender} content={content} />}
 			{message.type === "image" && <ChatMessageImage isSender={isSender} />}
+			{message.type === "system" && (
+				<ChatMessageSystem isSender={isSender} content={message.systemMessage?.content ?? ""} />
+			)}
 			{message.type === "deleted" && <ChatMessageDeleted isSender={isSender} />}
 		</ChatMessage>
 	);

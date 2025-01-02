@@ -16,6 +16,7 @@ import ConversationTile from "@/app/messenger/(chat-features)/_components/conver
 import LoadingSkeleton from "@/app/messenger/(chat-features)/_components/conversations-list/loading-skeleton";
 import ConversationsFilter from "@/app/messenger/(chat-features)/_components/conversations-list/conversations-filter";
 
+import useCurrentUser from "@/hooks/tanstack-query/use-current-user";
 import { useConversationWithMetadataQuery } from "@/hooks/tanstack-query/use-conversation";
 
 interface ConversationsListProps {
@@ -34,6 +35,7 @@ const ConversationsList = ({ className, classNames }: ConversationsListProps) =>
 
 	const [activeFilter, setActiveFilter] = useState<ConversationsFilterType>("all");
 
+	const { data: { data: currentUser } = {} } = useCurrentUser();
 	const {
 		data,
 		isLoading,
@@ -80,6 +82,7 @@ const ConversationsList = ({ className, classNames }: ConversationsListProps) =>
 												<li key={conversation.id}>
 													<ConversationTile
 														{...conversation}
+														currentUserId={currentUser?.id}
 														isActive={params?.id === conversation.id}
 														className={classNames?.conversationTile}
 														onNavigate={() => router.push(`/messenger/chats/${conversation.id}`)}

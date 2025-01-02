@@ -11,7 +11,9 @@ export type ModalType =
 	| "CLEAR_CONVERSATION"
 	| "EDIT_GROUP_DETAILS"
 	| "EDIT_GROUP_BANNER"
-	| "EDIT_GROUP_ICON";
+	| "EDIT_GROUP_ICON"
+	| "EXIT_GROUP"
+	| "DELETE_GROUP";
 
 interface DialogData {
 	messageToEdit?: {
@@ -31,6 +33,14 @@ interface DialogData {
 		conversationId: string;
 	};
 	groupConversationToEdit?: GroupOverview;
+	groupConversationToDelete?: {
+		conversationId: string;
+		name: string;
+	};
+	groupConversationToExit?: {
+		conversationId?: string;
+		name?: string;
+	};
 }
 
 interface MessengerDialogStore {

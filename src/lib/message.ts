@@ -1,3 +1,6 @@
+import "server-only";
+
+import type { SystemMessageEvent } from "@prisma/client";
 import type { CompleteMessage, ConversationWithMembers, MessageSeenMembers } from "@/types";
 
 import { prisma } from "@/lib/db";
@@ -46,6 +49,42 @@ interface SendGroupMessageResponse {
 	message: CompleteMessage | null;
 	error: SendGroupMessageError | null;
 }
+
+/**
+ * Creates a system message associated with a conversation and user.
+ */
+const createSystemMessage = async ({
+	conversationId,
+	userId,
+	event,
+	content,
+}: {
+	conversationId: string;
+	userId: string;
+	event: SystemMessageEvent;
+	content: string;
+}): Promise<CompleteMessage | null> => {
+	try {
+		const message = await prisma.message.create({
+			data: {
+				conversationId,
+				senderId: userId,
+				type: "system",
+				systemMessage: {
+					create: { event, content },
+				},
+			},
+			include: MESSAGE_INCLUDE,
+		});
+
+		// Update conversation timestamp
+		await updateConversationTimestamp({ conversationId: message.conversationId });
+
+		return transformMessageSeenAndStarStatus({ message: message, userId });
+	} catch (error) {
+		return null;
+	}
+};
 
 /**
  * Updates the seen status for a list of message IDs by a given member.
@@ -390,6 +429,7 @@ const broadcastGroupMessage = async <MessagePayload>({
 };
 
 export {
+	createSystemMessage,
 	updateMessageSeenStatus,
 	deleteMessage,
 	sendPrivateMessage,

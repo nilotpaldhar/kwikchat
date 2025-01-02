@@ -73,7 +73,7 @@ export async function POST(req: NextRequest, { params }: { params: Params }) {
 		const otherMember = conversation.members.find((member) => member.userId !== currentUserId);
 
 		// Ensure both members exist; return a 422 response if not
-		if (!currentMember || !otherMember) {
+		if (!currentMember) {
 			return NextResponse.json(
 				{ success: false, message: "Member IDs do not match the expected values." },
 				{ status: 422 }
@@ -104,7 +104,7 @@ export async function POST(req: NextRequest, { params }: { params: Params }) {
 				await broadcastPrivateMessage({
 					conversationId: conversation.id,
 					eventName,
-					receiverId: otherMember.userId,
+					receiverId: otherMember ? otherMember.userId : "",
 					payload: data,
 				});
 			}

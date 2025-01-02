@@ -42,7 +42,7 @@ export async function GET(req: NextRequest, { params }: { params: Params }) {
 				messages: {
 					take: 1,
 					orderBy: { createdAt: "desc" },
-					include: { textMessage: true, imageMessage: true },
+					include: { textMessage: true, imageMessage: true, systemMessage: true },
 				},
 				_count: {
 					select: {

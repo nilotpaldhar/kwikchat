@@ -234,3 +234,84 @@ export async function PATCH(req: NextRequest, { params }: { params: Params }) {
 		);
 	}
 }
+
+/**
+ * Handler function for deleting a group conversation.
+ *
+ * @returns A JSON response indicating success or failure of the operation.
+ */
+export async function DELETE(req: NextRequest, { params }: { params: Params }) {
+	// Retrieve the current user from the session
+	const currentUser = await getCurrentUser();
+
+	// Check if the current user is authenticated. If not, respond with an unauthorized status.
+	if (!currentUser) {
+		return NextResponse.json(
+			{ success: false, message: "Unauthorized! Access denied" },
+			{ status: 401 }
+		);
+	}
+
+	const userId = currentUser.id;
+	const conversationId = params.conversationId;
+
+	try {
+		// Find the group conversation that includes the current user
+		const conversation = await prisma.conversation.findFirst({
+			where: {
+				id: conversationId,
+				isGroup: true,
+				members: { some: { userId } },
+			},
+			include: {
+				members: true,
+				groupDetails: { select: { name: true } },
+			},
+		});
+
+		// If the conversation is not found, respond with a 404 error
+		if (!conversation) {
+			return NextResponse.json(
+				{ success: false, message: "The specified group conversation could not be found." },
+				{ status: 404 }
+			);
+		}
+
+		// Check if the user is the group creator
+		if (userId !== conversation.createdBy) {
+			return NextResponse.json(
+				{ success: false, message: "Only the group creator can delete the group." },
+				{ status: 403 }
+			);
+		}
+
+		// Check if there are multiple members remaining in the conversation before allowing the group to be deleted.
+		const hasMultipleMembers = conversation.members.filter((m) => m.userId !== userId).length >= 1;
+		if (hasMultipleMembers) {
+			return NextResponse.json(
+				{ success: false, message: "Please remove all members before deleting the group." },
+				{ status: 403 }
+			);
+		}
+
+		// Proceed to delete the conversation
+		await prisma.conversation.delete({
+			where: { id: conversation.id },
+		});
+
+		const groupName = conversation.groupDetails?.name;
+
+		return NextResponse.json({
+			success: true,
+			message: groupName
+				? `The '${groupName}' group has been successfully deleted.`
+				: `The group has been successfully deleted.`,
+			data: undefined,
+		});
+	} catch (error) {
+		return NextResponse.json(
+			{ success: false, message: "An unexpected error occurred. Please try again later" },
+			{ status: 500 }
+		);
+	}
+}

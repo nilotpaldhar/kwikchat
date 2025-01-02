@@ -7,6 +7,7 @@ import { useState } from "react";
 
 import ChatMessageText from "@/app/messenger/(chat-features)/_components/chat-message/chat-message-text";
 import ChatMessageImage from "@/app/messenger/(chat-features)/_components/chat-message/chat-message-image";
+import ChatMessageSystem from "@/app/messenger/(chat-features)/_components/chat-message/chat-message-system";
 import ChatMessageDeleted from "@/app/messenger/(chat-features)/_components/chat-message/chat-message-deleted";
 
 import ChatMessageMeta from "@/app/messenger/(chat-features)/_components/chat-message/chat-message-meta";
@@ -23,6 +24,7 @@ interface ChatMessageProps extends React.HTMLAttributes<HTMLDivElement> {
 	isEdited?: boolean;
 	isStarred?: boolean;
 	isDeleted?: boolean;
+	hideInteractionBar?: boolean;
 	onEdit?: () => void;
 	onReaction?: (emoji: ReactionClickData) => void;
 	onToggleStar?: () => void;
@@ -37,6 +39,7 @@ const ChatMessage = ({
 	isEdited = false,
 	isStarred = false,
 	isDeleted = false,
+	hideInteractionBar = false,
 	onEdit = () => {},
 	onReaction = () => {},
 	onToggleStar = () => {},
@@ -75,18 +78,20 @@ const ChatMessage = ({
 				/>
 				{!isDeleted && <ChatMessageReactions reactions={reactions} />}
 			</div>
-			<ChatMessageInteractionBar
-				isOpen={isActionsOpen}
-				isSender={isSender}
-				isDeleted={isDeleted}
-				onEdit={onEdit}
-				onReaction={onReaction}
-				isStarred={isStarred}
-				onToggleStar={onToggleStar}
-				onDelete={onDelete}
-			/>
+			{!hideInteractionBar && (
+				<ChatMessageInteractionBar
+					isOpen={isActionsOpen}
+					isSender={isSender}
+					isDeleted={isDeleted}
+					onEdit={onEdit}
+					onReaction={onReaction}
+					isStarred={isStarred}
+					onToggleStar={onToggleStar}
+					onDelete={onDelete}
+				/>
+			)}
 		</div>
 	);
 };
 
-export { ChatMessage, ChatMessageText, ChatMessageImage, ChatMessageDeleted };
+export { ChatMessage, ChatMessageText, ChatMessageImage, ChatMessageSystem, ChatMessageDeleted };

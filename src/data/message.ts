@@ -41,6 +41,7 @@ export const MESSAGE_INCLUDE = {
 	conversation: true,
 	textMessage: true,
 	imageMessage: true,
+	systemMessage: true,
 	sender: { omit: { password: true, image: true } },
 	reactions: { orderBy: { createdAt: "asc" } },
 	starred: { select: { userId: true } },

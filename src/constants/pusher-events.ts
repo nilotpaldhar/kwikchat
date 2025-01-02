@@ -23,3 +23,8 @@ export const conversationEvents = {
 	updateReaction: "update_reaction " as const,
 	removeReaction: "remove_reaction " as const,
 };
+
+export const memberEvents = {
+	exit: "member_exit_group" as const,
+	remove: "member_removed_from_group" as const,
+};

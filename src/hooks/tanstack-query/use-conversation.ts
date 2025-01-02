@@ -4,11 +4,12 @@ import { toast } from "sonner";
 
 import { useCallback } from "react";
 import { useInfiniteQuery, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+
 import usePusher from "@/hooks/use-pusher";
 import useCurrentUser from "@/hooks/tanstack-query/use-current-user";
 
 import { conversationKeys, messageKeys } from "@/constants/tanstack-query";
-import { friendEvents, conversationEvents } from "@/constants/pusher-events";
+import { friendEvents, conversationEvents, memberEvents } from "@/constants/pusher-events";
 
 import {
 	fetchConversationsWithMetadata,
@@ -18,6 +19,8 @@ import {
 	updateGroupConversationDetails,
 	fetchGroupConversationMembership,
 	clearConversation,
+	deleteGroupConversation,
+	exitGroupConversation,
 } from "@/services/conversation";
 import { fetchUnreadMessagesCount } from "@/services/message";
 
@@ -27,6 +30,7 @@ import {
 	updateGroupMembers,
 	prependConversation,
 	updateConversation,
+	removeConversation,
 	updateConversationUnreadMessagesCount,
 } from "@/utils/tanstack-query-cache/conversation";
 import {
@@ -38,6 +42,9 @@ import {
 import generateConversationLifecycleChannel, {
 	ConversationLifecycle,
 } from "@/utils/pusher/generate-conversation-lifecycle-channel";
+import generateMemberActionChannel, {
+	type MemberAction,
+} from "@/utils/pusher/generate-member-action-channel";
 
 /**
  * Custom hook to manage conversations with metadata, including real-time updates via Pusher.
@@ -176,13 +183,35 @@ const useParticipantInConversationQuery = (conversationId: string) => {
  * status updates for group members, updating the online members count in real-time.
  */
 const useGroupConversationDetailsQuery = (conversationId: string) => {
+	// Retrieve the current user data
+	const { data } = useCurrentUser();
+
+	// Create an instance of the query client for managing cache and query states
 	const queryClient = useQueryClient();
 
+	// Define a query to fetch group conversation details
 	const query = useQuery({
 		queryKey: conversationKeys.groupDetails(conversationId),
 		queryFn: () => fetchGroupConversationDetails(conversationId),
 	});
 
+	// Function to generate a channel name for member actions
+	const createMemberActionChannelName = useCallback(
+		(eventType: MemberAction) => {
+			const currentUserId = data?.data?.id;
+
+			if (!currentUserId) return undefined;
+
+			return generateMemberActionChannel({
+				conversationId,
+				receiverId: currentUserId,
+				action: eventType,
+			});
+		},
+		[data?.data?.id, conversationId]
+	);
+
+	// Function to handle updating group members
 	const handleUpdateGroupeMembers = useCallback(
 		(friendId?: string) => {
 			if (!friendId) return;
@@ -195,9 +224,26 @@ const useGroupConversationDetailsQuery = (conversationId: string) => {
 		[conversationId, queryClient]
 	);
 
-	// Subscribe to Pusher events for online and offline status of user
+	// Function to invalidate the group details query
+	const handleInvalidateGroupDetailsQuery = () => {
+		queryClient.invalidateQueries({ queryKey: conversationKeys.groupDetails(conversationId) });
+	};
+
+	// Subscribe to Pusher events for friend status changes
 	usePusher<string>(conversationId, friendEvents.online, handleUpdateGroupeMembers);
 	usePusher<string>(conversationId, friendEvents.offline, handleUpdateGroupeMembers);
+
+	// Subscribe to Pusher events for member actions
+	usePusher(
+		createMemberActionChannelName("exit"),
+		memberEvents.exit,
+		handleInvalidateGroupDetailsQuery
+	);
+	usePusher(
+		createMemberActionChannelName("removed"),
+		memberEvents.remove,
+		handleInvalidateGroupDetailsQuery
+	);
 
 	return query;
 };
@@ -267,6 +313,46 @@ const useClearConversation = () => {
 	});
 };
 
+/**
+ * Custom hook for deleting a group conversation.
+ */
+const useDeleteGroupConversation = () => {
+	const queryClient = useQueryClient();
+
+	return useMutation({
+		mutationFn: deleteGroupConversation,
+
+		onError: (error) => {
+			toast.error(error.message);
+		},
+
+		onSuccess: (data, { conversationId }) => {
+			toast.success(data.message);
+			removeConversation({ conversationId, queryClient });
+		},
+	});
+};
+
+/**
+ * Custom hook for exiting a group conversation.
+ */
+const useExitGroupConversation = () => {
+	const queryClient = useQueryClient();
+
+	return useMutation({
+		mutationFn: exitGroupConversation,
+
+		onError: (error) => {
+			toast.error(error.message);
+		},
+
+		onSuccess: (data, { conversationId }) => {
+			toast.success(data.message);
+			removeConversation({ conversationId, queryClient });
+		},
+	});
+};
+
 export {
 	useConversationWithMetadataQuery,
 	useParticipantInConversationQuery,
@@ -274,4 +360,6 @@ export {
 	useUpdateGroupConversationDetails,
 	useGroupConversationMembershipQuery,
 	useClearConversation,
+	useDeleteGroupConversation,
+	useExitGroupConversation,
 };

@@ -8,24 +8,37 @@ import UserAvatar from "@/components/user/user-avatar";
 import ActionMenu from "@/app/messenger/(chat-features)/_components/conversation-tile/action-menu";
 import RecentMsgPreview from "@/app/messenger/(chat-features)/_components/conversation-tile/recent-msg-preview";
 
+import useMessengerDialogStore from "@/store/use-messenger-dialog-store";
+
 import { cn } from "@/utils/general/cn";
 import generateUserAvatarFallback from "@/utils/user/generate-user-avatar-fallback";
 import formatDateBasedOnRecency from "@/utils/general/format-date-based-on-recency";
 
 interface ConversationTileProps extends ConversationWithMetadata {
 	isActive?: boolean;
+	currentUserId?: string;
 	className?: string;
 	onNavigate?: () => void;
 }
 
 const ConversationTile = ({
 	isActive = false,
+	currentUserId,
 	className,
 	onNavigate = () => {},
 	...conversation
 }: ConversationTileProps) => {
-	const { id, updatedAt, isGroup, participant, groupDetails, recentMessage, unreadMessages } =
-		conversation;
+	const {
+		id,
+		isGroup,
+		createdBy,
+		updatedAt,
+		participant,
+		groupDetails,
+		recentMessage,
+		unreadMessages,
+	} = conversation;
+	const openDialog = useMessengerDialogStore().onOpen;
 
 	const actionRootHtmlId = `action-root-${id}`;
 	const actionPopoverHtmlId = `action-popover-${id}`;
@@ -48,7 +61,7 @@ const ConversationTile = ({
 		return groupDetails?.name ?? "Unknown";
 	}, [isGroup, groupDetails?.name, participant]);
 
-	const timestamp = useMemo(() => formatDateBasedOnRecency(updatedAt, false), [updatedAt]);
+	const timestamp = useMemo(() => formatDateBasedOnRecency(updatedAt), [updatedAt]);
 
 	const isInsideActionContainer = (evtTarget: HTMLElement): boolean =>
 		!!evtTarget.closest(`#${actionRootHtmlId}`) || !!evtTarget.closest(`#${actionPopoverHtmlId}`);
@@ -113,6 +126,23 @@ const ConversationTile = ({
 							id={actionRootHtmlId}
 							popoverId={actionPopoverHtmlId}
 							isGroupConversation={isGroup}
+							isGroupCreator={isGroup && createdBy === currentUserId}
+							onGroupExit={() =>
+								openDialog("EXIT_GROUP", {
+									groupConversationToExit: {
+										conversationId: id,
+										name: groupDetails?.name,
+									},
+								})
+							}
+							onGroupDelete={() =>
+								openDialog("DELETE_GROUP", {
+									groupConversationToExit: {
+										conversationId: id,
+										name: groupDetails?.name,
+									},
+								})
+							}
 						/>
 					</div>
 				</div>
@@ -122,5 +152,3 @@ const ConversationTile = ({
 };
 
 export default ConversationTile;
-
-// group-focus-within: group-hover: group-focus:

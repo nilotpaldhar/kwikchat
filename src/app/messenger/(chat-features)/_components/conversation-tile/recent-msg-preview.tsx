@@ -13,8 +13,9 @@ const RecentMsgPreview = ({ message }: RecentMsgPreviewProps) => {
 	const getMessagePreview = (): { msgType: MessageType; content: string } | null => {
 		if (!message) return null;
 
-		const { textMessage, imageMessage } = message;
+		const { textMessage, imageMessage, systemMessage } = message;
 
+		if (systemMessage) return { msgType: MessageType.system, content: systemMessage.content };
 		if (imageMessage) return { msgType: MessageType.image, content: "photo shared" };
 		if (textMessage) return { msgType: MessageType.text, content: textMessage.content };
 

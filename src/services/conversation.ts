@@ -12,7 +12,7 @@ import type {
 import axios, { handleAxiosError } from "@/lib/axios";
 
 /**
- *
+ * Fetches conversations with metadata based on the provided parameters.
  */
 const fetchConversationsWithMetadata = async ({
 	page,
@@ -130,12 +130,42 @@ const fetchGroupConversationMembership = async (conversationId: string) => {
 };
 
 /**
- * Clears all messages in a specified conversation.
+ * Function to clear all messages in a specified conversation.
  */
 const clearConversation = async ({ conversationId }: { conversationId: string }) => {
 	try {
 		const res = await axios.delete<APIResponse<undefined>>(
 			`/conversations/${conversationId}/clear`
+		);
+		return res.data;
+	} catch (error) {
+		const errMsg = handleAxiosError(error);
+		throw new Error(errMsg);
+	}
+};
+
+/**
+ * Function to delete a group conversation by its ID.
+ */
+const deleteGroupConversation = async ({ conversationId }: { conversationId: string }) => {
+	try {
+		const res = await axios.delete<APIResponse<undefined>>(
+			`/conversations/${conversationId}/group`
+		);
+		return res.data;
+	} catch (error) {
+		const errMsg = handleAxiosError(error);
+		throw new Error(errMsg);
+	}
+};
+
+/**
+ * Function to exit a group conversation.
+ */
+const exitGroupConversation = async ({ conversationId }: { conversationId: string }) => {
+	try {
+		const res = await axios.delete<APIResponse<undefined>>(
+			`/conversations/${conversationId}/group/exit`
 		);
 		return res.data;
 	} catch (error) {
@@ -152,4 +182,6 @@ export {
 	updateGroupConversationDetails,
 	fetchGroupConversationMembership,
 	clearConversation,
+	deleteGroupConversation,
+	exitGroupConversation,
 };

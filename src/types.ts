@@ -6,6 +6,7 @@ import type {
 	Message,
 	TextMessage,
 	ImageMessage,
+	SystemMessage,
 	MessageReaction,
 	Member,
 	Media,
@@ -76,6 +77,7 @@ export interface CompleteMessage extends Message {
 	conversation: Conversation;
 	textMessage: TextMessage | null;
 	imageMessage: ImageMessage | null;
+	systemMessage: SystemMessage | null;
 	seenByMembers: string[];
 	sender: UserProfile;
 	reactions: MessageReaction[];
@@ -96,6 +98,7 @@ export interface MessageWithUserID extends Message {
 export interface RecentMessage extends Message {
 	textMessage: TextMessage | null;
 	imageMessage: ImageMessage | null;
+	systemMessage: SystemMessage | null;
 }
 
 export interface GroupOverview {

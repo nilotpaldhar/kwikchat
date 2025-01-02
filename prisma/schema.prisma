@@ -33,6 +33,7 @@ enum MemberRole {
 enum MessageType {
   text
   image
+  system
   deleted
 }
 
@@ -45,6 +46,12 @@ enum MessageReactionType {
   pray
   dislike
   angry
+}
+
+// Enum to represent the type of a event SystemMessage.
+enum SystemMessageEvent {
+  group_member_removed
+  group_member_exited
 }
 
 // Enum to represent the type of a file.
@@ -323,6 +330,9 @@ model Message {
 
   // Optional relation to an image message, if the message type is 'image'.
   imageMessage ImageMessage?
+
+  // Optional relation to a system message, if the message type is 'system'.
+  systemMessage SystemMessage?
 }
 
 // The MessageSeenStatus model represents the seen status of a message.
@@ -419,6 +429,19 @@ model ImageMessage {
 
   mediaId String @unique
   media   Media  @relation(fields: [mediaId], references: [id])
+}
+
+// The SystemMessage model represents a system generated message.
+model SystemMessage {
+  id      String             @id @default(cuid())
+  event   SystemMessageEvent
+  content String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  messageId String  @unique
+  message   Message @relation(fields: [messageId], references: [id], onDelete: Cascade)
 }
 
 // The GroupDetails model stores key information regarding a conversation.

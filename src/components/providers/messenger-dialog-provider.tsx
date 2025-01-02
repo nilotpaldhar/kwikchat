@@ -3,14 +3,17 @@
 import { useEffect, useState } from "react";
 
 import NewChatDialog from "@/components/dialogs/messenger/new-chat-dialog";
-import NewGroupDialog from "@/components/dialogs/messenger/new-group-dialog";
 import EditMessageDialog from "@/components/dialogs/messenger/edit-message-dialog";
 import DeleteMessageDialog from "@/components/dialogs/messenger/delete-message-dialog";
-import AddGroupMembersDialog from "@/components/dialogs/messenger/add-group-members-dialog";
+import ClearConversationDialog from "@/components/dialogs/messenger/clear-conversation-dialog";
+
+import NewGroupDialog from "@/components/dialogs/messenger/new-group-dialog";
+import ExitGroupDialog from "@/components/dialogs/messenger/exit-group-dialog";
+import DeleteGroupDialog from "@/components/dialogs/messenger/delete-group-dialog";
 import EditGroupIconDialog from "@/components/dialogs/messenger/edit-group-icon-dialog";
 import EditGroupBannerDialog from "@/components/dialogs/messenger/edit-group-banner-dialog";
+import AddGroupMembersDialog from "@/components/dialogs/messenger/add-group-members-dialog";
 import EditGroupDetailsDialog from "@/components/dialogs/messenger/edit-group-details-dialog";
-import ClearConversationDialog from "@/components/dialogs/messenger/clear-conversation-dialog";
 
 const MessengerDialogProvider = () => {
 	const [isMounted, setIsMounted] = useState(false);
@@ -24,14 +27,17 @@ const MessengerDialogProvider = () => {
 	return (
 		<>
 			<NewChatDialog />
-			<NewGroupDialog />
 			<EditMessageDialog />
 			<DeleteMessageDialog />
+			<ClearConversationDialog />
+
+			<NewGroupDialog />
+			<ExitGroupDialog />
+			<DeleteGroupDialog />
 			<EditGroupIconDialog />
+			<EditGroupBannerDialog />
 			<AddGroupMembersDialog />
 			<EditGroupDetailsDialog />
-			<EditGroupBannerDialog />
-			<ClearConversationDialog />
 		</>
 	);
 };

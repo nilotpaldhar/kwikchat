@@ -72,6 +72,7 @@ const updateRecentMessage = ({
 				isDeleted: message.isDeleted,
 				textMessage: message.textMessage,
 				imageMessage: message.imageMessage,
+				systemMessage: message.systemMessage,
 			},
 		};
 	}
@@ -331,6 +332,49 @@ const updateConversationUnreadMessagesCount = ({
 	);
 };
 
+/**
+ * Removes a conversation from the query cache.
+ */
+const removeConversation = ({
+	conversationId,
+	queryClient,
+}: {
+	conversationId: string;
+	queryClient: QueryClient;
+}) => {
+	// Function to update the paginated data by removing the specified conversation
+	const updateFn = (
+		data: PaginatedResponse<ConversationWithMetadata> | undefined,
+		pagination: PaginationMetadata
+	) => {
+		const items = data?.items ?? [];
+		const itemExists = items.some((c) => c.id === conversationId);
+
+		return {
+			data,
+			pagination,
+			items: itemExists ? items.filter((c) => c.id !== conversationId) : items,
+		};
+	};
+
+	// Update cached query data for different filtered conversations (all, group, unread)
+	queryClient.setQueryData<InfiniteData<APIResponse<PaginatedResponse<ConversationWithMetadata>>>>(
+		conversationKeys.filtered("all"),
+		(existingData) =>
+			updateInfinitePaginatedData<ConversationWithMetadata>({ existingData, updateFn })
+	);
+	queryClient.setQueryData<InfiniteData<APIResponse<PaginatedResponse<ConversationWithMetadata>>>>(
+		conversationKeys.filtered("group"),
+		(existingData) =>
+			updateInfinitePaginatedData<ConversationWithMetadata>({ existingData, updateFn })
+	);
+	queryClient.setQueryData<InfiniteData<APIResponse<PaginatedResponse<ConversationWithMetadata>>>>(
+		conversationKeys.filtered("unread"),
+		(existingData) =>
+			updateInfinitePaginatedData<ConversationWithMetadata>({ existingData, updateFn })
+	);
+};
+
 export {
 	updateParticipantStatus,
 	updateGroupMembers,
@@ -338,4 +382,5 @@ export {
 	updateConversation,
 	updateConversationRecentMessage,
 	updateConversationUnreadMessagesCount,
+	removeConversation,
 };
