@@ -52,6 +52,13 @@ export const MESSAGE_INCLUDE = {
 	},
 } satisfies Prisma.MessageInclude;
 
+// Prisma include statement for fetching a recent message with associated data.
+export const RECENT_MESSAGE_INCLUDE = {
+	textMessage: true,
+	imageMessage: true,
+	systemMessage: true,
+} satisfies Prisma.MessageInclude;
+
 /**
  * Fetches messages from the database with pagination.
  */

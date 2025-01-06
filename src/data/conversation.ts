@@ -5,6 +5,7 @@ import type { ConversationWithMetadata, PaginatedResponse } from "@/types";
 import { Prisma } from "@prisma/client";
 
 import { prisma } from "@/lib/db";
+import { RECENT_MESSAGE_INCLUDE } from "@/data/message";
 import { DEFAULT_PAGE, DEFAULT_PAGE_SIZE } from "@/constants/pagination";
 import { calculatePagination } from "@/utils/general/calculate-pagination";
 
@@ -15,6 +16,66 @@ interface GetUserConversationsWithMetadataParams {
 	groupOnly?: boolean;
 	includeUnreadOnly?: boolean;
 }
+
+// Include configuration for fetching conversation metadata
+const CONVERSATION_WITH_METADATA_INCLUDE = {
+	groupDetails: { include: { icon: true } },
+	members: { select: { user: { omit: { password: true } } } },
+	messages: {
+		take: 1,
+		orderBy: { createdAt: "desc" },
+		include: RECENT_MESSAGE_INCLUDE,
+	},
+} satisfies Prisma.ConversationInclude;
+
+/**
+ * Fetch a single conversation with metadata for a specific user.
+ */
+const getUserConversationWithMetadata = async ({
+	conversationId,
+	userId,
+}: {
+	conversationId: string;
+	userId: string;
+}): Promise<ConversationWithMetadata | null> => {
+	try {
+		const conversation = await prisma.conversation.findFirst({
+			where: {
+				id: conversationId,
+				members: { some: { userId } },
+			},
+			include: {
+				...CONVERSATION_WITH_METADATA_INCLUDE,
+				_count: {
+					select: {
+						messages: {
+							where: {
+								senderId: { not: userId },
+								seenByMembers: { none: { member: { userId } } },
+							},
+						},
+					},
+				},
+			},
+		});
+
+		if (!conversation) return null;
+
+		const { messages, members, _count: count, ...rest } = conversation;
+
+		const participant =
+			members.filter((member) => member.user.id !== userId).map((member) => member.user)[0] ?? null;
+
+		return {
+			...rest,
+			unreadMessages: count.messages,
+			recentMessage: messages[0] ?? null,
+			participant: !conversation.isGroup ? participant : null,
+		};
+	} catch (error) {
+		return null;
+	}
+};
 
 /**
  * Fetch user conversations with metadata from the database.
@@ -51,13 +112,7 @@ const getUserConversationsWithMetadataFromDB = async ({
 			prisma.conversation.findMany({
 				where: baseWhereClauseForConversations,
 				include: {
-					groupDetails: { include: { icon: true } },
-					members: { select: { user: { omit: { password: true } } } },
-					messages: {
-						take: 1,
-						orderBy: { createdAt: "desc" },
-						include: { textMessage: true, imageMessage: true, systemMessage: true },
-					},
+					...CONVERSATION_WITH_METADATA_INCLUDE,
 					_count: {
 						select: {
 							messages: {
@@ -221,6 +276,7 @@ const getUserConversationList = async ({ userId }: { userId: string }) => {
 };
 
 export {
+	getUserConversationWithMetadata,
 	getUserConversationsWithMetadata,
 	getConversationBetweenUsers,
 	getConversationById,
