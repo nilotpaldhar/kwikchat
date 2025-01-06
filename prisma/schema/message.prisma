@@ -1,0 +1,172 @@
+// Enum to represent the type of a message.
+enum MessageType {
+    text
+    image
+    system
+    deleted
+}
+
+// Enum to represent the type of a message reaction.
+enum MessageReactionType {
+    like
+    love
+    laugh
+    sad
+    pray
+    dislike
+    angry
+}
+
+// Enum to represent the type of a event SystemMessage.
+enum SystemMessageEvent {
+    group_member_removed
+    group_member_exited
+}
+
+// The Message model represents a message in a conversation.
+model Message {
+    id        String      @id @default(cuid())
+    type      MessageType // e.g., 'text', 'image'
+    isDeleted Boolean     @default(false) // Indicates if the message is deleted for everyone
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    // Relationship to the user who sent the message.
+    senderId String
+    sender   User   @relation(fields: [senderId], references: [id], onDelete: Cascade)
+
+    // Relationship to the conversation.
+    conversationId String
+    conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+
+    // Relation to the MessageSeenStatus model to track seen statuses.
+    seenByMembers MessageSeenStatus[]
+
+    // Relation to the MessagReaction model to track user reactions.
+    reactions MessageReaction[]
+
+    // Relation to the StarredMessage model to track starred messages.
+    starred StarredMessage[]
+
+    // Relation to the DeletedMessage model to track deleted messages.
+    deleted DeletedMessage[]
+
+    // Optional relation to a text message, if the message type is 'text'.
+    textMessage TextMessage?
+
+    // Optional relation to an image message, if the message type is 'image'.
+    imageMessage ImageMessage?
+
+    // Optional relation to a system message, if the message type is 'system'.
+    systemMessage SystemMessage?
+}
+
+// The MessageSeenStatus model represents the seen status of a message.
+model MessageSeenStatus {
+    id     String    @id @default(cuid())
+    seenAt DateTime?
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    memberId String
+    member   Member @relation(fields: [memberId], references: [id], onDelete: Cascade)
+
+    messageId String
+    message   Message @relation(fields: [messageId], references: [id], onDelete: Cascade)
+
+    @@unique([messageId, memberId]) // Ensures a unique entry for each message and member
+}
+
+// The MessageReaction model represents the reactions added by users to specific messages within a conversation.
+model MessageReaction {
+    id            String              @id @default(cuid())
+    type          MessageReactionType
+    emoji         String
+    emojiImageUrl String
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    // Relationship to the message.
+    messageId String
+    message   Message @relation(fields: [messageId], references: [id], onDelete: Cascade)
+
+    // Relationship to the user.
+    userId String
+    user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+    @@unique([messageId, userId]) // Ensures a unique entry for each message and user
+}
+
+// The StarredMessage model represents the relationship between users and the messages they have starred.
+model StarredMessage {
+    id        String   @id @default(cuid())
+    starredAt DateTime @default(now())
+
+    // Relationship to the message.
+    messageId String
+    message   Message @relation(fields: [messageId], references: [id], onDelete: Cascade)
+
+    // Relationship to the user.
+    userId String
+    user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+    @@unique([messageId, userId]) // Ensures a unique entry for each message and user
+}
+
+// The DeletedMessage model represents the relationship between users and the messages they have deleted.
+model DeletedMessage {
+    id        String   @id @default(cuid())
+    deletedAt DateTime @default(now())
+
+    // Relationship to the message.
+    messageId String
+    message   Message @relation(fields: [messageId], references: [id], onDelete: Cascade)
+
+    // Relationship to the user who deleted the message.
+    userId String
+    user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+    @@unique([messageId, userId]) // Ensures a unique entry for each message and user
+}
+
+// The TextMessage model represents a text message.
+model TextMessage {
+    id      String @id @default(uuid())
+    content String
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    messageId String  @unique
+    message   Message @relation(fields: [messageId], references: [id], onDelete: Cascade)
+}
+
+// The ImageMessage model represents an image message.
+model ImageMessage {
+    id String @id @default(cuid())
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    messageId String  @unique
+    message   Message @relation(fields: [messageId], references: [id], onDelete: Cascade)
+
+    mediaId String @unique
+    media   Media  @relation(fields: [mediaId], references: [id])
+}
+
+// The SystemMessage model represents a system generated message.
+model SystemMessage {
+    id      String             @id @default(cuid())
+    event   SystemMessageEvent
+    content String
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    messageId String  @unique
+    message   Message @relation(fields: [messageId], references: [id], onDelete: Cascade)
+}

@@ -1,0 +1,62 @@
+// Enum to represent the role of a member in a conversation.
+enum MemberRole {
+    admin
+    member
+}
+
+// The Conversation model represents a conversation between users.
+model Conversation {
+    id           String        @id @default(cuid())
+    isGroup      Boolean       @default(false)
+    groupDetails GroupDetails?
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    // Relationship to the user who created the conversation.
+    createdBy String
+    creator   User   @relation("CreatedConversations", fields: [createdBy], references: [id], onDelete: Cascade)
+
+    // List of members participating in the conversation.
+    members Member[]
+
+    // List of messages exchanged in the conversation.
+    messages Message[]
+}
+
+// The Member model represents a member of a conversation.
+model Member {
+    id       String     @id @default(cuid())
+    joinedAt DateTime   @default(now())
+    role     MemberRole @default(member) // e.g., 'admin', 'member'
+
+    // Relationship to the user.
+    userId String
+    user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+    // Relationship to the conversation.
+    conversationId String
+    conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+
+    // Relation to the MessageSeenStatus model to track seen statuses.
+    seenMessages MessageSeenStatus[]
+
+    // Ensures that a user cannot join the same conversation more than once.
+    @@unique([userId, conversationId])
+}
+
+// The GroupDetails model stores key information regarding a conversation.
+model GroupDetails {
+    id          String  @id @default(cuid())
+    name        String
+    description String?
+    bannerColor String? @default("#27AE80")
+
+    // Relationship to the conversation.
+    conversationId String       @unique
+    conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+
+    // Optional relationship with Media for the icon
+    iconId String? @unique
+    icon   Media?  @relation(fields: [iconId], references: [id])
+}
