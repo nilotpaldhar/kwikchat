@@ -27,7 +27,11 @@ const ChatPage = async ({ params: { id } }: ChatPageProps) => {
 	const user = await getCachedUserById(session?.user.id);
 	if (!user) notFound();
 
-	const conversation = await getConversationByIdAndUserId({ id, userId: user.id });
+	const conversation = await getConversationByIdAndUserId({
+		id,
+		userId: user.id,
+		excludeDeleted: true,
+	});
 	if (!conversation) notFound();
 
 	return (

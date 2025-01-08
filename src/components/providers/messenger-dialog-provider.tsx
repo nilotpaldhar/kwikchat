@@ -6,6 +6,7 @@ import NewChatDialog from "@/components/dialogs/messenger/new-chat-dialog";
 import EditMessageDialog from "@/components/dialogs/messenger/edit-message-dialog";
 import DeleteMessageDialog from "@/components/dialogs/messenger/delete-message-dialog";
 import ClearConversationDialog from "@/components/dialogs/messenger/clear-conversation-dialog";
+import DeleteConversationDialog from "@/components/dialogs/messenger/delete-conversation-dialog";
 
 import NewGroupDialog from "@/components/dialogs/messenger/new-group-dialog";
 import ExitGroupDialog from "@/components/dialogs/messenger/exit-group-dialog";
@@ -30,6 +31,7 @@ const MessengerDialogProvider = () => {
 			<EditMessageDialog />
 			<DeleteMessageDialog />
 			<ClearConversationDialog />
+			<DeleteConversationDialog />
 
 			<NewGroupDialog />
 			<ExitGroupDialog />

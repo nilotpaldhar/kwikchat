@@ -9,6 +9,7 @@ export type ModalType =
 	| "EDIT_MESSAGE"
 	| "DELETE_MESSAGE"
 	| "CLEAR_CONVERSATION"
+	| "DELETE_CONVERSATION"
 	| "EDIT_GROUP_DETAILS"
 	| "EDIT_GROUP_BANNER"
 	| "EDIT_GROUP_ICON"
@@ -27,6 +28,9 @@ interface DialogData {
 		showDeleteForEveryone: boolean;
 	};
 	conversationToClear?: {
+		conversationId: string;
+	};
+	conversationToDelete?: {
 		conversationId: string;
 	};
 	conversationToAddMembers?: {

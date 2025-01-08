@@ -20,6 +20,7 @@ import {
 	fetchGroupConversationMembership,
 	clearConversation,
 	deleteGroupConversation,
+	deleteConversation,
 	exitGroupConversation,
 } from "@/services/conversation";
 import { fetchUnreadMessagesCount } from "@/services/message";
@@ -334,6 +335,26 @@ const useDeleteGroupConversation = () => {
 };
 
 /**
+ * Custom hook to handle the deletion of a conversation.
+ */
+const useDeleteConversation = () => {
+	const queryClient = useQueryClient();
+
+	return useMutation({
+		mutationFn: deleteConversation,
+
+		onError: (error) => {
+			toast.error(error.message);
+		},
+
+		onSuccess: (data, { conversationId }) => {
+			toast.success(data.message);
+			removeConversation({ conversationId, queryClient });
+		},
+	});
+};
+
+/**
  * Custom hook for exiting a group conversation.
  */
 const useExitGroupConversation = () => {
@@ -361,5 +382,6 @@ export {
 	useGroupConversationMembershipQuery,
 	useClearConversation,
 	useDeleteGroupConversation,
+	useDeleteConversation,
 	useExitGroupConversation,
 };

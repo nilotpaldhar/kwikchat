@@ -22,6 +22,9 @@ model Conversation {
 
     // List of messages exchanged in the conversation.
     messages Message[]
+
+    // Relation to the DeletedConversation model to track deleted conversations.
+    deleted DeletedConversation[]
 }
 
 // The Member model represents a member of a conversation.
@@ -59,4 +62,22 @@ model GroupDetails {
     // Optional relationship with Media for the icon
     iconId String? @unique
     icon   Media?  @relation(fields: [iconId], references: [id])
+}
+
+// The DeletedConversation model represents the conversations a user has deleted.
+model DeletedConversation {
+    id        String   @id @default(cuid())
+    deletedAt DateTime @default(now())
+
+    // Relationship to the conversation.
+    conversationId String
+    conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+
+    // Relationship to the user who deleted the conversation.
+    userId String
+    user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+    @@unique([userId, conversationId]) // Ensures a unique entry for each conversation and user
+    @@index([conversationId])
+    @@index([userId])
 }

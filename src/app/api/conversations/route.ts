@@ -37,6 +37,7 @@ export async function GET(req: NextRequest) {
 		pageSize: pageSize ? parseInt(pageSize, 10) : undefined,
 		groupOnly: groupOnly === "true",
 		includeUnreadOnly: includeUnreadOnly === "true",
+		excludeDeleted: true,
 	});
 
 	return NextResponse.json({

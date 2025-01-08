@@ -15,7 +15,7 @@ interface GroupChatHeaderActionsProps {
 
 const GroupChatHeaderActions = ({ conversationId }: GroupChatHeaderActionsProps) => {
 	const toggleContactInfo = useChatInfoStore().toggleOpen;
-	const openClearConversationDialog = useMessengerDialogStore().onOpen;
+	const openMessengerDialog = useMessengerDialogStore().onOpen;
 
 	const btnClassNames = `border-transparent text-neutral-700 dark:border-transparent dark:text-neutral-300`;
 	const popoverBtnClassNames = `w-full justify-start border-transparent bg-transparent px-2.5 text-left hover:bg-surface-light-300 dark:border-transparent dark:hover:bg-surface-dark-500`;
@@ -56,14 +56,22 @@ const GroupChatHeaderActions = ({ conversationId }: GroupChatHeaderActionsProps)
 						variant="outline"
 						className={popoverBtnClassNames}
 						onClick={() =>
-							openClearConversationDialog("CLEAR_CONVERSATION", {
+							openMessengerDialog("CLEAR_CONVERSATION", {
 								conversationToClear: { conversationId },
 							})
 						}
 					>
 						<span className="font-semibold">Clear Chat</span>
 					</Button>
-					<Button variant="outline" className={popoverBtnClassNames}>
+					<Button
+						variant="outline"
+						className={popoverBtnClassNames}
+						onClick={() =>
+							openMessengerDialog("DELETE_CONVERSATION", {
+								conversationToDelete: { conversationId },
+							})
+						}
+					>
 						<span className="font-semibold">Delete Chat</span>
 					</Button>
 				</PopoverContent>

@@ -143,6 +143,11 @@ const ConversationTile = ({
 									},
 								})
 							}
+							onDeleteConversation={() =>
+								openDialog("DELETE_CONVERSATION", {
+									conversationToDelete: { conversationId: id },
+								})
+							}
 						/>
 					</div>
 				</div>

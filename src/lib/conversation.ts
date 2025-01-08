@@ -323,6 +323,54 @@ const broadcastConversation = async <ConversationPayload>({
 	}
 };
 
+/**
+ * Restores a deleted conversation by removing the deletion record for specified users.
+ * This operation deletes entries from the DeletedConversation table.
+ */
+const restoreDeletedConversation = async ({
+	conversationId,
+	userIds,
+}: {
+	conversationId: string;
+	userIds: string[];
+}) => {
+	try {
+		// Remove the deletion record for the specified users in the conversation
+		const res = await prisma.deletedConversation.deleteMany({
+			where: {
+				conversationId,
+				userId: { in: userIds },
+			},
+		});
+
+		return res.count > 0;
+	} catch (error) {
+		return false;
+	}
+};
+
+/**
+ * Checks if a conversation is marked as deleted for a specific user.
+ */
+const checkConversationDeleted = async ({
+	conversationId,
+	userId,
+}: {
+	conversationId: string;
+	userId: string;
+}) => {
+	try {
+		// Query the DeletedConversation table to check if there is a deletion record for the specified user and conversation
+		const isDeleted = await prisma.deletedConversation.findFirst({
+			where: { conversationId, userId },
+		});
+
+		return !!isDeleted;
+	} catch (error) {
+		return false;
+	}
+};
+
 export {
 	createPrivateConversation,
 	createGroupConversation,
@@ -332,4 +380,6 @@ export {
 	uploadAndUpdateGroupConversationIcon,
 	updateConversationTimestamp,
 	broadcastConversation,
+	restoreDeletedConversation,
+	checkConversationDeleted,
 };

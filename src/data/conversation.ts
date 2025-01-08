@@ -15,6 +15,7 @@ interface GetUserConversationsWithMetadataParams {
 	pageSize?: number;
 	groupOnly?: boolean;
 	includeUnreadOnly?: boolean;
+	excludeDeleted?: boolean;
 }
 
 // Include configuration for fetching conversation metadata
@@ -34,15 +35,18 @@ const CONVERSATION_WITH_METADATA_INCLUDE = {
 const getUserConversationWithMetadata = async ({
 	conversationId,
 	userId,
+	excludeDeleted = false,
 }: {
 	conversationId: string;
 	userId: string;
+	excludeDeleted?: boolean;
 }): Promise<ConversationWithMetadata | null> => {
 	try {
 		const conversation = await prisma.conversation.findFirst({
 			where: {
 				id: conversationId,
 				members: { some: { userId } },
+				...(excludeDeleted ? { NOT: { deleted: { some: { userId } } } } : {}),
 			},
 			include: {
 				...CONVERSATION_WITH_METADATA_INCLUDE,
@@ -86,6 +90,7 @@ const getUserConversationsWithMetadataFromDB = async ({
 	pageSize = DEFAULT_PAGE_SIZE,
 	groupOnly = false,
 	includeUnreadOnly = false,
+	excludeDeleted = false,
 }: GetUserConversationsWithMetadataParams) => {
 	// Calculate the offset for pagination
 	const skip = (page - 1) * pageSize;
@@ -94,6 +99,7 @@ const getUserConversationsWithMetadataFromDB = async ({
 	const baseWhereClauseForConversations: Prisma.ConversationWhereInput = {
 		members: { some: { userId } },
 		isGroup: groupOnly || undefined,
+		...(excludeDeleted ? { NOT: { deleted: { some: { userId } } } } : {}),
 	};
 
 	const baseWhereClauseForMessages: Prisma.MessageWhereInput = {
@@ -161,6 +167,7 @@ const getUserConversationsWithMetadata = async ({
 	pageSize = DEFAULT_PAGE_SIZE,
 	groupOnly = false,
 	includeUnreadOnly = false,
+	excludeDeleted = false,
 }: GetUserConversationsWithMetadataParams): Promise<
 	PaginatedResponse<ConversationWithMetadata>
 > => {
@@ -170,6 +177,7 @@ const getUserConversationsWithMetadata = async ({
 		pageSize,
 		groupOnly,
 		includeUnreadOnly,
+		excludeDeleted,
 	});
 
 	const paginationMetadata = calculatePagination({ page, pageSize, totalItems });
@@ -219,10 +227,22 @@ const getConversationById = async (id: string) => {
 /**
  * Retrieves a conversation by its ID and user ID.
  */
-const getConversationByIdAndUserId = async ({ id, userId }: { id: string; userId: string }) => {
+const getConversationByIdAndUserId = async ({
+	id,
+	userId,
+	excludeDeleted = false,
+}: {
+	id: string;
+	userId: string;
+	excludeDeleted?: boolean;
+}) => {
 	try {
 		const conversation = await prisma.conversation.findFirst({
-			where: { id, members: { some: { userId } } },
+			where: {
+				id,
+				members: { some: { userId } },
+				...(excludeDeleted ? { NOT: { deleted: { some: { userId } } } } : {}),
+			},
 		});
 
 		return conversation;

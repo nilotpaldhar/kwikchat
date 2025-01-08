@@ -19,6 +19,7 @@ interface ActionMenuProps {
 	className?: number;
 	onGroupExit?: () => void;
 	onGroupDelete?: () => void;
+	onDeleteConversation?: () => void;
 }
 
 const ActionMenu = ({
@@ -33,6 +34,7 @@ const ActionMenu = ({
 	className,
 	onGroupExit = () => {},
 	onGroupDelete = () => {},
+	onDeleteConversation = () => {},
 }: ActionMenuProps) => {
 	const btnClassNames =
 		"w-full justify-start space-x-2 border-transparent bg-transparent px-1.5 text-left hover:bg-surface-light-300 dark:border-transparent dark:hover:bg-surface-dark-500";
@@ -74,7 +76,11 @@ const ActionMenu = ({
 						</Button>
 					)}
 
-					<Button variant="outline" className={btnClassNames}>
+					<Button
+						variant="outline"
+						className={btnClassNames}
+						onClick={() => onDeleteConversation()}
+					>
 						<span className="font-semibold">Delete Chat</span>
 					</Button>
 				</PopoverContent>

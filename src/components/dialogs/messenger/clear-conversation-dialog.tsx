@@ -36,7 +36,8 @@ const ClearConversationDialog = () => {
 						<AlertDialogHeader>
 							<AlertDialogTitle>Clear this chat?</AlertDialogTitle>
 							<AlertDialogDescription>
-								This chat will be empty but will remain in your chat list.
+								Clearing this chat will permanently delete all messages and media for you, but the
+								conversation will remain in your chat list. This action cannot be undone.
 							</AlertDialogDescription>
 						</AlertDialogHeader>
 						<AlertDialogFooter>

@@ -75,6 +75,9 @@ model User {
 
     // One-to-many relationship representing deleted messages.
     deletedMessages DeletedMessage[]
+
+    // One-to-many relationship representing deleted conversations.
+    deletedConversations DeletedConversation[]
 }
 
 // The Account model represents external accounts connected to a user.

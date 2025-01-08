@@ -160,6 +160,19 @@ const deleteGroupConversation = async ({ conversationId }: { conversationId: str
 };
 
 /**
+ * Function to delete a conversation by its ID.
+ */
+const deleteConversation = async ({ conversationId }: { conversationId: string }) => {
+	try {
+		const res = await axios.delete<APIResponse<undefined>>(`/conversations/${conversationId}`);
+		return res.data;
+	} catch (error) {
+		const errMsg = handleAxiosError(error);
+		throw new Error(errMsg);
+	}
+};
+
+/**
  * Function to exit a group conversation.
  */
 const exitGroupConversation = async ({ conversationId }: { conversationId: string }) => {
@@ -183,5 +196,6 @@ export {
 	fetchGroupConversationMembership,
 	clearConversation,
 	deleteGroupConversation,
+	deleteConversation,
 	exitGroupConversation,
 };

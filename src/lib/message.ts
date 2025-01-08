@@ -9,7 +9,7 @@ import { pusherServer } from "@/lib/pusher/server";
 import { isBlocked } from "@/lib/block";
 import { MESSAGE_INCLUDE } from "@/data/message";
 import { areUsersFriends } from "@/lib/friendship";
-import { updateConversationTimestamp } from "@/lib/conversation";
+import { updateConversationTimestamp, restoreDeletedConversation } from "@/lib/conversation";
 
 import generateChatMessagingChannel from "@/utils/pusher/generate-chat-messaging-channel";
 import transformMessageSeenAndStarStatus from "@/utils/messenger/transform-message-seen-and-star-status";
@@ -295,8 +295,13 @@ const sendPrivateMessage = async ({
 			include: MESSAGE_INCLUDE,
 		});
 
-		// Update conversation timestamp
-		await updateConversationTimestamp({ conversationId: conversation.id });
+		await Promise.all([
+			// Update conversation timestamp
+			updateConversationTimestamp({ conversationId: conversation.id }),
+
+			// Automatically restore the Conversation for the other User (if deleted previously)
+			restoreDeletedConversation({ conversationId: conversation.id, userIds: [receiverId] }),
+		]);
 
 		// Return the message along with the transformed status for the sender.
 		return {
@@ -353,8 +358,13 @@ const sendGroupMessage = async ({
 			include: MESSAGE_INCLUDE,
 		});
 
-		// Update conversation timestamp
-		await updateConversationTimestamp({ conversationId: conversation.id });
+		await Promise.all([
+			// Update conversation timestamp
+			updateConversationTimestamp({ conversationId: conversation.id }),
+
+			// Automatically restore the Conversation for the other Users (if deleted previously)
+			restoreDeletedConversation({ conversationId: conversation.id, userIds: receiverIds }),
+		]);
 
 		// Transform the message for the sender with seen and star status
 		return {
