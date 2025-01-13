@@ -1,26 +1,20 @@
 /* eslint-disable import/prefer-default-export */
 
+import type { FriendRequestWithRequestType } from "@/types";
 import { type NextRequest, NextResponse } from "next/server";
 
 import { prisma } from "@/lib/db";
-import { pusherServer } from "@/lib/pusher/server";
-import { friendRequestEvents } from "@/constants/pusher-events";
 import { getCurrentUser } from "@/data/auth/session";
-import { classifyFriendRequest } from "@/lib/friend-request";
+import { broadcastFriendRequest, classifyFriendRequest } from "@/lib/friend-request";
+
+import { friendRequestEvents } from "@/constants/pusher-events";
 
 /**
  * Handler function to accept a pending friend request by its ID.
  *
  * @returns A JSON response containing the status, message, and data of friend request.
  */
-export async function POST(
-	req: NextRequest,
-	{
-		params,
-	}: {
-		params: { id: string };
-	}
-) {
+export async function POST(req: NextRequest, { params }: { params: { id: string } }) {
 	const friendReqId = params.id;
 	const currentUser = await getCurrentUser();
 
@@ -69,15 +63,16 @@ export async function POST(
 		}
 
 		// Trigger a Pusher event to notify the sender about an accepted friend request with updated information
-		pusherServer.trigger(
-			friendRequest.senderId,
-			friendRequestEvents.accept,
-			classifyFriendRequest({
+		broadcastFriendRequest<FriendRequestWithRequestType>({
+			receiver: friendRequest.senderId,
+			eventType: "accepted",
+			eventName: friendRequestEvents.accept,
+			payload: classifyFriendRequest({
 				userId: currentUser.id,
 				friendRequest: updatedFriendRequest,
 				invert: true,
-			})
-		);
+			}),
+		});
 
 		return NextResponse.json({
 			success: true,

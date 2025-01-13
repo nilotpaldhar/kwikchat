@@ -1,6 +1,6 @@
 "use client";
 
-import type { ConversationWithMetadata } from "@/types";
+import type { ConversationWithMetadata, FriendWithFriendship } from "@/types";
 
 import { useMemo } from "react";
 
@@ -146,6 +146,11 @@ const ConversationTile = ({
 							onDeleteConversation={() =>
 								openDialog("DELETE_CONVERSATION", {
 									conversationToDelete: { conversationId: id },
+								})
+							}
+							onBlock={() =>
+								openDialog("BLOCK_FRIEND", {
+									friendToBlock: { ...participant, friendship: {} } as FriendWithFriendship,
 								})
 							}
 						/>

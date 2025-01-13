@@ -15,7 +15,9 @@ import ContactPanel from "@/app/messenger/(chat-features)/_components/chat-conta
 import StarredMessagesPanel from "@/app/messenger/(chat-features)/_components/chat-contact-info/starred-messages-panel";
 
 import useChatInfoStore from "@/store/use-chat-info-store";
+import useMessengerDialogStore from "@/store/use-messenger-dialog-store";
 import { useParticipantInConversationQuery } from "@/hooks/tanstack-query/use-conversation";
+import { FriendWithFriendship } from "@/types";
 
 interface ChatContactInfoProps {
 	conversationId: string;
@@ -25,12 +27,12 @@ type ViewMode = "default" | "starred_messages";
 
 const ChatContactInfo = ({ conversationId }: ChatContactInfoProps) => {
 	const [viewMode, setViewMode] = useState<ViewMode>("default");
-
 	const { data, isLoading, isError, error, refetch } =
 		useParticipantInConversationQuery(conversationId);
-	const participant = data?.data;
-
 	const { isOpen, type, onClose } = useChatInfoStore();
+	const openDialog = useMessengerDialogStore().onOpen;
+
+	const participant = data?.data;
 	const isContactInfoOpen = isOpen && type === "USER_INFO";
 
 	useEffect(() => {
@@ -66,8 +68,18 @@ const ChatContactInfo = ({ conversationId }: ChatContactInfoProps) => {
 								onClose={onClose}
 								onSharedMedia={() => {}}
 								onStarredMessage={() => setViewMode("starred_messages")}
-								onBlock={() => {}}
-								onDeleteChat={() => {}}
+								onBlock={() => {
+									if (participant) {
+										openDialog("BLOCK_FRIEND", {
+											friendToBlock: { ...participant, friendship: {} } as FriendWithFriendship,
+										});
+									}
+								}}
+								onDeleteChat={() =>
+									openDialog("DELETE_CONVERSATION", {
+										conversationToDelete: { conversationId },
+									})
+								}
 							/>
 						</motion.div>
 					)}

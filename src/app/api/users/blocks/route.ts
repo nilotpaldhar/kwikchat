@@ -1,14 +1,15 @@
 import { type NextRequest, NextResponse } from "next/server";
 
 import { prisma } from "@/lib/db";
-import { isBlocked } from "@/lib/block";
 import { pusherServer } from "@/lib/pusher/server";
 
-import { friendEvents } from "@/constants/pusher-events";
-
+import { isBlocked } from "@/lib/block";
 import { getBlockedUsers } from "@/data/block";
-import { getCurrentUser } from "@/data/auth/session";
 import { deleteFriendship } from "@/lib/friendship";
+import { getCurrentUser } from "@/data/auth/session";
+
+import { friendEvents } from "@/constants/pusher-events";
+import generateFriendChannel from "@/utils/pusher/generate-friend-channel";
 
 /**
  * Handler function to list all blocked users.
@@ -118,7 +119,14 @@ export async function POST(req: NextRequest) {
 		};
 
 		// Trigger a Pusher event to remove the friend from the friend list.
-		pusherServer.trigger(blockedId, friendEvents.block, blockerId);
+		await pusherServer.trigger(
+			[
+				generateFriendChannel({ uid: blockedId, channelType: "default" }),
+				generateFriendChannel({ uid: blockedId, channelType: "filtered_friends" }),
+			],
+			friendEvents.block,
+			blockerId
+		);
 
 		return NextResponse.json(
 			{ success: true, message: "User has been blocked successfully", data },

@@ -6,10 +6,7 @@ import Skeleton from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 import { Popover, PopoverTrigger, PopoverContent } from "@/components/ui/popover";
 
-import BlockConfirm from "@/app/messenger/_components/block-confirm";
-
 interface MoreActionsProps {
-	username: string;
 	side?: "bottom" | "top" | "right" | "left";
 	sideOffset?: number;
 	align?: "center" | "end" | "start";
@@ -20,11 +17,10 @@ interface MoreActionsProps {
 }
 
 const MoreActions = ({
-	username,
-	side = "top",
+	side = "bottom",
 	sideOffset = 8,
-	align = "end",
-	alignOffset = 0,
+	align = "start",
+	alignOffset = -4,
 	children,
 	onBlock = () => {},
 	onRemoveFriend = () => {},
@@ -40,7 +36,7 @@ const MoreActions = ({
 	}
 
 	const btnClassName =
-		"w-full justify-start border-transparent bg-transparent text-left font-semibold text-red-600 hover:bg-red-600 hover:text-white dark:border-transparent dark:text-red-600 dark:hover:bg-red-600 dark:hover:text-neutral-200";
+		"w-full justify-start space-x-2 border-transparent bg-transparent px-1.5 text-left hover:bg-surface-light-300 dark:border-transparent dark:hover:bg-surface-dark-500";
 
 	return (
 		<Popover>
@@ -55,11 +51,9 @@ const MoreActions = ({
 				<Button variant="outline" className={btnClassName} onClick={onRemoveFriend}>
 					Remove Friend
 				</Button>
-				<BlockConfirm username={username} onBlock={onBlock}>
-					<Button variant="outline" className={btnClassName}>
-						Block
-					</Button>
-				</BlockConfirm>
+				<Button variant="outline" className={btnClassName} onClick={onBlock}>
+					Block
+				</Button>
 			</PopoverContent>
 		</Popover>
 	);

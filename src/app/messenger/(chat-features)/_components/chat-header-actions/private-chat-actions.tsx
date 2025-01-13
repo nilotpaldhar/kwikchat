@@ -87,9 +87,6 @@ const PrivateChatHeaderActions = ({ conversationId }: PrivateChatHeaderActionsPr
 					>
 						<span className="font-semibold">Delete Chat</span>
 					</Button>
-					<Button variant="outline" className={popoverBtnClassNames}>
-						<span className="font-semibold">Block</span>
-					</Button>
 				</PopoverContent>
 			</Popover>
 		</div>

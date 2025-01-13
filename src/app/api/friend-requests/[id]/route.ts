@@ -3,25 +3,17 @@
 import { type NextRequest, NextResponse } from "next/server";
 
 import { prisma } from "@/lib/db";
-import { pusherServer } from "@/lib/pusher/server";
-import { friendRequestEvents } from "@/constants/pusher-events";
 import { getCurrentUser } from "@/data/auth/session";
+import { broadcastFriendRequest } from "@/lib/friend-request";
+
+import { friendRequestEvents } from "@/constants/pusher-events";
 
 /**
  * Handler function to remove a pending friend request by its ID.
  *
  * @returns A JSON response containing the status and message.
  */
-export async function DELETE(
-	req: NextRequest,
-	{
-		params,
-	}: {
-		params: {
-			id: string;
-		};
-	}
-) {
+export async function DELETE(req: NextRequest, { params }: { params: { id: string } }) {
 	// Extract the friend request ID from the request parameters.
 	const friendReqId = params.id;
 	const currentUser = await getCurrentUser();
@@ -55,7 +47,12 @@ export async function DELETE(
 		});
 
 		// Trigger a Pusher event to notify the receiver about the deletion of a friend request
-		pusherServer.trigger(friendRequest.receiverId, friendRequestEvents.delete, friendRequest.id);
+		broadcastFriendRequest<string>({
+			receiver: friendRequest.receiverId,
+			eventType: "deleted",
+			eventName: friendRequestEvents.delete,
+			payload: friendRequest.id,
+		});
 
 		return NextResponse.json({
 			success: true,

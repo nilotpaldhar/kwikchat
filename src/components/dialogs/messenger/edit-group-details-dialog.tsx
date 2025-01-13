@@ -138,7 +138,7 @@ const EditGroupDetailsDialog = () => {
 				name="groupDescription"
 				render={({ field }) => (
 					<FormItem>
-						<FormLabel>Group Name</FormLabel>
+						<FormLabel>Description</FormLabel>
 						<FormControl>
 							<TextArea
 								rows={4}

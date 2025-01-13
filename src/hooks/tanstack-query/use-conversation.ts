@@ -46,6 +46,7 @@ import generateConversationLifecycleChannel, {
 import generateMemberActionChannel, {
 	type MemberAction,
 } from "@/utils/pusher/generate-member-action-channel";
+import generateFriendChannel from "@/utils/pusher/generate-friend-channel";
 
 /**
  * Custom hook to manage conversations with metadata, including real-time updates via Pusher.
@@ -172,8 +173,9 @@ const useParticipantInConversationQuery = (conversationId: string) => {
 	);
 
 	// Subscribe to Pusher events for online and offline status of user
-	usePusher<string>(conversationId, friendEvents.online, handleParticipantStatus);
-	usePusher<string>(conversationId, friendEvents.offline, handleParticipantStatus);
+	const friendChannel = generateFriendChannel({ uid: conversationId, channelType: "default" });
+	usePusher<string>(friendChannel, friendEvents.online, handleParticipantStatus);
+	usePusher<string>(friendChannel, friendEvents.offline, handleParticipantStatus);
 
 	return query;
 };
@@ -213,7 +215,7 @@ const useGroupConversationDetailsQuery = (conversationId: string) => {
 	);
 
 	// Function to handle updating group members
-	const handleUpdateGroupeMembers = useCallback(
+	const handleUpdateGroupMembers = useCallback(
 		(friendId?: string) => {
 			if (!friendId) return;
 			fetchGroupConversationDetails(conversationId).then((res) => {
@@ -231,8 +233,9 @@ const useGroupConversationDetailsQuery = (conversationId: string) => {
 	};
 
 	// Subscribe to Pusher events for friend status changes
-	usePusher<string>(conversationId, friendEvents.online, handleUpdateGroupeMembers);
-	usePusher<string>(conversationId, friendEvents.offline, handleUpdateGroupeMembers);
+	const friendChannel = generateFriendChannel({ uid: conversationId, channelType: "default" });
+	usePusher<string>(friendChannel, friendEvents.online, handleUpdateGroupMembers);
+	usePusher<string>(friendChannel, friendEvents.offline, handleUpdateGroupMembers);
 
 	// Subscribe to Pusher events for member actions
 	usePusher(
@@ -245,6 +248,22 @@ const useGroupConversationDetailsQuery = (conversationId: string) => {
 		memberEvents.remove,
 		handleInvalidateGroupDetailsQuery
 	);
+
+	return query;
+};
+
+/**
+ * Custom hook to fetch the membership details of the current user in a specific conversation.
+ */
+const useGroupConversationMembershipQuery = (
+	conversationId: string,
+	{ enabled = true }: { enabled?: boolean } = {}
+) => {
+	const query = useQuery({
+		queryKey: conversationKeys.groupMembership(conversationId),
+		queryFn: () => fetchGroupConversationMembership(conversationId),
+		enabled,
+	});
 
 	return query;
 };
@@ -264,22 +283,6 @@ const useUpdateGroupConversationDetails = () => {
 			queryClient.invalidateQueries({ queryKey: conversationKeys.groupDetails(conversationId) });
 		},
 	});
-};
-
-/**
- * Custom hook to fetch the membership details of the current user in a specific conversation.
- */
-const useGroupConversationMembershipQuery = (
-	conversationId: string,
-	{ enabled = true }: { enabled?: boolean } = {}
-) => {
-	const query = useQuery({
-		queryKey: conversationKeys.groupMembership(conversationId),
-		queryFn: () => fetchGroupConversationMembership(conversationId),
-		enabled,
-	});
-
-	return query;
 };
 
 /**

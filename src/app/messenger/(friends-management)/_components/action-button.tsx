@@ -57,7 +57,7 @@ const ActionButtonWithTooltip = ({
 					<span className="sr-only">{srText}</span>
 				</Button>
 			</TooltipTrigger>
-			<TooltipContent>{tooltipText}</TooltipContent>
+			<TooltipContent className="px-2 py-1 text-xs">{tooltipText}</TooltipContent>
 		</Tooltip>
 	</TooltipProvider>
 );

@@ -9,11 +9,18 @@ import type {
 import { subYears, isBefore } from "date-fns";
 
 import { prisma } from "@/lib/db";
+import { pusherServer } from "@/lib/pusher/server";
+
 import { isBlocked } from "@/lib/block";
 import { areUsersFriends } from "@/lib/friendship";
 
+import generateFriendRequestChannel, {
+	type FriendRequestStatus,
+} from "@/utils/pusher/generate-friend-request-channel";
+
 export enum SendFriendRequestError {
-	SenderIsBlocked = "SenderIsBlocked",
+	SenderIsBlockedByReceiver = "SenderIsBlockedByReceiver",
+	ReceiverIsBlockedBySender = "ReceiverIsBlockedBySender",
 	AlreadyFriends = "AlreadyFriends",
 	PendingIncomingRequest = "PendingIncomingRequest",
 	RequestAlreadySent = "RequestAlreadySent",
@@ -74,13 +81,27 @@ const sendFriendRequest = async ({
 	receiverId: string;
 }): Promise<FriendRequestResponse<SendFriendRequestError>> => {
 	try {
-		// Check if sender is blocked by receiver
-		const isSenderBlocked = await isBlocked({ blockerId: receiverId, blockedId: senderId });
+		// Check if either the sender is blocked by the receiver or the receiver is blocked by the sender
+		const [isSenderBlocked, isReceiverBlocked] = await Promise.all([
+			isBlocked({ blockerId: receiverId, blockedId: senderId }),
+			isBlocked({ blockerId: senderId, blockedId: receiverId }),
+		]);
+
+		// Handle the case where the sender is blocked by the receiver
 		if (isSenderBlocked) {
 			return {
 				friendRequest: null,
 				invertedFriendRequest: null,
-				error: SendFriendRequestError.SenderIsBlocked,
+				error: SendFriendRequestError.SenderIsBlockedByReceiver,
+			};
+		}
+
+		// Handle the case where the receiver is blocked by the sender
+		if (isReceiverBlocked) {
+			return {
+				friendRequest: null,
+				invertedFriendRequest: null,
+				error: SendFriendRequestError.ReceiverIsBlockedBySender,
 			};
 		}
 
@@ -186,4 +207,46 @@ const sendFriendRequest = async ({
 	}
 };
 
-export { sendFriendRequest, wasFriendRequestSentLongAgo, classifyFriendRequest };
+/**
+ * Broadcasts a friend request event to multiple channels.
+ *
+ * This function sends a payload to relevant channels based on the friend request status
+ * and associated channel types (default, recent, count).
+ */
+const broadcastFriendRequest = async <FriendRequestPayload>({
+	receiver,
+	eventType,
+	eventName,
+	payload,
+}: {
+	receiver: string;
+	eventType: FriendRequestStatus;
+	eventName: string;
+	payload: FriendRequestPayload;
+}) => {
+	// Assign receiver and status to meaningful variables for clarity
+	const receiverId = receiver;
+	const status = eventType;
+
+	// Generate channel names for broadcasting based on the request status and channel types
+	const channelNames = [
+		generateFriendRequestChannel({ channelType: "default", receiverId, status }),
+		generateFriendRequestChannel({ channelType: "recent", receiverId, status }),
+		generateFriendRequestChannel({ channelType: "count", receiverId, status }),
+	];
+
+	try {
+		// Trigger the pusher server to broadcast the event to the generated channels
+		await pusherServer.trigger(channelNames, eventName, payload);
+	} catch (error) {
+		// eslint-disable-next-line no-console
+		console.error(`Failed to broadcast friend request event: "${eventType}"`);
+	}
+};
+
+export {
+	sendFriendRequest,
+	wasFriendRequestSentLongAgo,
+	classifyFriendRequest,
+	broadcastFriendRequest,
+};

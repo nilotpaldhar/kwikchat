@@ -20,6 +20,7 @@ interface ActionMenuProps {
 	onGroupExit?: () => void;
 	onGroupDelete?: () => void;
 	onDeleteConversation?: () => void;
+	onBlock?: () => void;
 }
 
 const ActionMenu = ({
@@ -35,6 +36,7 @@ const ActionMenu = ({
 	onGroupExit = () => {},
 	onGroupDelete = () => {},
 	onDeleteConversation = () => {},
+	onBlock = () => {},
 }: ActionMenuProps) => {
 	const btnClassNames =
 		"w-full justify-start space-x-2 border-transparent bg-transparent px-1.5 text-left hover:bg-surface-light-300 dark:border-transparent dark:hover:bg-surface-dark-500";
@@ -71,7 +73,7 @@ const ActionMenu = ({
 					)}
 
 					{!isGroupConversation && (
-						<Button variant="outline" className={btnClassNames}>
+						<Button variant="outline" className={btnClassNames} onClick={() => onBlock()}>
 							<span className="font-semibold">Block</span>
 						</Button>
 					)}
