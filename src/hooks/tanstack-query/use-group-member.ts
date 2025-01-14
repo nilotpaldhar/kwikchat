@@ -1,7 +1,12 @@
 import { toast } from "sonner";
 
+import { useCallback } from "react";
 import { useInfiniteQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 
+import usePusher from "@/hooks/use-pusher";
+import useCurrentUser from "@/hooks/tanstack-query/use-current-user";
+
+import { memberEvents } from "@/constants/pusher-events";
 import { groupMemberKeys } from "@/constants/tanstack-query";
 
 import {
@@ -17,17 +22,63 @@ import {
 	refetchOptimisticGroupMembers,
 	optimisticGroupMembersError,
 } from "@/utils/optimistic-updates/group-member";
+import { removeGroupMember as removeGroupMemberCache } from "@/utils/tanstack-query-cache/group-member";
+
+import generateMemberActionChannel, {
+	type MemberAction,
+} from "@/utils/pusher/generate-member-action-channel";
 
 /**
- * Custom hook for querying group members in a paginated format.
+ * Custom hook for managing and querying group members based on a given conversation ID.
  */
 const useGroupMembersQuery = ({ conversationId }: { conversationId: string }) => {
+	// Retrieve the current user data
+	const { data } = useCurrentUser();
+
+	// Create an instance of the query client for managing cache and query states
+	const queryClient = useQueryClient();
+
+	// Define an infinite query to fetch group members
 	const query = useInfiniteQuery({
 		queryKey: groupMemberKeys.all(conversationId),
 		queryFn: ({ pageParam }) => fetchGroupMembers({ conversationId, page: pageParam }),
 		initialPageParam: 1,
 		getNextPageParam: (lastPage) => lastPage.data?.pagination.nextPage,
 	});
+
+	// Function to generate a channel name for member actions
+	const createMemberActionChannelName = useCallback(
+		(eventType: MemberAction) => {
+			const currentUserId = data?.data?.id;
+
+			if (!currentUserId) return undefined;
+
+			return generateMemberActionChannel({
+				conversationId,
+				receiverId: currentUserId,
+				action: eventType,
+			});
+		},
+		[data?.data?.id, conversationId]
+	);
+
+	// Function to handle removing a group member
+	const handleRemoveGroupMember = (memberId?: string) => {
+		if (!memberId) return;
+		removeGroupMemberCache({ conversationId, memberId, queryClient });
+	};
+
+	// Subscribe to Pusher events for member actions
+	usePusher<string>(
+		createMemberActionChannelName("exit"),
+		memberEvents.exit,
+		handleRemoveGroupMember
+	);
+	usePusher<string>(
+		createMemberActionChannelName("removed"),
+		memberEvents.exit,
+		handleRemoveGroupMember
+	);
 
 	return query;
 };

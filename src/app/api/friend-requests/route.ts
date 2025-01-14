@@ -1,12 +1,16 @@
+import type { FriendRequestWithRequestType } from "@/types";
 import { type NextRequest, NextResponse } from "next/server";
-
-import { pusherServer } from "@/lib/pusher/server";
-import { friendRequestEvents } from "@/constants/pusher-events";
 
 import { getUserByUsername } from "@/data/user";
 import { getCurrentUser } from "@/data/auth/session";
 import { getFriendRequests } from "@/data/friend-request";
-import { SendFriendRequestError, sendFriendRequest } from "@/lib/friend-request";
+import {
+	SendFriendRequestError,
+	broadcastFriendRequest,
+	sendFriendRequest,
+} from "@/lib/friend-request";
+
+import { friendRequestEvents } from "@/constants/pusher-events";
 
 /**
  * Handler function for retrieving friend requests for the current user.
@@ -135,12 +139,23 @@ export async function POST(req: NextRequest) {
 				);
 			}
 
-			case SendFriendRequestError.SenderIsBlocked: {
+			case SendFriendRequestError.SenderIsBlockedByReceiver: {
 				return NextResponse.json(
 					{
 						success: false,
 						message:
 							"Oops! The request didn't go through. Please verify that the username is correct and try again",
+					},
+					{ status: 422 }
+				);
+			}
+
+			case SendFriendRequestError.ReceiverIsBlockedBySender: {
+				return NextResponse.json(
+					{
+						success: false,
+						message:
+							"You cannot send a friend request because you have blocked this user. Please unblock them first to proceed.",
 					},
 					{ status: 422 }
 				);
@@ -156,7 +171,14 @@ export async function POST(req: NextRequest) {
 	}
 
 	// Trigger a Pusher event to notify the receiver about an incoming friend request
-	pusherServer.trigger(receiver.id, friendRequestEvents.incoming, invertedFriendRequest);
+	if (invertedFriendRequest) {
+		await broadcastFriendRequest<FriendRequestWithRequestType>({
+			receiver: receiver.id,
+			eventType: "incoming",
+			eventName: friendRequestEvents.incoming,
+			payload: invertedFriendRequest,
+		});
+	}
 
 	// If no error, return a success response with the created friend request details
 	return NextResponse.json(

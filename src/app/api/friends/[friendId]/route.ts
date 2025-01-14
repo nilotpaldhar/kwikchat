@@ -2,9 +2,12 @@ import { type NextRequest, NextResponse } from "next/server";
 
 import { prisma } from "@/lib/db";
 import { pusherServer } from "@/lib/pusher/server";
-import { friendEvents } from "@/constants/pusher-events";
+
 import { getCurrentUser } from "@/data/auth/session";
 import { deleteFriendship } from "@/lib/friendship";
+
+import { friendEvents } from "@/constants/pusher-events";
+import generateFriendChannel from "@/utils/pusher/generate-friend-channel";
 
 type Params = { friendId: string };
 
@@ -100,7 +103,14 @@ export async function DELETE(req: NextRequest, { params }: { params: Params }) {
 	}
 
 	// Trigger a Pusher event to notify the friend about the deletion of a friendship.
-	pusherServer.trigger(friendId, friendEvents.delete, currentUser.id);
+	await pusherServer.trigger(
+		[
+			generateFriendChannel({ uid: friendId, channelType: "default" }),
+			generateFriendChannel({ uid: friendId, channelType: "filtered_friends" }),
+		],
+		friendEvents.delete,
+		currentUser.id
+	);
 
 	return NextResponse.json({
 		success: true,

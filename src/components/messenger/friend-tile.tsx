@@ -11,6 +11,7 @@ import Checkbox from "@/components/ui/checkbox";
 import UserAvatar from "@/components/user/user-avatar";
 
 import { cn } from "@/utils/general/cn";
+import generateUserAvatarFallback from "@/utils/user/generate-user-avatar-fallback";
 
 interface FriendTileProps extends FriendWithFriendship {
 	defaultSelected?: boolean;
@@ -29,7 +30,7 @@ const FriendTile = ({
 	const [selected, setSelected] = useState(defaultSelected);
 
 	const { avatar, displayName, username } = friend;
-	const fallback = displayName ? displayName.charAt(0) : username?.charAt(0);
+	const fallback = generateUserAvatarFallback({ user: friend });
 
 	const handleClick = () => {
 		setSelected(!selected);

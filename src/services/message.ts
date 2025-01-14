@@ -12,9 +12,9 @@ import type {
 import axios, { handleAxiosError } from "@/lib/axios";
 
 /**
- * Fetches private messages for a given conversation with pagination support.
+ * Fetches messages for a given conversation with pagination support.
  */
-const fetchPrivateMessages = async ({
+const fetchMessages = async ({
 	conversationId,
 	page,
 }: {
@@ -64,9 +64,9 @@ const fetchStarredMessages = async ({
 };
 
 /**
- * Sends a private message to a specified conversation.
+ * Sends a message to a specified conversation.
  */
-const sendPrivateMessage = async ({
+const sendMessage = async ({
 	conversationId,
 	message,
 }: {
@@ -87,9 +87,9 @@ const sendPrivateMessage = async ({
 };
 
 /**
- * Update a private message to a specified conversation.
+ * Update a message of a specified conversation.
  */
-const updatePrivateMessage = async ({
+const updateMessage = async ({
 	conversationId,
 	messageId,
 	message,
@@ -270,15 +270,31 @@ const deleteMessage = async ({
 	}
 };
 
+/**
+ * Fetches the count of unread messages for a specific conversation.
+ */
+const fetchUnreadMessagesCount = async ({ conversationId }: { conversationId: string }) => {
+	try {
+		const res = await axios.get<APIResponse<{ unreadMessages: number }>>(
+			`/conversations/${conversationId}/messages/unread-count`
+		);
+		return res.data;
+	} catch (error) {
+		const errMsg = handleAxiosError(error);
+		throw new Error(errMsg);
+	}
+};
+
 export {
-	fetchPrivateMessages,
+	fetchMessages,
 	fetchStarredMessages,
-	sendPrivateMessage,
-	updatePrivateMessage,
+	sendMessage,
+	updateMessage,
 	updateMessageSeenStatus,
 	createMessageReaction,
 	updateMessageReaction,
 	deleteMessageReaction,
 	toggleMessageStarStatus,
 	deleteMessage,
+	fetchUnreadMessagesCount,
 };

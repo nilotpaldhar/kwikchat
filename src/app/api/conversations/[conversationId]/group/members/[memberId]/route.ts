@@ -1,10 +1,17 @@
+import type { CompleteMessage } from "@/types";
+
 import { type NextRequest, NextResponse } from "next/server";
+import { SystemMessageEvent } from "@prisma/client";
 
 import { prisma } from "@/lib/db";
 import { getCurrentUser } from "@/data/auth/session";
+import { broadcastMemberAction } from "@/lib/member";
+import { broadcastConversation } from "@/lib/conversation";
+import { broadcastGroupMessage, createSystemMessage } from "@/lib/message";
 
 import { UpdateMemberRoleSchema } from "@/schemas";
 import isGroupAdmin from "@/utils/messenger/is-group-admin";
+import { conversationEvents, memberEvents } from "@/constants/pusher-events";
 
 type Params = {
 	conversationId: string;
@@ -202,6 +209,49 @@ export async function DELETE(req: NextRequest, { params }: { params: Params }) {
 		const {
 			user: { displayName, username },
 		} = deletedMember;
+
+		// Create a system message announcing the member's removal
+		const message = await createSystemMessage({
+			userId: currentUser.id,
+			conversationId: conversation.id,
+			event: SystemMessageEvent.group_member_removed,
+			content: `'${displayName ?? username}' has been removed from the group.`,
+		});
+
+		if (message) {
+			// Prepare a list of remaining member IDs for notification
+			const receiverIds = conversation.members
+				.filter((m) => m.userId !== deletedMember.userId)
+				.map((m) => m.userId);
+
+			// Broadcast events to update group members about the member removal
+			await Promise.all([
+				// Notify members of the new system message
+				broadcastGroupMessage<CompleteMessage>({
+					conversationId: conversation.id,
+					eventName: conversationEvents.newMessage,
+					payload: message,
+					receiverIds,
+				}),
+
+				// Notify members about the updated conversation
+				broadcastConversation<string>({
+					receiver: receiverIds,
+					eventType: "updated",
+					eventName: conversationEvents.updateConversation,
+					payload: message.conversationId,
+				}),
+
+				// Notify members about the member removal action
+				broadcastMemberAction<string>({
+					conversationId: deletedMember.conversationId,
+					receiverIds,
+					eventName: memberEvents.remove,
+					eventType: "removed",
+					payload: deletedMember.id,
+				}),
+			]);
+		}
 
 		return NextResponse.json({
 			success: true,

@@ -6,6 +6,7 @@ import { getFriendsOfUser } from "@/data/friendship";
 import { getUserConversationList } from "@/data/conversation";
 
 import { friendEvents } from "@/constants/pusher-events";
+import generateFriendChannel from "@/utils/pusher/generate-friend-channel";
 
 /**
  * Updates the online status of a user in the database.
@@ -45,7 +46,17 @@ const broadcastUserStatus = async ({
 		const friendIds = friends.map((friend) => friend.id);
 		const conversationIds = conversations.map((conversation) => conversation.id);
 
-		pusherServer.trigger([...friendIds, ...conversationIds], event, userId);
+		pusherServer.trigger(
+			[
+				...friendIds.map((id) => generateFriendChannel({ uid: id, channelType: "default" })),
+				...friendIds.map((id) =>
+					generateFriendChannel({ uid: id, channelType: "filtered_friends" })
+				),
+				...conversationIds.map((id) => generateFriendChannel({ uid: id, channelType: "default" })),
+			],
+			event,
+			userId
+		);
 	} catch (error) {
 		// eslint-disable-next-line no-console
 		console.error("Failed to notify friends of user status change.");

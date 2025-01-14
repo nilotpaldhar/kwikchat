@@ -6,9 +6,11 @@ import type {
 	Message,
 	TextMessage,
 	ImageMessage,
+	SystemMessage,
 	MessageReaction,
 	Member,
 	Media,
+	GroupDetails,
 } from "@prisma/client";
 import { PaginationMetadata } from "@/utils/general/calculate-pagination";
 
@@ -32,6 +34,8 @@ export enum TokenValidationStatus {
 }
 
 export type FriendsFilterType = "all" | "online" | "new";
+
+export type ConversationsFilterType = "all" | "group" | "unread";
 
 export interface PaginatedResponse<T> {
 	pagination: PaginationMetadata;
@@ -73,6 +77,7 @@ export interface CompleteMessage extends Message {
 	conversation: Conversation;
 	textMessage: TextMessage | null;
 	imageMessage: ImageMessage | null;
+	systemMessage: SystemMessage | null;
 	seenByMembers: string[];
 	sender: UserProfile;
 	reactions: MessageReaction[];
@@ -90,11 +95,18 @@ export interface MessageWithUserID extends Message {
 	};
 }
 
+export interface RecentMessage extends Message {
+	textMessage: TextMessage | null;
+	imageMessage: ImageMessage | null;
+	systemMessage: SystemMessage | null;
+}
+
 export interface GroupOverview {
 	id: string;
 	name: string;
 	description?: string | null;
 	icon?: string | null;
+	bannerColor?: string | null;
 	createdAt: Date;
 	creator: UserWithoutPassword;
 	members: {
@@ -109,4 +121,15 @@ export interface GroupMember extends Member {
 
 export interface GroupConversationWithMembers extends Conversation {
 	members: GroupMember[];
+}
+
+export interface GroupDetailsWithIcon extends GroupDetails {
+	icon?: Media | null;
+}
+
+export interface ConversationWithMetadata extends Conversation {
+	recentMessage: RecentMessage | null;
+	unreadMessages: number;
+	groupDetails: GroupDetailsWithIcon | null;
+	participant: UserWithoutPassword | null;
 }

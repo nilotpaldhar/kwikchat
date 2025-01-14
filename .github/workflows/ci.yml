@@ -34,4 +34,8 @@ jobs:
         run: 'npm run lint:check && npm run format:check'
         
       - name: Bundle and Output
+        env:
+          IMAGE_KIT_PUBLIC_KEY: ${{ secrets.IMAGE_KIT_PUBLIC_KEY }}
+          IMAGE_KIT_PRIVATE_KEY: ${{ secrets.IMAGE_KIT_PRIVATE_KEY }}
+          IMAGE_KIT_URL_ENDPOINT: ${{ secrets.IMAGE_KIT_URL_ENDPOINT }}
         run: npm run build

@@ -56,6 +56,7 @@ const createCompleteMessage = ({
 			updatedAt: new Date(),
 		},
 		imageMessage: null,
+		systemMessage: null,
 		reactions: [],
 		isStarred: false,
 		isDeleted: false,

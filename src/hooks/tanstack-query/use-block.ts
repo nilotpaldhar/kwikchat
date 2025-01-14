@@ -1,4 +1,5 @@
 import { useInfiniteQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
 
 import { blockedUserKeys } from "@/constants/tanstack-query";
 import { fetchBlockedUsers, blockUser, unblockUser } from "@/services/block";
@@ -38,10 +39,20 @@ const useBlock = () => {
 		onMutate: (friend) => optimisticBlock({ friend, queryClient }),
 
 		// Error handling: if the mutation fails, revert to the previous cache state
-		onError: (_error, _blockedUserId, context) => optimisticBlockError({ queryClient, context }),
+		onError: (error, _blockedUserId, context) => {
+			optimisticBlockError({ queryClient, context });
+			toast.error(error.message);
+		},
 
 		// After mutation settles (either success or failure), refetch the relevant data
 		onSettled: () => refetchOptimisticBlockedUsers({ queryClient }),
+
+		onSuccess: ({ data }) => {
+			const username = data?.user.username ?? "unknown";
+			toast.success(
+				`You have successfully blocked "${username}". They will no longer be able to interact with you.`
+			);
+		},
 	});
 };
 
@@ -59,10 +70,17 @@ const useUnblock = () => {
 		onMutate: (blockedUserId) => optimisticUnblock({ blockedUserId, queryClient }),
 
 		// Error handling: if the mutation fails, revert to the previous cache state
-		onError: (_error, _friendReqId, context) => optimisticUnblockError({ queryClient, context }),
+		onError: (error, _friendReqId, context) => {
+			optimisticUnblockError({ queryClient, context });
+			toast.error(error.message);
+		},
 
 		// After mutation settles (either success or failure), refetch the relevant data
 		onSettled: () => refetchOptimisticBlockedUsers({ queryClient }),
+
+		onSuccess: ({ message }) => {
+			toast.success(message);
+		},
 	});
 };
 

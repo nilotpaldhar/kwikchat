@@ -1,0 +1,10 @@
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["omitApi", "prismaSchemaFolder"]
+}
+
+// The datasource configuration, defining the database connection.
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}

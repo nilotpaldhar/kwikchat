@@ -22,10 +22,10 @@ import ChatInput from "@/components/messenger/chat-input";
 
 import useMediaQuery from "@/hooks/use-media-query";
 import useMessengerDialogStore from "@/store/use-messenger-dialog-store";
-import { useUpdatePrivateMessage } from "@/hooks/tanstack-query/use-message";
+import { useUpdateMessage } from "@/hooks/tanstack-query/use-message";
 
 const EditMessageDialog = () => {
-	const { mutate } = useUpdatePrivateMessage();
+	const { mutate } = useUpdateMessage();
 	const isDesktop = useMediaQuery("(min-width: 768px)");
 
 	const title = `Edit Message`;

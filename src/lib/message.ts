@@ -1,13 +1,17 @@
+import "server-only";
+
+import type { SystemMessageEvent } from "@prisma/client";
 import type { CompleteMessage, ConversationWithMembers, MessageSeenMembers } from "@/types";
 
 import { prisma } from "@/lib/db";
 import { pusherServer } from "@/lib/pusher/server";
 
 import { isBlocked } from "@/lib/block";
-import { areUsersFriends } from "@/lib/friendship";
-import generateChatChannelName from "@/utils/pusher/generate-chat-channel-name";
 import { MESSAGE_INCLUDE } from "@/data/message";
+import { areUsersFriends } from "@/lib/friendship";
+import { updateConversationTimestamp, restoreDeletedConversation } from "@/lib/conversation";
 
+import generateChatMessagingChannel from "@/utils/pusher/generate-chat-messaging-channel";
 import transformMessageSeenAndStarStatus from "@/utils/messenger/transform-message-seen-and-star-status";
 
 export enum DeleteMessageError {
@@ -45,6 +49,42 @@ interface SendGroupMessageResponse {
 	message: CompleteMessage | null;
 	error: SendGroupMessageError | null;
 }
+
+/**
+ * Creates a system message associated with a conversation and user.
+ */
+const createSystemMessage = async ({
+	conversationId,
+	userId,
+	event,
+	content,
+}: {
+	conversationId: string;
+	userId: string;
+	event: SystemMessageEvent;
+	content: string;
+}): Promise<CompleteMessage | null> => {
+	try {
+		const message = await prisma.message.create({
+			data: {
+				conversationId,
+				senderId: userId,
+				type: "system",
+				systemMessage: {
+					create: { event, content },
+				},
+			},
+			include: MESSAGE_INCLUDE,
+		});
+
+		// Update conversation timestamp
+		await updateConversationTimestamp({ conversationId: message.conversationId });
+
+		return transformMessageSeenAndStarStatus({ message: message, userId });
+	} catch (error) {
+		return null;
+	}
+};
 
 /**
  * Updates the seen status for a list of message IDs by a given member.
@@ -255,6 +295,14 @@ const sendPrivateMessage = async ({
 			include: MESSAGE_INCLUDE,
 		});
 
+		await Promise.all([
+			// Update conversation timestamp
+			updateConversationTimestamp({ conversationId: conversation.id }),
+
+			// Automatically restore the Conversation for the other User (if deleted previously)
+			restoreDeletedConversation({ conversationId: conversation.id, userIds: [receiverId] }),
+		]);
+
 		// Return the message along with the transformed status for the sender.
 		return {
 			receiverId,
@@ -310,6 +358,14 @@ const sendGroupMessage = async ({
 			include: MESSAGE_INCLUDE,
 		});
 
+		await Promise.all([
+			// Update conversation timestamp
+			updateConversationTimestamp({ conversationId: conversation.id }),
+
+			// Automatically restore the Conversation for the other Users (if deleted previously)
+			restoreDeletedConversation({ conversationId: conversation.id, userIds: receiverIds }),
+		]);
+
 		// Transform the message for the sender with seen and star status
 		return {
 			receiverIds,
@@ -337,13 +393,13 @@ const broadcastPrivateMessage = async <MessagePayload>({
 }) => {
 	try {
 		// Generate the private chat channel ID for the receiver based on the conversation and receiver IDs
-		const channelId = generateChatChannelName({
+		const channelId = generateChatMessagingChannel({
 			conversationId,
 			receiverId,
 		});
 
 		// Trigger the specified event on the generated channel with the payload
-		pusherServer.trigger(channelId, eventName, payload);
+		await pusherServer.trigger(channelId, eventName, payload);
 	} catch (error) {
 		// eslint-disable-next-line no-console
 		console.error("Failed to broadcast private message.");
@@ -367,7 +423,7 @@ const broadcastGroupMessage = async <MessagePayload>({
 	try {
 		// Generate group chat channel IDs for each receiver
 		const groupChatChannelIds = receiverIds.map((receiverId) =>
-			generateChatChannelName({
+			generateChatMessagingChannel({
 				conversationId: conversationId,
 				conversationType: "group",
 				receiverId,
@@ -375,7 +431,7 @@ const broadcastGroupMessage = async <MessagePayload>({
 		);
 
 		// Trigger the event on all channels with the message as payload
-		pusherServer.trigger(groupChatChannelIds, eventName, payload);
+		await pusherServer.trigger(groupChatChannelIds, eventName, payload);
 	} catch (error) {
 		// eslint-disable-next-line no-console
 		console.error("Failed to broadcast group message.");
@@ -383,6 +439,7 @@ const broadcastGroupMessage = async <MessagePayload>({
 };
 
 export {
+	createSystemMessage,
 	updateMessageSeenStatus,
 	deleteMessage,
 	sendPrivateMessage,

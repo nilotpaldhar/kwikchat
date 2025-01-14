@@ -3,7 +3,10 @@
 import type { UserProfile } from "@/types";
 
 import { useEffect, useRef, useState, useTransition } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 import useProfileStore from "@/store/use-profile-store";
+
+import { userKeys } from "@/constants/tanstack-query";
 import updateProfile from "@/actions/user/update-profile";
 
 import { XOctagon } from "lucide-react";
@@ -19,6 +22,8 @@ interface ProfileManagerProps {
 }
 
 const ProfileManager = ({ user }: ProfileManagerProps) => {
+	const queryClient = useQueryClient();
+
 	// State management for profile data and error handling
 	const { data, init, reset, saveProfile } = useProfileStore();
 	const [error, setError] = useState<string | undefined>("");
@@ -43,6 +48,7 @@ const ProfileManager = ({ user }: ProfileManagerProps) => {
 			}).then((response) => {
 				setError(response?.error);
 				saveProfile();
+				queryClient.invalidateQueries({ queryKey: userKeys.current });
 			});
 		});
 	};

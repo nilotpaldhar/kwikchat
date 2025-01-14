@@ -13,10 +13,18 @@ export const friendRequestEvents = {
 };
 
 export const conversationEvents = {
+	newConversation: "conversation_new" as const,
+	updateConversation: "conversation_updated" as const,
+	updateConversationUnreadMessages: "conversation_updated_unread_messages" as const,
 	newMessage: "new_message" as const,
 	updateMessage: "update_message" as const,
 	seenMessage: "seen_message" as const,
 	createReaction: "create_reaction" as const,
 	updateReaction: "update_reaction " as const,
 	removeReaction: "remove_reaction " as const,
+};
+
+export const memberEvents = {
+	exit: "member_exit_group" as const,
+	remove: "member_removed_from_group" as const,
 };

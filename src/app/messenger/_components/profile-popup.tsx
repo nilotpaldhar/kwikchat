@@ -56,7 +56,7 @@ const ProfilePopup = ({
 				</Button>
 			</HoverCardTrigger>
 			<HoverCardContent
-				className="w-[340px] overflow-hidden rounded-xl border-none p-0 shadow-[0_8px_16px_rgba(0,0,0,0.1)]"
+				className="z-50 w-[340px] overflow-hidden rounded-xl border-none p-0 shadow-[0_8px_16px_rgba(0,0,0,0.1)]"
 				side={side}
 				sideOffset={sideOffset}
 				align={align}

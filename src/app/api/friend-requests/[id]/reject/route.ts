@@ -3,26 +3,17 @@
 import { type NextRequest, NextResponse } from "next/server";
 
 import { prisma } from "@/lib/db";
-import { pusherServer } from "@/lib/pusher/server";
-import { friendRequestEvents } from "@/constants/pusher-events";
 import { getCurrentUser } from "@/data/auth/session";
-import { classifyFriendRequest } from "@/lib/friend-request";
+import { broadcastFriendRequest, classifyFriendRequest } from "@/lib/friend-request";
+
+import { friendRequestEvents } from "@/constants/pusher-events";
 
 /**
  * Handler function to reject a pending friend request by its ID.
  *
  * @returns A JSON response containing the status, message, and data of friend request.
  */
-export async function POST(
-	req: NextRequest,
-	{
-		params,
-	}: {
-		params: {
-			id: string;
-		};
-	}
-) {
+export async function POST(req: NextRequest, { params }: { params: { id: string } }) {
 	const friendReqId = params.id;
 	const currentUser = await getCurrentUser();
 
@@ -57,7 +48,12 @@ export async function POST(
 		});
 
 		// Trigger a Pusher event to notify the sender about a rejected friend request
-		pusherServer.trigger(friendRequest.senderId, friendRequestEvents.reject, friendRequest.id);
+		broadcastFriendRequest<string>({
+			receiver: friendRequest.senderId,
+			eventType: "rejected",
+			eventName: friendRequestEvents.reject,
+			payload: friendRequest.id,
+		});
 
 		return NextResponse.json({
 			success: true,

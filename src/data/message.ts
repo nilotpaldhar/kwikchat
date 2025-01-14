@@ -41,6 +41,7 @@ export const MESSAGE_INCLUDE = {
 	conversation: true,
 	textMessage: true,
 	imageMessage: true,
+	systemMessage: true,
 	sender: { omit: { password: true, image: true } },
 	reactions: { orderBy: { createdAt: "asc" } },
 	starred: { select: { userId: true } },
@@ -49,6 +50,13 @@ export const MESSAGE_INCLUDE = {
 			member: { select: { userId: true } },
 		},
 	},
+} satisfies Prisma.MessageInclude;
+
+// Prisma include statement for fetching a recent message with associated data.
+export const RECENT_MESSAGE_INCLUDE = {
+	textMessage: true,
+	imageMessage: true,
+	systemMessage: true,
 } satisfies Prisma.MessageInclude;
 
 /**

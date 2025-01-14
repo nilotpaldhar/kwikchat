@@ -1,4 +1,4 @@
-import type { CompleteMessage } from "@/types";
+import type { CompleteMessage, FriendWithFriendship, GroupOverview } from "@/types";
 
 import { create } from "zustand";
 
@@ -8,7 +8,15 @@ export type ModalType =
 	| "ADD_NEW_GROUP_MEMBERS"
 	| "EDIT_MESSAGE"
 	| "DELETE_MESSAGE"
-	| "CLEAR_CONVERSATION";
+	| "CLEAR_CONVERSATION"
+	| "DELETE_CONVERSATION"
+	| "EDIT_GROUP_DETAILS"
+	| "EDIT_GROUP_BANNER"
+	| "EDIT_GROUP_ICON"
+	| "EXIT_GROUP"
+	| "DELETE_GROUP"
+	| "BLOCK_FRIEND"
+	| "REMOVE_FRIEND";
 
 interface DialogData {
 	messageToEdit?: {
@@ -17,16 +25,15 @@ interface DialogData {
 		content: string;
 		timestamp: string;
 	};
-	messageToDelete?: {
-		message: CompleteMessage;
-		showDeleteForEveryone: boolean;
-	};
-	conversationToClear?: {
-		conversationId: string;
-	};
-	conversationToAddMembers?: {
-		conversationId: string;
-	};
+	messageToDelete?: { message: CompleteMessage; showDeleteForEveryone: boolean };
+	conversationToClear?: { conversationId: string };
+	conversationToDelete?: { conversationId: string };
+	conversationToAddMembers?: { conversationId: string };
+	groupConversationToEdit?: GroupOverview;
+	groupConversationToDelete?: { conversationId: string; name: string };
+	groupConversationToExit?: { conversationId?: string; name?: string };
+	friendToBlock?: FriendWithFriendship;
+	friendToRemove?: FriendWithFriendship;
 }
 
 interface MessengerDialogStore {
@@ -51,6 +58,8 @@ const useMessengerDialogStore = create<MessengerDialogStore>((set) => ({
 				messageToEdit: undefined,
 				messageToDelete: undefined,
 				conversationToClear: undefined,
+				conversationToAddMembers: undefined,
+				groupConversationToEdit: undefined,
 			},
 		}),
 }));

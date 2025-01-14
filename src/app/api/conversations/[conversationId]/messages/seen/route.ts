@@ -10,6 +10,7 @@ import {
 	broadcastPrivateMessage,
 	broadcastGroupMessage,
 } from "@/lib/message";
+import { broadcastConversation } from "@/lib/conversation";
 import { getCurrentUser } from "@/data/auth/session";
 
 import { conversationEvents } from "@/constants/pusher-events";
@@ -72,7 +73,7 @@ export async function POST(req: NextRequest, { params }: { params: Params }) {
 		const otherMember = conversation.members.find((member) => member.userId !== currentUserId);
 
 		// Ensure both members exist; return a 422 response if not
-		if (!currentMember || !otherMember) {
+		if (!currentMember) {
 			return NextResponse.json(
 				{ success: false, message: "Member IDs do not match the expected values." },
 				{ status: 422 }
@@ -92,7 +93,6 @@ export async function POST(req: NextRequest, { params }: { params: Params }) {
 
 			// Check if the conversation is a group chat
 			if (conversation.isGroup) {
-				// Broadcast the seen message event to all group members with relevant payload
 				await broadcastGroupMessage({
 					conversationId: conversation.id,
 					eventName,
@@ -104,10 +104,18 @@ export async function POST(req: NextRequest, { params }: { params: Params }) {
 				await broadcastPrivateMessage({
 					conversationId: conversation.id,
 					eventName,
-					receiverId: otherMember.userId,
+					receiverId: otherMember ? otherMember.userId : "",
 					payload: data,
 				});
 			}
+
+			// Broadcast the updated unread message count to the current user
+			await broadcastConversation<string>({
+				receiver: currentMember.userId,
+				eventType: "updated_unread_count",
+				eventName: conversationEvents.updateConversationUnreadMessages,
+				payload: conversation.id,
+			});
 		}
 
 		return NextResponse.json({

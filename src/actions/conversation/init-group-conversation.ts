@@ -5,33 +5,16 @@ import type { MediaWithoutId } from "@/types";
 import * as z from "zod";
 import { NewGroupSchema } from "@/schemas";
 
-import { uploadImage } from "@/lib/upload";
 import { getCurrentUser } from "@/data/auth/session";
-import { createGroupConversation } from "@/lib/conversation";
 import { hasAnyFriendshipWithUser } from "@/lib/friendship";
+import {
+	createGroupConversation,
+	uploadGroupConversationIcon,
+	broadcastConversation,
+} from "@/lib/conversation";
 
+import { conversationEvents } from "@/constants/pusher-events";
 import { INIT_GROUP_CONVERSATION_MESSAGE as MESSAGE } from "@/constants/conversation";
-
-async function uploadGroupIcon({
-	icon,
-	groupName,
-	userId,
-}: {
-	icon: string;
-	groupName: string;
-	userId: string;
-}) {
-	try {
-		const res = await uploadImage({
-			image: icon,
-			imageName: `${groupName}-icon`,
-			folder: `${userId}/group-icons`,
-		});
-		return res;
-	} catch (error) {
-		return null;
-	}
-}
 
 const initGroupConversation = async (values: z.infer<typeof NewGroupSchema>) => {
 	const validatedFields = NewGroupSchema.safeParse(values);
@@ -56,9 +39,8 @@ const initGroupConversation = async (values: z.infer<typeof NewGroupSchema>) => 
 
 		// Upload group icon
 		if (groupIcon) {
-			const res = await uploadGroupIcon({
+			const res = await uploadGroupConversationIcon({
 				icon: groupIcon,
-				groupName,
 				userId: currentUser.id,
 			});
 
@@ -84,6 +66,14 @@ const initGroupConversation = async (values: z.infer<typeof NewGroupSchema>) => 
 			groupMemberIds,
 			groupIcon: icon,
 			createdBy: currentUser.id,
+		});
+
+		// Broadcast the creation of the new conversation to every group members
+		await broadcastConversation<string>({
+			receiver: [currentUser.id, ...groupMemberIds],
+			eventType: "created",
+			eventName: conversationEvents.newConversation,
+			payload: groupConversation.id,
 		});
 
 		return { redirectPath: `/messenger/chats/${groupConversation.id}` };

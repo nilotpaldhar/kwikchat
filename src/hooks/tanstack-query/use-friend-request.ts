@@ -5,7 +5,7 @@ import { useCallback } from "react";
 import usePusher from "@/hooks/use-pusher";
 import useCurrentUser from "@/hooks/tanstack-query/use-current-user";
 
-import { friendRequestKeys } from "@/constants/tanstack-query";
+import { friendKeys, friendRequestKeys } from "@/constants/tanstack-query";
 import { friendRequestEvents } from "@/constants/pusher-events";
 
 import {
@@ -33,6 +33,30 @@ import {
 	syncFriendRequestCount,
 } from "@/utils/tanstack-query-cache/friend-request";
 
+import generateFriendRequestChannel, {
+	type FriendRequestStatus,
+	type FriendRequestChannelType,
+} from "@/utils/pusher/generate-friend-request-channel";
+
+/**
+ * Helper function to generate a Pusher channel name for friend request lifecycle events.
+ */
+const createFriendRequestChannelName = ({
+	channelType,
+	status,
+	currentUserId,
+}: {
+	channelType: FriendRequestChannelType;
+	status: FriendRequestStatus;
+	currentUserId?: string;
+}) => {
+	// Return undefined if the user is not authenticated
+	if (!currentUserId) return undefined;
+
+	// Generate the channel name based on the user ID and event type
+	return generateFriendRequestChannel({ receiverId: currentUserId, status, channelType });
+};
+
 /**
  * Custom hook to fetch a paginated list of friend requests.
  *
@@ -41,7 +65,9 @@ import {
  */
 const useFriendRequestsQuery = (searchQuery?: string) => {
 	const queryClient = useQueryClient();
+
 	const { data } = useCurrentUser();
+	const currentUserId = data?.data?.id;
 
 	const query = useInfiniteQuery({
 		queryKey: friendRequestKeys.search(searchQuery || ""),
@@ -52,20 +78,24 @@ const useFriendRequestsQuery = (searchQuery?: string) => {
 
 	// Set up Pusher listeners for real-time friend request events
 	usePusher<FriendRequestWithRequestType>(
-		data?.data?.id,
+		createFriendRequestChannelName({ channelType: "default", status: "incoming", currentUserId }),
 		friendRequestEvents.incoming,
 		(friendRequest) => prependFriendRequest({ friendRequest, queryClient })
 	);
 	usePusher<FriendRequestWithRequestType>(
-		data?.data?.id,
+		createFriendRequestChannelName({ channelType: "default", status: "accepted", currentUserId }),
 		friendRequestEvents.accept,
 		(friendRequest) => removeFriendRequestFromCache({ friendReqId: friendRequest?.id, queryClient })
 	);
-	usePusher<string>(data?.data?.id, friendRequestEvents.delete, (friendReqId) =>
-		removeFriendRequestFromCache({ friendReqId, queryClient })
+	usePusher<string>(
+		createFriendRequestChannelName({ channelType: "default", status: "deleted", currentUserId }),
+		friendRequestEvents.delete,
+		(friendReqId) => removeFriendRequestFromCache({ friendReqId, queryClient })
 	);
-	usePusher<string>(data?.data?.id, friendRequestEvents.reject, (friendReqId) =>
-		removeFriendRequestFromCache({ friendReqId, queryClient })
+	usePusher<string>(
+		createFriendRequestChannelName({ channelType: "default", status: "rejected", currentUserId }),
+		friendRequestEvents.reject,
+		(friendReqId) => removeFriendRequestFromCache({ friendReqId, queryClient })
 	);
 
 	return query;
@@ -78,7 +108,9 @@ const useFriendRequestsQuery = (searchQuery?: string) => {
  */
 const useRecentFriendRequestsQuery = () => {
 	const queryClient = useQueryClient();
+
 	const { data } = useCurrentUser();
+	const currentUserId = data?.data?.id;
 
 	const query = useQuery({
 		queryKey: friendRequestKeys.recent(),
@@ -87,20 +119,24 @@ const useRecentFriendRequestsQuery = () => {
 
 	// Set up Pusher listeners for real-time updates
 	usePusher<FriendRequestWithRequestType>(
-		data?.data?.id,
+		createFriendRequestChannelName({ channelType: "recent", status: "incoming", currentUserId }),
 		friendRequestEvents.incoming,
 		(friendRequest) => prependRecentFriendRequest({ friendRequest, queryClient })
 	);
 	usePusher<FriendRequestWithRequestType>(
-		data?.data?.id,
+		createFriendRequestChannelName({ channelType: "recent", status: "accepted", currentUserId }),
 		friendRequestEvents.accept,
 		(friendRequest) => removeRecentFriendRequest({ friendReqId: friendRequest?.id, queryClient })
 	);
-	usePusher<string>(data?.data?.id, friendRequestEvents.delete, (friendReqId) =>
-		removeRecentFriendRequest({ friendReqId, queryClient })
+	usePusher<string>(
+		createFriendRequestChannelName({ channelType: "recent", status: "deleted", currentUserId }),
+		friendRequestEvents.delete,
+		(friendReqId) => removeRecentFriendRequest({ friendReqId, queryClient })
 	);
-	usePusher<string>(data?.data?.id, friendRequestEvents.reject, (friendReqId) =>
-		removeRecentFriendRequest({ friendReqId, queryClient })
+	usePusher<string>(
+		createFriendRequestChannelName({ channelType: "recent", status: "rejected", currentUserId }),
+		friendRequestEvents.reject,
+		(friendReqId) => removeRecentFriendRequest({ friendReqId, queryClient })
 	);
 
 	return query;
@@ -113,31 +149,43 @@ const useRecentFriendRequestsQuery = () => {
  */
 const usePendingFriendRequestsCountQuery = () => {
 	const queryClient = useQueryClient();
+
 	const { data } = useCurrentUser();
+	const currentUserId = data?.data?.id;
 
 	const query = useQuery({
 		queryKey: friendRequestKeys.pendingCount(),
 		queryFn: () => fetchPendingFriendRequestsCount(),
 	});
 
-	const handleSyncRequestCount = useCallback(
-		() => syncFriendRequestCount({ queryClient }),
-		[queryClient]
-	);
+	const handleSyncRequestCount = useCallback(() => {
+		syncFriendRequestCount({ queryClient });
+	}, [queryClient]);
 
 	// Set up Pusher listeners for real-time updates on request count
 	usePusher<FriendRequestWithRequestType>(
-		data?.data?.id,
+		createFriendRequestChannelName({ channelType: "count", status: "incoming", currentUserId }),
 		friendRequestEvents.incoming,
 		handleSyncRequestCount
 	);
 	usePusher<FriendRequestWithRequestType>(
-		data?.data?.id,
+		createFriendRequestChannelName({ channelType: "count", status: "accepted", currentUserId }),
 		friendRequestEvents.accept,
+		() => {
+			queryClient.invalidateQueries({ queryKey: friendKeys.all });
+			handleSyncRequestCount();
+		}
+	);
+	usePusher<string>(
+		createFriendRequestChannelName({ channelType: "count", status: "deleted", currentUserId }),
+		friendRequestEvents.delete,
 		handleSyncRequestCount
 	);
-	usePusher<string>(data?.data?.id, friendRequestEvents.delete, handleSyncRequestCount);
-	usePusher<string>(data?.data?.id, friendRequestEvents.reject, handleSyncRequestCount);
+	usePusher<string>(
+		createFriendRequestChannelName({ channelType: "count", status: "rejected", currentUserId }),
+		friendRequestEvents.reject,
+		handleSyncRequestCount
+	);
 
 	return query;
 };
