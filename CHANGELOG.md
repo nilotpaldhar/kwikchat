@@ -1,3 +1,22 @@
+# [0.8.0](https://github.com/nilotpaldhar/storekeeper/compare/v0.7.1...v0.8.0) (2025-01-14)
+
+
+### Bug Fixes
+
+* **messenger-friends:** fix real-time issues in friend management functionality ([d2de78a](https://github.com/nilotpaldhar/storekeeper/commit/d2de78a12207f4ecd8f57dc2d432f5a4f965eab9))
+
+
+### Features
+
+* **group-chat:** add ability to modify group details to enhance group management ([fca4d04](https://github.com/nilotpaldhar/storekeeper/commit/fca4d04935c9c2d9d7cf03fbf51760004451c064))
+* **group-chat:** add functionality for handling group exit and group deletion ([5ca1be2](https://github.com/nilotpaldhar/storekeeper/commit/5ca1be2c40b99450ea5a1c1bb7b883eeca3e7ac8))
+* **messenger:** add ConversationsList component and reorganize Messenger folder structure ([d537e05](https://github.com/nilotpaldhar/storekeeper/commit/d537e05ec3befb60554a8c05ab2c62eb7fbcb893))
+* **messenger:** add OnlineFriendsList and ChatWelcome components ([cfe2ae9](https://github.com/nilotpaldhar/storekeeper/commit/cfe2ae98d734c40a3e6b1730733f26960fd0b0ec))
+* **messenger:** add real-time updates to the conversation list for instant message synchronization ([8434d70](https://github.com/nilotpaldhar/storekeeper/commit/8434d70b0fc92a286ebf5c11c1afcb81e7024998))
+* **messenger:** implement chat deletion functionality with necessary validation and error handling ([5f0706b](https://github.com/nilotpaldhar/storekeeper/commit/5f0706b019f899f57e524224480e54a7782fc486))
+
+
+
 ## [0.7.1](https://github.com/nilotpaldhar/storekeeper/compare/v0.7.0...v0.7.1) (2024-12-06)
 
 
@@ -53,18 +72,6 @@
 * **messenger-friends:** add send friend request API endpoint and implement frontend request form ([a13955e](https://github.com/nilotpaldhar/storekeeper/commit/a13955ea211da0b3134b72bf77baa2429d4a81c5))
 * **messenger:** add API endpoints for listing, blocking, and unblocking users ([2813e9f](https://github.com/nilotpaldhar/storekeeper/commit/2813e9f76b2d368cc9354267941913a7b2b75683))
 * **messenger:** add messenger layout ([23d7d8c](https://github.com/nilotpaldhar/storekeeper/commit/23d7d8c469214c1929e3cafa97b471297286340c))
-
-
-
-# [0.4.0](https://github.com/nilotpaldhar/storekeeper/compare/v0.3.0...v0.4.0) (2024-08-08)
-
-
-### Features
-
-* **settings:** add account screen ([50ea1af](https://github.com/nilotpaldhar/storekeeper/commit/50ea1afba00eccf74a0879f1fa9143c4f24481c4))
-* **settings:** add account-profile screen to manage User profile updates ([f7dc8fb](https://github.com/nilotpaldhar/storekeeper/commit/f7dc8fb8e8a6082c7f31654156cd9eb51cc7caaf))
-* **settings:** add account-security screen ([7a02776](https://github.com/nilotpaldhar/storekeeper/commit/7a02776fac185052ff1e76ae78845ace803cbb32))
-* **settings:** add settings layout ([816465d](https://github.com/nilotpaldhar/storekeeper/commit/816465de17f6e7a41e0c27b7793d1385be848e89))
 
 
 
