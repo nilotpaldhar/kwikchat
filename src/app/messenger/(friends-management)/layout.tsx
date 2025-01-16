@@ -1,3 +1,7 @@
+import type { Metadata } from "next";
+
+import { APP_NAME } from "@/constants/seo";
+
 import {
 	Wrapper,
 	WrapperSidePanel,
@@ -11,6 +15,14 @@ import MobileNav from "@/app/messenger/_components/mobile-nav";
 import FriendsNav from "@/app/messenger/(friends-management)/_components/friends-nav";
 import MobileHeader from "@/app/messenger/(friends-management)/_components/mobile-header";
 import FriendsSidePanel from "@/app/messenger/(friends-management)/_components/friends-side-panel";
+
+export const metadata: Metadata = {
+	title: {
+		template: `%s | ${APP_NAME}`,
+		default: "Manage Friends",
+	},
+	description: "View, add, and manage your friends with ease, all in one place.",
+};
 
 interface FriendsManagementLayoutProps {
 	children: React.ReactNode;
