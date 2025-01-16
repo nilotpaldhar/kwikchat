@@ -2,12 +2,14 @@
 
 // External libraries and hooks
 import { useState, useTransition } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 
 // Local schemas and actions
 import { UpdateUsernameSchema } from "@/schemas";
+import { userKeys } from "@/constants/tanstack-query";
 import updateUsername from "@/actions/auth/update-username";
 
 // Custom hooks and stores
@@ -50,6 +52,8 @@ import { Alert, AlertTitle } from "@/components/ui/alert";
 import { Loader2, CheckCircle, XOctagon } from "lucide-react";
 
 const UpdateUsernameDialog = () => {
+	const queryClient = useQueryClient();
+
 	const title = `Change Your Username`;
 	const description = `Enter a new username and your existing password.`;
 
@@ -60,12 +64,7 @@ const UpdateUsernameDialog = () => {
 	const isDesktop = useMediaQuery("(min-width: 768px)");
 
 	// Get dialog state from the store
-	const {
-		type,
-
-		isOpen,
-		onClose,
-	} = useSettingsDialogStore();
+	const { type, isOpen, onClose } = useSettingsDialogStore();
 	const isDialogOpen = isOpen && type === "UPDATE_USERNAME";
 
 	// Initialize form with validation schema and default values
@@ -88,6 +87,7 @@ const UpdateUsernameDialog = () => {
 
 				if (data?.success) {
 					setSuccess(data.success);
+					queryClient.invalidateQueries({ queryKey: userKeys.current });
 					form.reset();
 				}
 			});
