@@ -1,3 +1,5 @@
+import type { Metadata } from "next";
+
 import { TokenValidationStatus } from "@/types";
 
 import { validateToken } from "@/lib/auth/tokens";
@@ -10,6 +12,11 @@ import ResetPasswordForm from "@/app/(auth)/_components/forms/reset-password-for
 import { SigninLink } from "@/app/(auth)/_components/navbar/actions";
 import ValidationFeedback from "@/app/(auth)/_components/validation-feedback";
 import { Button } from "@/components/ui/button";
+
+export const metadata: Metadata = {
+	title: "Reset Password",
+	description: "Set a new password to maintain the security of your account.",
+};
 
 interface ResetPasswordPageProps {
 	searchParams?: { [key: string]: string | string[] | undefined };

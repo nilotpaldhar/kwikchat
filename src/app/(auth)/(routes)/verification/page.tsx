@@ -1,3 +1,5 @@
+import type { Metadata } from "next";
+
 import Link from "next/link";
 
 import { TokenValidationStatus } from "@/types";
@@ -7,6 +9,11 @@ import { validateToken } from "@/lib/auth/tokens";
 import { CheckCircle, Info, XOctagon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import ValidationFeedback from "@/app/(auth)/_components/validation-feedback";
+
+export const metadata: Metadata = {
+	title: "Verify Account",
+	description: "Complete the verification process to unlock full platform features.",
+};
 
 interface VerificationPageProps {
 	searchParams?: { [key: string]: string | string[] | undefined };
