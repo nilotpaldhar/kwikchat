@@ -280,6 +280,9 @@ const useUpdateGroupConversationDetails = () => {
 
 		// Invalidate relevant queries after the mutation is settled (either success or failure)
 		onSettled: (_data, _error, { conversationId }) => {
+			queryClient.invalidateQueries({ queryKey: conversationKeys.filtered("all") });
+			queryClient.invalidateQueries({ queryKey: conversationKeys.filtered("group") });
+			queryClient.invalidateQueries({ queryKey: conversationKeys.filtered("unread") });
 			queryClient.invalidateQueries({ queryKey: conversationKeys.groupDetails(conversationId) });
 		},
 	});

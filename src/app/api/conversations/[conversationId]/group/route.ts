@@ -1,6 +1,7 @@
-import { type NextRequest, NextResponse } from "next/server";
 import type { Media } from "@prisma/client";
 import type { GroupOverview } from "@/types";
+
+import { type NextRequest, NextResponse } from "next/server";
 
 import { prisma } from "@/lib/db";
 import { uploadAndUpdateGroupConversationIcon } from "@/lib/conversation";
