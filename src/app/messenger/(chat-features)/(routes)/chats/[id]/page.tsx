@@ -1,3 +1,5 @@
+import type { Metadata } from "next";
+
 import { notFound } from "next/navigation";
 
 import { getSession } from "@/data/auth/session";
@@ -19,6 +21,12 @@ import GroupMembershipSync from "@/app/messenger/(chat-features)/_components/gro
 interface ChatPageProps {
 	params: { id: string };
 }
+
+export const metadata: Metadata = {
+	title: "Connect & Chat",
+	description:
+		"Dive into lively one-on-one or group chats with an intuitive, feature-packed experience designed for meaningful connections",
+};
 
 const ChatPage = async ({ params: { id } }: ChatPageProps) => {
 	const session = await getSession();

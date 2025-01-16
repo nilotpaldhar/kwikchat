@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { AuthError } from "@/types";
 
 import { XOctagon } from "lucide-react";
@@ -5,6 +6,11 @@ import { XOctagon } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import ValidationFeedback from "@/app/(auth)/_components/validation-feedback";
+
+export const metadata: Metadata = {
+	title: "Login Error",
+	description: "Trouble logging in? Let's fix it quickly.",
+};
 
 interface SignInErrorPageProps {
 	searchParams?: { [key: string]: string | string[] | undefined };

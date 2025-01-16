@@ -77,7 +77,7 @@ const MobileNav = () => {
 				<li>
 					<NavLink
 						icon={PhoneCall}
-						href="/messenger/friends"
+						href="/messenger/calls"
 						active={pathname.startsWith("/messenger/calls")}
 					>
 						Calls

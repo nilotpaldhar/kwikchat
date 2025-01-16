@@ -1,12 +1,12 @@
-"use client";
+import type { Metadata } from "next";
 
-import { Suspense } from "react";
 import SigninCard from "@/app/(auth)/_components/signin-card";
 
-const SignInPage = () => (
-	<Suspense>
-		<SigninCard />
-	</Suspense>
-);
+export const metadata: Metadata = {
+	title: "Login",
+	description: "Access your account securely and continue your conversations effortlessly.",
+};
+
+const SignInPage = () => <SigninCard />;
 
 export default SignInPage;
