@@ -1,4 +1,5 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { PLACEHOLDER_USER_IMAGE } from "@/constants/media";
 import { cn } from "@/utils/general/cn";
 
 export interface UserAvatarProps {
@@ -15,7 +16,7 @@ export interface UserAvatarProps {
 const UserAvatar = ({
 	src,
 	alt,
-	placeholder = "/placeholder/user.png",
+	placeholder = PLACEHOLDER_USER_IMAGE,
 	fallback,
 	status = "offline",
 	className,

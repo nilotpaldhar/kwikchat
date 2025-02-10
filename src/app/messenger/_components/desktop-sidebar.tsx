@@ -7,10 +7,12 @@ import DesktopNav from "@/app/messenger/_components/desktop-nav";
 import ProfilePopup from "@/app/messenger/_components/profile-popup";
 import ThemeToggle from "@/app/messenger/_components/theme-toggle";
 
+import { LOGO_ICON } from "@/constants/media";
+
 const DesktopSidebar = () => (
 	<div className="flex h-full flex-col items-center">
 		<div className="flex size-16 items-center justify-center">
-			<SiteLogo href="/messenger" src="/images/logo-icon.svg" width={28} height={28} />
+			<SiteLogo href="/messenger" src={LOGO_ICON} width={40} height={40} />
 		</div>
 		<nav className="w-full flex-1 py-8">
 			<DesktopNav />

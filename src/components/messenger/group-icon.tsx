@@ -1,4 +1,5 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { PLACEHOLDER_GROUP_IMAGE } from "@/constants/media";
 import { cn } from "@/utils/general/cn";
 
 export interface GroupIconProps {
@@ -15,7 +16,7 @@ export interface GroupIconProps {
 const GroupIcon = ({
 	src,
 	alt,
-	placeholder = "/placeholder/group.png",
+	placeholder = PLACEHOLDER_GROUP_IMAGE,
 	fallback,
 	className,
 	wrapperClassName,

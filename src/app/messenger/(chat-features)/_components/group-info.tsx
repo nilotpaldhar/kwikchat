@@ -7,6 +7,8 @@ import UserAvatar from "@/components/user/user-avatar";
 import useChatInfoStore from "@/store/use-chat-info-store";
 import { useGroupConversationDetailsQuery } from "@/hooks/tanstack-query/use-conversation";
 
+import { PLACEHOLDER_GROUP_IMAGE } from "@/constants/media";
+
 interface GroupInfoProps {
 	conversationId: string;
 }
@@ -39,7 +41,7 @@ const GroupInfo = ({ conversationId }: GroupInfoProps) => {
 			onClick={() => toggleContactInfo("GROUP_DETAILS")}
 			className="flex items-center justify-start space-x-2 border-none bg-transparent p-0 text-left hover:bg-transparent dark:bg-transparent dark:hover:bg-transparent"
 		>
-			<UserAvatar src={icon ?? "/placeholder/group.png"} fallback={name.charAt(0).toUpperCase()} />
+			<UserAvatar src={icon ?? PLACEHOLDER_GROUP_IMAGE} fallback={name.charAt(0).toUpperCase()} />
 			<div className="flex flex-col space-y-1.5">
 				<div title={name} className="max-w-48 truncate text-base font-semibold leading-4">
 					{name}

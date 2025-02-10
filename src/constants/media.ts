@@ -6,3 +6,14 @@ export const MAX_AVATAR_SIZE = 400 * 1024; // 400 KB
 
 // The maximum allowed size for group icon uploads
 export const MAX_GROUP_ICON_SIZE = 400 * 1024; // 400 KB
+
+// Placeholder images for users and groups
+export const PLACEHOLDER_USER_IMAGE = "/placeholder/user.webp";
+export const PLACEHOLDER_GROUP_IMAGE = "/placeholder/group.webp";
+
+// Logo assets for branding
+export const LOGO_FULL = "/images/logos/full-logo.svg";
+export const LOGO_ICON = "/images/logos/logo-icon.svg";
+
+// Default image shown on the messenger welcome screen
+export const CHAT_WELCOME_IMAGE = "/images/messenger/chat-welcome.webp";

@@ -10,6 +10,8 @@ import RecentMsgPreview from "@/app/messenger/(chat-features)/_components/conver
 
 import useMessengerDialogStore from "@/store/use-messenger-dialog-store";
 
+import { PLACEHOLDER_USER_IMAGE, PLACEHOLDER_GROUP_IMAGE } from "@/constants/media";
+
 import { cn } from "@/utils/general/cn";
 import generateUserAvatarFallback from "@/utils/user/generate-user-avatar-fallback";
 import formatDateBasedOnRecency from "@/utils/general/format-date-based-on-recency";
@@ -45,11 +47,11 @@ const ConversationTile = ({
 
 	const icon = useMemo(() => {
 		if (isGroup) {
-			const src = groupDetails?.icon?.url ?? "/placeholder/group.png";
+			const src = groupDetails?.icon?.url ?? PLACEHOLDER_GROUP_IMAGE;
 			const fallback = groupDetails?.name?.charAt(0).toUpperCase() ?? "?";
 			return { src, fallback };
 		}
-		const src = participant?.avatar ?? "/placeholder/user.png";
+		const src = participant?.avatar ?? PLACEHOLDER_USER_IMAGE;
 		const fallback = participant ? generateUserAvatarFallback({ user: participant }) : "?";
 		return { src, fallback };
 	}, [isGroup, groupDetails?.icon?.url, groupDetails?.name, participant]);

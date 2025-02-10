@@ -1,6 +1,8 @@
 import Link from "next/link";
 import Image from "next/image";
+
 import { cn } from "@/utils/general/cn";
+import { LOGO_FULL } from "@/constants/media";
 
 interface SiteLogoProps {
 	src?: string;
@@ -12,7 +14,7 @@ interface SiteLogoProps {
 }
 
 const SiteLogo: React.FC<SiteLogoProps> = ({
-	src = "/images/logo.svg",
+	src = LOGO_FULL,
 	href = "/",
 	alt = "KwikChat",
 	width = 140,

@@ -22,6 +22,7 @@ import GroupMembers from "@/app/messenger/(chat-features)/_components/group-memb
 import useGroupMembershipStore from "@/store/use-group-membership-store";
 import useMessengerDialogStore from "@/store/use-messenger-dialog-store";
 
+import { PLACEHOLDER_GROUP_IMAGE } from "@/constants/media";
 import formatJoining from "@/utils/user/format-joining";
 
 interface GroupInsightsCardProps {
@@ -45,7 +46,7 @@ const GroupInsightsCard = ({ overview }: GroupInsightsCardProps) => {
 			<ProfileHeader className="group">
 				<ProfileBanner color={bannerColor} />
 				<ProfileAvatar
-					src={icon ?? "/placeholder/group.png"}
+					src={icon ?? PLACEHOLDER_GROUP_IMAGE}
 					fallback={fallback?.toUpperCase()}
 					status="offline"
 					wrapperClassName="dark:bg-surface-dark-400"
