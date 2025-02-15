@@ -133,3 +133,10 @@ export interface ConversationWithMetadata extends Conversation {
 	groupDetails: GroupDetailsWithIcon | null;
 	participant: UserWithoutPassword | null;
 }
+
+export type SocialPlatform = "twitter" | "instagram" | "github";
+export interface SocialLink {
+	id: SocialPlatform;
+	label: string;
+	url: string | null;
+}

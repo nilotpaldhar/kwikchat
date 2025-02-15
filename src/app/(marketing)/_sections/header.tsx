@@ -4,13 +4,14 @@ import TryNowButton from "@/app/(marketing)/_components/try-now-button";
 import ExploreCodeButton from "@/app/(marketing)/_components/explore-code-button";
 
 import HeroImage from "@/app/(marketing)/_sections/header/hero-image";
+import HeaderOverlay from "@/app/(marketing)/_sections/header/header-overlay";
 
 import { NAV_SECTIONS } from "@/constants/marketing";
 
 const HeaderSection = () => (
-	<div className="w-full bg-primary-400 text-white">
-		<HeaderNavbar navLinks={Object.values(NAV_SECTIONS)} />
-		<div className="pt-20 md:pt-24">
+	<div className="relative w-full bg-primary-400 text-white">
+		<HeaderNavbar className="relative z-10" navLinks={Object.values(NAV_SECTIONS)} />
+		<div className="relative z-10 pt-20 md:pt-24">
 			<Container>
 				<div className="flex flex-col space-y-4 xl:flex-row xl:space-y-0">
 					<div className="flex-1">
@@ -38,6 +39,7 @@ const HeaderSection = () => (
 				<HeroImage />
 			</div>
 		</div>
+		<HeaderOverlay />
 	</div>
 );
 

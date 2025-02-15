@@ -29,7 +29,7 @@ const MobileMenu = ({ navLinks }: MobileMenuProps) => {
 				size="icon"
 				variant="primary"
 				onClick={() => setOpen(true)}
-				className="ring-offset-primary-400 focus-visible:ring-neutral-300 dark:ring-offset-primary-400"
+				className="size-6 border-transparent bg-transparent p-0 ring-offset-primary-400 hover:bg-transparent focus-visible:ring-neutral-300 dark:border-transparent dark:bg-transparent dark:ring-offset-primary-400 dark:hover:bg-transparent"
 			>
 				<Menu />
 				<span className="sr-only">Open Mobile Menu</span>

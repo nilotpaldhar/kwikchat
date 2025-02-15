@@ -21,3 +21,4 @@ export const LOGO_ICON_LIGHT = "/images/logos/logo-icon-light.svg";
 export const CHAT_WELCOME_IMAGE = "/images/messenger/chat-welcome.webp";
 
 export const APP_OVERVIEW_IMAGE = "/images/marketing/app-overview.webp";
+export const HEADER_BG_IMAGE = "/images/marketing/header-bg.webp";
