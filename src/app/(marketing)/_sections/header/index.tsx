@@ -3,12 +3,15 @@ import HeaderNavbar from "@/app/(marketing)/_components/header-navbar";
 import TryNowButton from "@/app/(marketing)/_components/try-now-button";
 import ExploreCodeButton from "@/app/(marketing)/_components/explore-code-button";
 
+import HeroImage from "@/app/(marketing)/_sections/header/hero-image";
+import HeaderOverlay from "@/app/(marketing)/_sections/header/header-overlay";
+
 import { NAV_SECTIONS } from "@/constants/marketing";
 
 const HeaderSection = () => (
 	<div className="relative w-full bg-primary-400 text-white">
-		<HeaderNavbar navLinks={Object.values(NAV_SECTIONS)} />
-		<div className="pt-20 md:pt-24">
+		<HeaderNavbar className="relative z-10" navLinks={Object.values(NAV_SECTIONS)} />
+		<div className="relative z-10 pt-20 md:pt-24">
 			<Container>
 				<div className="flex flex-col space-y-4 xl:flex-row xl:space-y-0">
 					<div className="flex-1">
@@ -31,15 +34,12 @@ const HeaderSection = () => (
 						</div>
 					</div>
 				</div>
-				<div className="relative z-10 pt-12 sm:pt-16 md:pt-20 xl:pt-24">
-					<div className="aspect-video w-full">
-						<div className="flex size-full items-center justify-center rounded-2xl border-4 border-e-neutral-200 bg-white text-neutral-900">
-							<h1 className="text-4xl font-extrabold">Hero Image</h1>
-						</div>
-					</div>
-				</div>
 			</Container>
+			<div className="pt-12 sm:pt-16 md:pt-20 xl:pt-24">
+				<HeroImage />
+			</div>
 		</div>
+		<HeaderOverlay />
 	</div>
 );
 

@@ -1,5 +1,6 @@
 import HeaderSection from "@/app/(marketing)/_sections/header";
 import FooterSection from "@/app/(marketing)/_sections/footer";
+import FAQSection from "@/app/(marketing)/_sections/faq";
 
 import { NAV_SECTIONS } from "@/constants/marketing";
 
@@ -8,7 +9,11 @@ const HomePage = () => (
 		<header id={NAV_SECTIONS.home.id} className="relative">
 			<HeaderSection />
 		</header>
-		<main className="flex-1 py-36" />
+		<main className="flex-1 pb-16 pt-28 md:pt-32 lg:pt-36">
+			<section id={NAV_SECTIONS.faqs.id}>
+				<FAQSection />
+			</section>
+		</main>
 		<footer>
 			<FooterSection />
 		</footer>
