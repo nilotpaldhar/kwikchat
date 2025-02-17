@@ -1,3 +1,4 @@
+import { Slot } from "@radix-ui/react-slot";
 import { cn } from "@/utils/general/cn";
 
 const SectionHeader = ({ className, ...props }: React.HTMLAttributes<HTMLElement>) => (
@@ -11,7 +12,7 @@ SectionHeader.displayName = "SectionHeader";
 const SectionBadge = ({ className, ...props }: React.HTMLAttributes<HTMLSpanElement>) => (
 	<span
 		className={cn(
-			"block whitespace-nowrap rounded-full bg-primary-100 px-3 py-1 text-xs font-semibold !leading-none text-primary-400 md:py-2 md:text-sm",
+			"flex items-center justify-center space-x-1.5 whitespace-nowrap rounded-full bg-primary-100 px-3 py-1 text-xs font-semibold !leading-none text-primary-400 md:py-2 md:text-sm",
 			className
 		)}
 		{...props}
@@ -19,21 +20,24 @@ const SectionBadge = ({ className, ...props }: React.HTMLAttributes<HTMLSpanElem
 );
 SectionBadge.displayName = "SectionBadge";
 
-const SectionTitle = ({
-	children,
-	className,
-	...props
-}: React.HTMLAttributes<HTMLHeadingElement>) => (
-	<h2
-		className={cn(
-			"text-xl font-extrabold tracking-[1px] text-neutral-900 md:text-2xl lg:text-3xl",
-			className
-		)}
-		{...props}
-	>
-		{children}
-	</h2>
-);
+interface SectionTitleProps extends React.HTMLAttributes<HTMLHeadingElement> {
+	asChild?: boolean;
+}
+const SectionTitle = ({ children, className, asChild = false, ...props }: SectionTitleProps) => {
+	const Comp = asChild ? Slot : "h2";
+
+	return (
+		<Comp
+			className={cn(
+				"text-xl font-extrabold tracking-[1px] text-neutral-900 md:text-2xl lg:text-3xl",
+				className
+			)}
+			{...props}
+		>
+			{children}
+		</Comp>
+	);
+};
 SectionTitle.displayName = "SectionTitle";
 
 const SectionDescription = ({
