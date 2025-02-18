@@ -1,27 +1,30 @@
-// The root folder for media storage
+// Root folder for storing media files
 export const ROOT_MEDIA_FOLDER = "kwikchat";
 
-// The maximum allowed size for avatar uploads
+// Maximum file size limits for media uploads
 export const MAX_AVATAR_SIZE = 400 * 1024; // 400 KB
-
-// The maximum allowed size for group icon uploads
 export const MAX_GROUP_ICON_SIZE = 400 * 1024; // 400 KB
 
-// Placeholder images for users and groups
+// Placeholder images used when users or groups don't have custom avatars
 export const PLACEHOLDER_USER_IMAGE = "/placeholder/user.webp";
 export const PLACEHOLDER_GROUP_IMAGE = "/placeholder/group.webp";
 
-// Logo assets for branding
+// Branding assets - Logos for different themes and use cases
 export const LOGO_FULL = "/images/logos/full-logo.svg";
 export const LOGO_ICON = "/images/logos/logo-icon.svg";
 export const LOGO_FULL_LIGHT = "/images/logos/full-logo-light.svg";
 export const LOGO_ICON_LIGHT = "/images/logos/logo-icon-light.svg";
 
-// Default image shown on the messenger welcome screen
-export const CHAT_WELCOME_IMAGE = "/images/messenger/chat-welcome.webp";
+// UI Images - Used in various sections of the app
+export const CHAT_WELCOME_IMAGE = "/images/messenger/chat-welcome.webp"; // Shown on the messenger welcome screen
 
+// Marketing Images - Used in promotional sections
 export const APP_OVERVIEW_IMAGE = "/images/marketing/app-overview.webp";
 export const HEADER_BG_IMAGE = "/images/marketing/header-bg.webp";
+export const CTA_BG_IMAGE = "/images/marketing/cta-bg.webp";
+export const CHAT_PREVIEW_GRID_IMAGE = "/images/marketing/chat-preview-grid.webp";
+
+// Feature-specific images for marketing materials
 export const APP_FEATURE_IMAGES = {
 	realTimeChat: {
 		src: "/images/marketing/features/real-time-chat.webp",

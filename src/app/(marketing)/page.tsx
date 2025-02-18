@@ -1,7 +1,8 @@
 import HeaderSection from "@/app/(marketing)/_sections/header";
-import FooterSection from "@/app/(marketing)/_sections/footer";
-import FAQSection from "@/app/(marketing)/_sections/faq";
 import FeaturesSection from "@/app/(marketing)/_sections/features";
+import FAQSection from "@/app/(marketing)/_sections/faq";
+import CTASection from "@/app/(marketing)/_sections/cta";
+import FooterSection from "@/app/(marketing)/_sections/footer";
 
 import { NAV_SECTIONS } from "@/constants/marketing";
 
@@ -19,6 +20,9 @@ const HomePage = () => (
 				className="pb-12 pt-16 md:pb-16 md:pt-20 lg:pb-20 lg:pt-24"
 			>
 				<FAQSection />
+			</section>
+			<section className="pt-12 md:pt-16 lg:pt-20">
+				<CTASection />
 			</section>
 		</main>
 		<footer>
