@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import dynamic from "next/dynamic";
 
 import SiteLogo from "@/components/site-logo";
 import SocialLink from "@/components/social-link";
@@ -16,7 +17,10 @@ import {
 
 import { APP_NAME } from "@/constants/seo";
 import { NAV_SECTIONS, SOCIAL_MEDIA_LINKS, DEVELOPER_LINKS } from "@/constants/marketing";
+
 import openInNewTab from "@/utils/general/open-in-new-tab";
+
+const TechStackDialog = dynamic(() => import("@/app/(marketing)/_components/tech-stack-dialog"));
 
 const FooterSection = () => {
 	const currentYear = new Date().getFullYear();
@@ -49,7 +53,9 @@ const FooterSection = () => {
 												{NAV_SECTIONS.features.label}
 											</Link>
 										</FoterMenuButton>
-										<FoterMenuButton disabled>Tech Stack</FoterMenuButton>
+										<TechStackDialog>
+											<FoterMenuButton>Tech Stack</FoterMenuButton>
+										</TechStackDialog>
 										<FoterMenuButton asChild>
 											<Link href={`/#${NAV_SECTIONS.faqs.id}`}>{NAV_SECTIONS.faqs.label}</Link>
 										</FoterMenuButton>
