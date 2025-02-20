@@ -12,7 +12,7 @@ const HomePage = () => (
 			<HeaderSection />
 		</header>
 		<main className="flex-1 py-16 md:py-20">
-			<section id={NAV_SECTIONS.features.id} className="pb-16 pt-16 md:pb-20 lg:pb-24">
+			<section id={NAV_SECTIONS.features.id} className="py-16 md:pb-20 lg:pb-24">
 				<FeaturesSection />
 			</section>
 			<section

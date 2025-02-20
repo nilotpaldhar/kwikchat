@@ -14,7 +14,7 @@ import { Button } from "@/components/ui/button";
 
 import LoginOrAppLink from "@/app/(marketing)/_components/header-navbar/login-or-app-link";
 import NavLinks, { type NavLink } from "@/app/(marketing)/_components/header-navbar/nav-links";
-import { useState } from "react";
+import { useCallback, useState } from "react";
 
 interface MobileMenuProps {
 	navLinks: NavLink[];
@@ -22,6 +22,10 @@ interface MobileMenuProps {
 
 const MobileMenu = ({ navLinks }: MobileMenuProps) => {
 	const [open, setOpen] = useState(false);
+
+	const handleScrollComplete = useCallback(() => {
+		setOpen(false);
+	}, []);
 
 	return (
 		<>
@@ -64,7 +68,8 @@ const MobileMenu = ({ navLinks }: MobileMenuProps) => {
 								<nav className="px-3 py-6">
 									<NavLinks
 										links={navLinks}
-										onLinkClick={() => setOpen(false)}
+										scrollOffset={64}
+										onScrollComplete={handleScrollComplete}
 										className="flex-col items-start space-x-0 space-y-5 lg:space-x-0"
 										linkClassName="text-neutral-900 after:bg-neutral-900 focus-visible:ring-neutral-300 focus-visible:ring-offset-4  ring-offset-white focus-visible:ring-neutral-500"
 									/>

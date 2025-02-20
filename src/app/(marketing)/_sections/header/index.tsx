@@ -10,8 +10,8 @@ import { NAV_SECTIONS } from "@/constants/marketing";
 
 const HeaderSection = () => (
 	<div className="relative w-full bg-primary-400 text-white">
-		<HeaderNavbar className="relative z-10" navLinks={Object.values(NAV_SECTIONS)} />
-		<div className="relative z-10 pt-20 md:pt-24">
+		<HeaderNavbar navLinks={Object.values(NAV_SECTIONS)} />
+		<div className="relative z-10 pt-36 md:pt-44">
 			<Container>
 				<div className="flex flex-col space-y-4 xl:flex-row xl:space-y-0">
 					<div className="flex-1">
