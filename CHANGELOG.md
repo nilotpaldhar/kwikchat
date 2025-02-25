@@ -1,3 +1,19 @@
+# [0.10.0](https://github.com/nilotpaldhar/storekeeper/compare/v0.9.0...v0.10.0) (2025-02-25)
+
+
+### Features
+
+* **landing-page:** add CTA section with button and supporting text ([24f0ce6](https://github.com/nilotpaldhar/storekeeper/commit/24f0ce6a70d30be00a782f4ba230006bc5ceebe0))
+* **landing-page:** add features section with responsive layout and icons ([1439b89](https://github.com/nilotpaldhar/storekeeper/commit/1439b8965937fa9696401ed77c0e70f10a47ccf2))
+* **landing-page:** add header section with responsive hero image ([02289ff](https://github.com/nilotpaldhar/storekeeper/commit/02289ff6daeb4b7c45fdccbe76f651e5653e3339))
+* **landing-page:** add interactive FAQs section with expandable questions ([24bc5a9](https://github.com/nilotpaldhar/storekeeper/commit/24bc5a97bdf0fd5217fbc19795aca43aa4610786))
+* **landing-page:** add responsive footer with links and social icons ([d341581](https://github.com/nilotpaldhar/storekeeper/commit/d341581b26069a06302c1c0c7c14f74816cfdd43))
+* **landing-page:** add SmoothScrollLink for seamless section navigation ([ab5c1f8](https://github.com/nilotpaldhar/storekeeper/commit/ab5c1f8a4dde040ce53be3e31ac46ae32d86ad7b))
+* **landing-page:** add tech stack dialog ([2634a70](https://github.com/nilotpaldhar/storekeeper/commit/2634a70896093d29ccf21105e625cae2c839f94f))
+* **not-found:** add global 404 Not Found page ([2e28d72](https://github.com/nilotpaldhar/storekeeper/commit/2e28d727674733dc558c90f7c90a885d920cc62b))
+
+
+
 # [0.9.0](https://github.com/nilotpaldhar/storekeeper/compare/v0.8.0...v0.9.0) (2025-01-16)
 
 
@@ -46,24 +62,6 @@
 * **group-chat:** add functionality to update group member roles and remove members ([7e3eae1](https://github.com/nilotpaldhar/storekeeper/commit/7e3eae19cf1d4545558c86655dd835ffba934a6a))
 * **group-chat:** add group chat support, allowing users to create and join group conversations ([17a3e35](https://github.com/nilotpaldhar/storekeeper/commit/17a3e3520edc30ab43411ee2a32005770a88317c))
 * **group-chat:** add group creation dialog with server-side handling ([13d3752](https://github.com/nilotpaldhar/storekeeper/commit/13d3752593c2dd84081109fd9e0faa0e7d8483e5))
-
-
-
-# [0.6.0](https://github.com/nilotpaldhar/storekeeper/compare/v0.5.0...v0.6.0) (2024-10-17)
-
-
-### Features
-
-* **messenger-chat:** add chat screen ([40af9c4](https://github.com/nilotpaldhar/storekeeper/commit/40af9c476808b34433c0e9d4253b9732615e8ed0))
-* **messenger-chat:** add ChatInput component with dynamic resizing and message handling ([1d8996f](https://github.com/nilotpaldhar/storekeeper/commit/1d8996ffcca199c87b7afa747331ae64feac6104))
-* **messenger-chat:** add New Chat Dialog component with friend selection functionality ([11f2613](https://github.com/nilotpaldhar/storekeeper/commit/11f261306cc8a8b3a948099795b9eb92fc9fe1f4))
-* **messenger-chat:** add real-time message updates for seamless user interaction ([5e499e1](https://github.com/nilotpaldhar/storekeeper/commit/5e499e108c8f951db98802dd38162f9c95e63ec0))
-* **messenger-chat:** add support for displaying message reactions in chat messages ([da51203](https://github.com/nilotpaldhar/storekeeper/commit/da51203b5256f278f7ec46937025d7021eb91b17))
-* **messenger-chat:** add support for starring messages in chat ([72de18d](https://github.com/nilotpaldhar/storekeeper/commit/72de18d198c571bb092c53f7126a848c8f8a0e46))
-* **messenger-chat:** implement clear chat functionality and add message deletion feature ([ab6030c](https://github.com/nilotpaldhar/storekeeper/commit/ab6030c18373e4cb25e3076e8a30f53cdc4d7956))
-* **messenger-chat:** implement functionality to open chat screen for user conversations ([7f024f9](https://github.com/nilotpaldhar/storekeeper/commit/7f024f94c4b2b9abe02e4a81f5b94b4285ae7e18))
-* **messenger-chat:** implement private one-to-one chat with real-time messaging functionality ([8424d12](https://github.com/nilotpaldhar/storekeeper/commit/8424d12b3eeb25a21e9023440ddc309b87f04f6e))
-* **messenger-chat:** implement real-time message seen status tracking ([2757ec9](https://github.com/nilotpaldhar/storekeeper/commit/2757ec9245de0ba1c8403c4a9cf296a67ca8ca80))
 
 
 
