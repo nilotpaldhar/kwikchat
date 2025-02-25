@@ -4,6 +4,7 @@ import Image from "next/image";
 import { PlusIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
+import { CHAT_WELCOME_IMAGE } from "@/constants/media";
 import useMessengerDialogStore from "@/store/use-messenger-dialog-store";
 
 const ChatWelcome = () => {
@@ -12,7 +13,7 @@ const ChatWelcome = () => {
 	return (
 		<div className="flex h-full flex-col items-center justify-center space-y-10">
 			<div className="flex max-w-max items-center justify-center">
-				<Image src="/images/chat-welcome.png" alt="chat-welcome" width={320} height={320} />
+				<Image src={CHAT_WELCOME_IMAGE} alt="chat-welcome" width={320} height={320} />
 			</div>
 			<div className="flex max-w-md flex-col items-center space-y-4 px-5 text-center lg:max-w-lg lg:px-0">
 				<h1 className="heading-3 lg:heading-2">Start a Fresh Vibe or Jump Back In!</h1>

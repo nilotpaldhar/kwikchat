@@ -58,6 +58,11 @@ const config = {
 					500: "#131313",
 					600: "#060606",
 				},
+				"social-media": {
+					twitter: "#14171a",
+					instagram: "#405DE6",
+					github: "#333333",
+				},
 			},
 			boxShadow: {
 				header: "0 4px 12px rgba(0, 0, 0, 0.06)",
