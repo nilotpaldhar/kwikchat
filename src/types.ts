@@ -140,3 +140,20 @@ export interface SocialLink {
 	label: string;
 	url: string | null;
 }
+
+export enum ChatAttachmentTypes {
+	Image = "Image",
+	Document = "Document",
+}
+interface ChatAttachmentUploadData {
+	caption?: string;
+}
+export interface ChatDocumentAttachment extends ChatAttachmentUploadData {
+	document: File;
+}
+export interface ChatImageAttachment extends ChatAttachmentUploadData {
+	image: File;
+}
+export type ChatAttachmentUploadPayload =
+	| { type: ChatAttachmentTypes.Document; data: ChatDocumentAttachment }
+	| { type: ChatAttachmentTypes.Image; data: ChatImageAttachment[] };

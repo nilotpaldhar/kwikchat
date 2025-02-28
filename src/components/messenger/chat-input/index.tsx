@@ -8,8 +8,10 @@ import { SendHorizonal } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { TextArea } from "@/components/ui/textarea";
 
-import AttachmentButton from "@/components/messenger/chat-input/attachment-button";
 import EmojiButton from "@/components/messenger/chat-input/emoji-button";
+import AttachmentPopover, {
+	type OnAttachmentUpload,
+} from "@/components/messenger/chat-input/attachment-popover";
 
 import { cn } from "@/utils/general/cn";
 import { MAX_INPUT_SIZE, MAX_MESSAGE_CHAR_LENGTH } from "@/constants/chat-input";
@@ -27,6 +29,7 @@ interface ChatInputProps {
 		submitButtonClassName?: string;
 	};
 	onSubmit?: (message: string) => void;
+	onAttachmentUpload?: OnAttachmentUpload;
 }
 
 const ChatInput = ({
@@ -37,6 +40,7 @@ const ChatInput = ({
 	className,
 	classNames,
 	onSubmit,
+	onAttachmentUpload,
 }: ChatInputProps) => {
 	const textareaRef = useRef<HTMLTextAreaElement>(null);
 	const [message, setMessage] = useState("");
@@ -126,7 +130,12 @@ const ChatInput = ({
 
 	return (
 		<div className={cn("flex w-full items-start space-x-2", classNames?.wrapperClassName)}>
-			{attachment && <AttachmentButton className={classNames?.attachmentButtonClassName} />}
+			{attachment && (
+				<AttachmentPopover
+					onAttachmentUpload={onAttachmentUpload}
+					className={classNames?.attachmentButtonClassName}
+				/>
+			)}
 			<div className="flex flex-1 items-start space-x-1 rounded-lg border border-neutral-200 px-2 dark:border-neutral-800">
 				{emojiPicker && (
 					<EmojiButton className={classNames?.emojiButtonClassName} onSelect={handleEmojiSelect} />

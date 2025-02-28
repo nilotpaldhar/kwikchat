@@ -1,10 +1,10 @@
 "use client";
 
-import Link from "next/link";
 import dynamic from "next/dynamic";
 
 import SiteLogo from "@/components/site-logo";
 import SocialLink from "@/components/social-link";
+import SmoothScrollLink from "@/components/smooth-scroll-link";
 
 import Container from "@/app/(marketing)/_components/container";
 import TryNowButton from "@/app/(marketing)/_components/try-now-button";
@@ -49,15 +49,17 @@ const FooterSection = () => {
 									<FoterMenuLabel>Product</FoterMenuLabel>
 									<FoterMenuContent>
 										<FoterMenuButton asChild>
-											<Link href={`/#${NAV_SECTIONS.features.id}`}>
+											<SmoothScrollLink href={`#${NAV_SECTIONS.features.id}`} offset={80}>
 												{NAV_SECTIONS.features.label}
-											</Link>
+											</SmoothScrollLink>
 										</FoterMenuButton>
 										<TechStackDialog>
 											<FoterMenuButton>Tech Stack</FoterMenuButton>
 										</TechStackDialog>
 										<FoterMenuButton asChild>
-											<Link href={`/#${NAV_SECTIONS.faqs.id}`}>{NAV_SECTIONS.faqs.label}</Link>
+											<SmoothScrollLink href={`#${NAV_SECTIONS.faqs.id}`} offset={80}>
+												{NAV_SECTIONS.faqs.label}
+											</SmoothScrollLink>
 										</FoterMenuButton>
 									</FoterMenuContent>
 								</FoterMenu>

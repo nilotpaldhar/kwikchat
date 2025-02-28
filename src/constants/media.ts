@@ -4,6 +4,8 @@ export const ROOT_MEDIA_FOLDER = "kwikchat";
 // Maximum file size limits for media uploads
 export const MAX_AVATAR_SIZE = 400 * 1024; // 400 KB
 export const MAX_GROUP_ICON_SIZE = 400 * 1024; // 400 KB
+export const MAX_CHAT_DOCUMENT_FILE_SIZE = 10 * 1024 * 1024; // 10MB
+export const MAX_CHAT_IMAGE_FILE_SIZE = 10 * 1024 * 1024; // 10MB
 
 // Placeholder images used when users or groups don't have custom avatars
 export const PLACEHOLDER_USER_IMAGE = "/placeholder/user.webp";

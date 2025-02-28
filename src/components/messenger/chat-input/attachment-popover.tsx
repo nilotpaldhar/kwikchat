@@ -1,14 +1,25 @@
 "use client";
 
+import type { ChatAttachmentUploadPayload } from "@/types";
+import { ChatAttachmentTypes } from "@/types";
+
 import { toast } from "sonner";
-import { Plus, File, Image, FileVideo } from "lucide-react";
+import { Plus, File, Image } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Popover, PopoverTrigger, PopoverContent } from "@/components/ui/popover";
+import DocumentPicker from "@/components/messenger/chat-input/document-picker";
 
 import { cn } from "@/utils/general/cn";
 
-const AttachmentButton = ({ className }: { className?: string }) => {
+export type OnAttachmentUpload = (data: ChatAttachmentUploadPayload) => void;
+
+interface AttachmentPopoverProps {
+	className?: string;
+	onAttachmentUpload?: OnAttachmentUpload;
+}
+
+const AttachmentPopover = ({ className, onAttachmentUpload }: AttachmentPopoverProps) => {
 	const actionBtnClassName =
 		"w-full justify-start space-x-2 border-transparent bg-transparent px-1.5 text-left hover:bg-surface-light-300 dark:border-transparent dark:hover:bg-surface-dark-500";
 
@@ -41,21 +52,27 @@ const AttachmentButton = ({ className }: { className?: string }) => {
 				alignOffset={0}
 				className="max-w-48 p-1.5"
 			>
-				<Button variant="outline" className={actionBtnClassName} onClick={handleClick}>
+				<DocumentPicker
+					variant="outline"
+					className={actionBtnClassName}
+					onConfirmUpload={({ caption, document }) => {
+						if (onAttachmentUpload)
+							onAttachmentUpload({
+								type: ChatAttachmentTypes.Document,
+								data: { caption, document },
+							});
+					}}
+				>
 					<File size={16} />
 					<span className="font-semibold">Document</span>
-				</Button>
+				</DocumentPicker>
 				<Button variant="outline" className={actionBtnClassName} onClick={handleClick}>
 					<Image size={16} />
 					<span className="font-semibold">Photos</span>
-				</Button>
-				<Button variant="outline" className={actionBtnClassName} onClick={handleClick}>
-					<FileVideo size={16} />
-					<span className="font-semibold">Videos</span>
 				</Button>
 			</PopoverContent>
 		</Popover>
 	);
 };
 
-export default AttachmentButton;
+export default AttachmentPopover;

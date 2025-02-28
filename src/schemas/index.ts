@@ -142,3 +142,7 @@ export const AddGroupMemberSchema = z.object({
 export const UpdateMemberRoleSchema = z.object({
 	memberRole: z.nativeEnum(MemberRole, { message: "Invalid member role" }),
 });
+
+export const MessageCaptionSchema = z.object({
+	caption: z.string().max(200, "Caption too long. Please keep it under 200 characters.").optional(),
+});

@@ -1,5 +1,3 @@
-/* eslint-disable no-console */
-
 "use client";
 
 import Skeleton from "@/components/ui/skeleton";
@@ -35,7 +33,13 @@ const ChatMessageInput = ({ conversationId }: ChatMessageInputProps) => {
 			</ErrorAlert>
 		);
 
-	return <ChatInput onSubmit={(message) => mutate({ conversationId, sender, message })} />;
+	return (
+		<ChatInput
+			onSubmit={(message) => mutate({ conversationId, sender, message })}
+			// eslint-disable-next-line no-console
+			onAttachmentUpload={(attachmentdata) => console.log("ChatMessageInput: ", attachmentdata)}
+		/>
+	);
 };
 
 export default ChatMessageInput;
