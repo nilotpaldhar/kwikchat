@@ -15,3 +15,6 @@ export const SUPPORTED_DOCUMENT_FILE_MESSAGE_TYPES = ["PDF", "TXT", "DOC", "DOCX
 
 // Supported image types for image uploads
 export const SUPPORTED_IMAGE_FILE_MESSAGE_TYPES = ["PNG", "JPG", "JPEG", "GIF"];
+
+// Maximum number of images a user can select in the chat input
+export const MAX_IMAGE_SELECTION_LIMIT = 10;

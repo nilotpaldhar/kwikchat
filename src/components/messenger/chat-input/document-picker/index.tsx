@@ -2,104 +2,106 @@
 
 import type { ChatDocumentAttachment } from "@/types";
 
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { toast } from "sonner";
 
-import { Button, type ButtonProps } from "@/components/ui/button";
-import DocumentPreviewDialog from "@/components/messenger/chat-input/document-picker/document-preview-dialog";
+import CustomFileInput from "@/components/ui/custom-file-input";
+import DocumentUploadDialog from "@/components/messenger/chat-input/document-picker/document-upload-dialog";
 
 import { MAX_CHAT_DOCUMENT_FILE_SIZE } from "@/constants/media";
 import { SUPPORTED_DOCUMENT_FILE_MESSAGE_TYPES } from "@/constants/chat-input";
 
 import { getFileDetails, formatFileSize, type FileDetails } from "@/utils/general/file";
 
-interface FilePickerProps extends ButtonProps {
+interface DocumentPickerProps {
+	className?: string;
 	children: React.ReactNode;
 	onConfirmUpload?: (data: ChatDocumentAttachment) => void;
 }
 
-const DocumentPicker = ({ children, className, onConfirmUpload, ...props }: FilePickerProps) => {
-	const fileInputRef = useRef<HTMLInputElement>(null);
+const DocumentPicker = ({ className, children, onConfirmUpload }: DocumentPickerProps) => {
 	const [isPreviewOpen, setIsPreviewOpen] = useState(false);
 	const [document, setDocument] = useState<File | null>(null);
 	const [documentDetails, setDocumentDetails] = useState<FileDetails | null>(null);
 
+	// Generate the accepted file formats for the input element
 	const fileAcceptAttribute = SUPPORTED_DOCUMENT_FILE_MESSAGE_TYPES.map(
 		(type) => `.${type.toLocaleLowerCase()}`
 	).join(",");
 
-	// Reset file input so the same file can be selected again
-	const handleResetFileInput = () => {
-		if (fileInputRef.current) fileInputRef.current.value = "";
-	};
-
-	// Show an error toast for oversized files
-	const handleDocumentTooLarge = (fileSize: string) => {
-		toast.error("Document size too large.", {
-			description: `The selected document is ${fileSize}, exceeding the ${formatFileSize(MAX_CHAT_DOCUMENT_FILE_SIZE)} limit.`,
-			position: "top-right",
-		});
-	};
-
-	// Show an error toast for unsupported files
-	const handleUnsupportedDocument = (fileType: string) => {
-		toast.error("File type not supported.", {
-			description: `The selected file type (${fileType}) is not allowed. Please upload a supported document format: ${SUPPORTED_DOCUMENT_FILE_MESSAGE_TYPES.join(", ")}.`,
-			position: "top-right",
-		});
-	};
-
-	const handleChange = (evt: React.ChangeEvent<HTMLInputElement>) => {
+	// Handle file selection and validation
+	const handleChange = useCallback((evt: React.ChangeEvent<HTMLInputElement>) => {
+		// Get the selected file from the input element
 		const selectedFile = evt.target.files?.[0];
 		if (!selectedFile) return;
 
+		// Extract file details such as type and size
 		const { fileType, fileSize, ...restFileDetails } = getFileDetails(selectedFile);
 
+		// Check if the file exceeds the maximum allowed size
 		if (selectedFile.size > MAX_CHAT_DOCUMENT_FILE_SIZE) {
-			handleDocumentTooLarge(fileSize);
-			handleResetFileInput();
+			toast.error("Document size too large.", {
+				description: `The selected document is ${fileSize}, exceeding the ${formatFileSize(MAX_CHAT_DOCUMENT_FILE_SIZE)} limit.`,
+				position: "top-right",
+			});
+
+			// Reset input field to allow re-selection
+			evt.target.value = "";
+
 			return;
 		}
 
+		// Check if the selected file type is supported
 		if (!SUPPORTED_DOCUMENT_FILE_MESSAGE_TYPES.includes(fileType)) {
-			handleUnsupportedDocument(fileType);
-			handleResetFileInput();
+			toast.error("File type not supported.", {
+				description: `The selected file type (${fileType}) is not allowed. Please upload a supported document format: ${SUPPORTED_DOCUMENT_FILE_MESSAGE_TYPES.join(", ")}.`,
+				position: "top-right",
+			});
+
+			// Reset input field to allow re-selection
+			evt.target.value = "";
+
 			return;
 		}
 
+		// Open preview modal with the selected document details
 		setIsPreviewOpen(true);
 		setDocument(selectedFile);
+
+		// Update document details only if the file type is different from the previous one
 		setDocumentDetails((prev) =>
 			prev?.fileType === fileType ? prev : { fileType, fileSize, ...restFileDetails }
 		);
-	};
 
+		// Reset input field to allow re-selection
+		evt.target.value = "";
+	}, []);
+
+	// Handle confirmation of the document upload
 	const handleConfirmUpload = (caption?: string) => {
 		if (document && onConfirmUpload) onConfirmUpload({ document, caption });
 		setIsPreviewOpen(false);
 	};
 
+	// Reset file states when preview modal is closed
 	useEffect(() => {
 		if (!isPreviewOpen) {
 			setDocument(null);
 			setDocumentDetails(null);
-			handleResetFileInput();
 		}
 	}, [isPreviewOpen]);
 
 	return (
 		<>
-			<Button className={className} onClick={() => fileInputRef.current?.click()} {...props}>
-				{children}
-			</Button>
-			<input
-				type="file"
-				className="hidden"
-				ref={fileInputRef}
+			<CustomFileInput
+				multiple={false}
+				className={className}
 				accept={fileAcceptAttribute}
 				onChange={handleChange}
-			/>
-			<DocumentPreviewDialog
+			>
+				{children}
+			</CustomFileInput>
+			<DocumentUploadDialog
 				open={isPreviewOpen}
 				documentDetails={documentDetails}
 				onOpenChange={setIsPreviewOpen}

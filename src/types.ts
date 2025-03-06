@@ -12,6 +12,7 @@ import type {
 	Media,
 	GroupDetails,
 } from "@prisma/client";
+import type { Area, Point } from "react-easy-crop";
 import { PaginationMetadata } from "@/utils/general/calculate-pagination";
 
 export interface UserProfile extends Omit<User, "password" | "image"> {}
@@ -153,7 +154,18 @@ export interface ChatDocumentAttachment extends ChatAttachmentUploadData {
 }
 export interface ChatImageAttachment extends ChatAttachmentUploadData {
 	image: File;
+	imageDataUrl: string | null;
 }
 export type ChatAttachmentUploadPayload =
 	| { type: ChatAttachmentTypes.Document; data: ChatDocumentAttachment }
 	| { type: ChatAttachmentTypes.Image; data: ChatImageAttachment[] };
+
+export interface ImageUpload {
+	id: string;
+	image: File;
+	imageUrl: string | null;
+	caption?: string;
+	crop: Point;
+	zoom: number;
+	cropPixels: Area | null;
+}

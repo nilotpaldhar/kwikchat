@@ -41,20 +41,20 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 
-interface DocumentPreviewDialogProps {
+interface DocumentUploadDialogProps {
 	open?: boolean;
 	documentDetails: FileDetails | null;
 	onOpenChange?: (open: boolean) => void;
 	onConfirmUpload?: (data: { documentDetails: FileDetails; caption?: string }) => void;
 }
 
-const DocumentPreviewDialog = ({
+const DocumentUploadDialog = ({
 	open,
 	documentDetails,
 	onOpenChange,
 	onConfirmUpload,
-}: DocumentPreviewDialogProps) => {
-	const title = `Send File`;
+}: DocumentUploadDialogProps) => {
+	const title = `Send Document`;
 	const description = `No Description`;
 
 	const isDesktop = useMediaQuery("(min-width: 768px)");
@@ -180,4 +180,4 @@ const DocumentPreviewDialog = ({
 	);
 };
 
-export default DocumentPreviewDialog;
+export default DocumentUploadDialog;

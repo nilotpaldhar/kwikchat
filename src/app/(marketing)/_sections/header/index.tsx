@@ -24,7 +24,7 @@ const HeaderSection = () => (
 						</h1>
 					</div>
 					<div className="flex flex-1 flex-col items-center xl:items-end">
-						<p className="max-w-xs text-center text-base font-medium sm:max-w-md md:max-w-md md:text-xl xl:flex xl:flex-col xl:space-y-3 xl:text-left xl:leading-none">
+						<p className="max-w-xs space-x-1 text-center text-base font-medium sm:max-w-md md:max-w-md md:text-xl xl:flex xl:flex-col xl:space-x-0 xl:space-y-3 xl:text-left xl:leading-none">
 							<span>Platform used to send messages a myriad of</span>
 							<span>features, by prioritizing the user experience</span>
 						</p>

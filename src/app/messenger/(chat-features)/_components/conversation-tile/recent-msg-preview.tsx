@@ -5,8 +5,6 @@ import type { RecentMessage } from "@/types";
 import { MessageType } from "@prisma/client";
 import { Image, MessageSquareOff } from "lucide-react";
 
-import { cn } from "@/utils/general/cn";
-
 interface RecentMsgPreviewProps {
 	message: RecentMessage | null;
 }
@@ -42,9 +40,7 @@ const RecentMsgPreview = ({ message }: RecentMsgPreviewProps) => {
 			{preview.msgType === MessageType.image && <Image size={14} />}
 			{preview.msgType === MessageType.deleted && <MessageSquareOff size={14} />}
 			<div title={preview.content} className="text-xs font-semibold leading-5">
-				<div className={cn("line-clamp-1", preview.msgType === MessageType.deleted && "italic")}>
-					{preview.content}
-				</div>
+				<div className="line-clamp-1">{preview.content}</div>
 			</div>
 		</div>
 	);
