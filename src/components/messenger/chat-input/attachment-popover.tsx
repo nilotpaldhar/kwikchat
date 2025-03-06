@@ -3,11 +3,12 @@
 import type { ChatAttachmentUploadPayload } from "@/types";
 import { ChatAttachmentTypes } from "@/types";
 
-import { toast } from "sonner";
 import { Plus, File, Image } from "lucide-react";
 
-import { Button } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
 import { Popover, PopoverTrigger, PopoverContent } from "@/components/ui/popover";
+
+import ImagePicker from "@/components/messenger/chat-input/image-picker";
 import DocumentPicker from "@/components/messenger/chat-input/document-picker";
 
 import { cn } from "@/utils/general/cn";
@@ -20,15 +21,11 @@ interface AttachmentPopoverProps {
 }
 
 const AttachmentPopover = ({ className, onAttachmentUpload }: AttachmentPopoverProps) => {
-	const actionBtnClassName =
-		"w-full justify-start space-x-2 border-transparent bg-transparent px-1.5 text-left hover:bg-surface-light-300 dark:border-transparent dark:hover:bg-surface-dark-500";
-
-	const handleClick = () => {
-		const title = "Coming Soon!";
-		const description =
-			"This feature isn’t available just yet. We’re working hard to bring it to you soon.";
-		toast.info(title, { description, position: "top-right" });
-	};
+	const actionBtnClassName = buttonVariants({
+		variant: "outline",
+		className:
+			"w-full justify-start space-x-2 border-transparent bg-transparent px-1.5 text-left hover:bg-surface-light-300 dark:border-transparent dark:hover:bg-surface-dark-500",
+	});
 
 	return (
 		<Popover>
@@ -50,10 +47,9 @@ const AttachmentPopover = ({ className, onAttachmentUpload }: AttachmentPopoverP
 				sideOffset={24}
 				align="start"
 				alignOffset={0}
-				className="max-w-48 p-1.5"
+				className="max-w-48 flex-col space-y-1 p-1.5"
 			>
 				<DocumentPicker
-					variant="outline"
 					className={actionBtnClassName}
 					onConfirmUpload={({ caption, document }) => {
 						if (onAttachmentUpload)
@@ -66,10 +62,15 @@ const AttachmentPopover = ({ className, onAttachmentUpload }: AttachmentPopoverP
 					<File size={16} />
 					<span className="font-semibold">Document</span>
 				</DocumentPicker>
-				<Button variant="outline" className={actionBtnClassName} onClick={handleClick}>
+				<ImagePicker
+					className={actionBtnClassName}
+					onConfirmUpload={(data) => {
+						if (onAttachmentUpload) onAttachmentUpload({ type: ChatAttachmentTypes.Image, data });
+					}}
+				>
 					<Image size={16} />
 					<span className="font-semibold">Photos</span>
-				</Button>
+				</ImagePicker>
 			</PopoverContent>
 		</Popover>
 	);
