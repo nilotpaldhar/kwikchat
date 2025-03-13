@@ -76,6 +76,12 @@ const getImageUrl = async (image: File): Promise<string | null> => {
 	return typeof imgDataUrl === "string" ? imgDataUrl : null;
 };
 
+// Utility function to validate image file type
+export const isValidImageFileType = (
+	fileType: string
+): fileType is (typeof SUPPORTED_IMAGE_FILE_MESSAGE_TYPES)[number] =>
+	[...SUPPORTED_IMAGE_FILE_MESSAGE_TYPES].includes(fileType as any);
+
 const ImagePicker = ({ className, children, onConfirmUpload }: ImagePickerProps) => {
 	const [state, dispatch] = useReducer(reducer, initialState);
 
@@ -105,7 +111,7 @@ const ImagePicker = ({ className, children, onConfirmUpload }: ImagePickerProps)
 	const checkImageType = (selectedFiles: File[]) => {
 		const unspportedFiles: File[] = [];
 		selectedFiles.forEach((file) => {
-			if (!SUPPORTED_IMAGE_FILE_MESSAGE_TYPES.includes(getFileDetails(file).fileType)) {
+			if (!isValidImageFileType(getFileDetails(file).fileType)) {
 				unspportedFiles.push(file);
 			}
 		});
@@ -271,13 +277,13 @@ const ImagePicker = ({ className, children, onConfirmUpload }: ImagePickerProps)
 
 				return {
 					caption: upload.caption,
-					image: upload.image,
+					image: getFileDetails(upload.image),
 					imageDataUrl: processedImageUrl,
 				};
 			} catch (error) {
 				return {
 					caption: upload.caption,
-					image: upload.image,
+					image: getFileDetails(upload.image),
 					imageDataUrl: null,
 				};
 			}

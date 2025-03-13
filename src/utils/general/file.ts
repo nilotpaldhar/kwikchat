@@ -1,7 +1,10 @@
 export interface FileDetails {
 	fileName: string;
 	fileType: string;
-	fileSize: string;
+	fileSize: {
+		raw: number;
+		formatted: string;
+	};
 }
 
 /**
@@ -42,9 +45,16 @@ const formatFileSize = (size: number): string => {
 const getFileDetails = (file: File): FileDetails => {
 	const fileName = file.name;
 	const fileType = file.name.split(".").pop()?.toUpperCase() || "UNKNOWN";
-	const fileSize = formatFileSize(file.size);
+	const formattedFileSize = formatFileSize(file.size);
 
-	return { fileName, fileType, fileSize };
+	return {
+		fileName,
+		fileType,
+		fileSize: {
+			raw: file.size,
+			formatted: formattedFileSize,
+		},
+	};
 };
 
 export { truncateFileName, formatFileSize, getFileDetails };

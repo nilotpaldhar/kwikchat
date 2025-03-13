@@ -11,6 +11,7 @@ import DocumentUploadDialog from "@/components/messenger/chat-input/document-pic
 import { MAX_CHAT_DOCUMENT_FILE_SIZE } from "@/constants/media";
 import { SUPPORTED_DOCUMENT_FILE_MESSAGE_TYPES } from "@/constants/chat-input";
 
+import { readFile } from "@/lib/crop-image";
 import { getFileDetails, formatFileSize, type FileDetails } from "@/utils/general/file";
 
 interface DocumentPickerProps {
@@ -18,6 +19,12 @@ interface DocumentPickerProps {
 	children: React.ReactNode;
 	onConfirmUpload?: (data: ChatDocumentAttachment) => void;
 }
+
+// Utility function to validate document file type
+const isValidDocumentFileType = (
+	fileType: string
+): fileType is (typeof SUPPORTED_DOCUMENT_FILE_MESSAGE_TYPES)[number] =>
+	[...SUPPORTED_DOCUMENT_FILE_MESSAGE_TYPES].includes(fileType as any);
 
 const DocumentPicker = ({ className, children, onConfirmUpload }: DocumentPickerProps) => {
 	const [isPreviewOpen, setIsPreviewOpen] = useState(false);
@@ -41,7 +48,7 @@ const DocumentPicker = ({ className, children, onConfirmUpload }: DocumentPicker
 		// Check if the file exceeds the maximum allowed size
 		if (selectedFile.size > MAX_CHAT_DOCUMENT_FILE_SIZE) {
 			toast.error("Document size too large.", {
-				description: `The selected document is ${fileSize}, exceeding the ${formatFileSize(MAX_CHAT_DOCUMENT_FILE_SIZE)} limit.`,
+				description: `The selected document is ${fileSize.formatted}, exceeding the ${formatFileSize(MAX_CHAT_DOCUMENT_FILE_SIZE)} limit.`,
 				position: "top-right",
 			});
 
@@ -52,7 +59,7 @@ const DocumentPicker = ({ className, children, onConfirmUpload }: DocumentPicker
 		}
 
 		// Check if the selected file type is supported
-		if (!SUPPORTED_DOCUMENT_FILE_MESSAGE_TYPES.includes(fileType)) {
+		if (!isValidDocumentFileType(fileType)) {
 			toast.error("File type not supported.", {
 				description: `The selected file type (${fileType}) is not allowed. Please upload a supported document format: ${SUPPORTED_DOCUMENT_FILE_MESSAGE_TYPES.join(", ")}.`,
 				position: "top-right",
@@ -78,9 +85,23 @@ const DocumentPicker = ({ className, children, onConfirmUpload }: DocumentPicker
 	}, []);
 
 	// Handle confirmation of the document upload
-	const handleConfirmUpload = (caption?: string) => {
-		if (document && onConfirmUpload) onConfirmUpload({ document, caption });
-		setIsPreviewOpen(false);
+	const handleConfirmUpload = async (caption?: string) => {
+		if (!document || !documentDetails) return;
+
+		try {
+			const documentDataUrl = (await readFile(document)) as string | null;
+			if (onConfirmUpload) {
+				onConfirmUpload({
+					document: documentDetails,
+					documentDataUrl,
+					caption,
+				});
+			}
+
+			setIsPreviewOpen(false);
+		} catch (error) {
+			toast.error("Something went wrong");
+		}
 	};
 
 	// Reset file states when preview modal is closed

@@ -1,6 +1,6 @@
 "use client";
 
-import type { ChatAttachmentUploadPayload } from "@/types";
+import type { ChatDocumentAttachment, ChatImageAttachment } from "@/types";
 import { ChatAttachmentTypes } from "@/types";
 
 import { Plus, File, Image } from "lucide-react";
@@ -13,6 +13,9 @@ import DocumentPicker from "@/components/messenger/chat-input/document-picker";
 
 import { cn } from "@/utils/general/cn";
 
+export type ChatAttachmentUploadPayload =
+	| { type: ChatAttachmentTypes.Document; data: ChatDocumentAttachment }
+	| { type: ChatAttachmentTypes.Image; data: ChatImageAttachment[] };
 export type OnAttachmentUpload = (data: ChatAttachmentUploadPayload) => void;
 
 interface AttachmentPopoverProps {
@@ -51,12 +54,9 @@ const AttachmentPopover = ({ className, onAttachmentUpload }: AttachmentPopoverP
 			>
 				<DocumentPicker
 					className={actionBtnClassName}
-					onConfirmUpload={({ caption, document }) => {
+					onConfirmUpload={(data) => {
 						if (onAttachmentUpload)
-							onAttachmentUpload({
-								type: ChatAttachmentTypes.Document,
-								data: { caption, document },
-							});
+							onAttachmentUpload({ type: ChatAttachmentTypes.Document, data });
 					}}
 				>
 					<File size={16} />

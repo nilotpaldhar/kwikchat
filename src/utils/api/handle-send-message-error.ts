@@ -35,6 +35,15 @@ const handleSendPrivateMessageError = (error: SendPrivateMessageError) => {
 				},
 				{ status: 404 }
 			);
+		case SendPrivateMessageError.MessageCreationFailed:
+			return NextResponse.json(
+				{
+					success: false,
+					message:
+						"Message creation failed due to an unexpected error. Please check your connection and try again.",
+				},
+				{ status: 500 }
+			);
 		default:
 			return NextResponse.json(
 				{ success: false, message: "An unexpected error occurred. Please try again later" },
@@ -56,6 +65,15 @@ const handleSendGroupMessageError = (error: SendGroupMessageError) => {
 						"You are not a member of this group and do not have permission to send messages here.",
 				},
 				{ status: 403 }
+			);
+		case SendGroupMessageError.MessageCreationFailed:
+			return NextResponse.json(
+				{
+					success: false,
+					message:
+						"Message creation failed due to an unexpected error. Please check your connection and try again.",
+				},
+				{ status: 500 }
 			);
 		default:
 			return NextResponse.json(

@@ -34,7 +34,7 @@ const createRecentMessage = ({
 		createdAt: new Date(),
 		updatedAt: new Date(),
 		isDeleted: false,
-		imageMessage: null,
+		imageMessage: [],
 		systemMessage: null,
 		textMessage: {
 			id: nanoid(),

@@ -8,7 +8,7 @@ import { pusherServer } from "@/lib/pusher/server";
 
 import { saveMedia } from "@/lib/media";
 import { hasAnyFriendshipWithUser } from "@/lib/friendship";
-import { uploadImage, deleteImageOrFile } from "@/lib/upload";
+import { deleteImageOrFile, uploadGroupIcon } from "@/lib/upload";
 
 import generateConversationLifecycleChannel, {
 	ConversationLifecycle,
@@ -204,30 +204,6 @@ const addGroupConversationMembers = async ({
 };
 
 /**
- * Function to upload a group conversation icon.
- */
-async function uploadGroupConversationIcon({
-	icon,
-	groupId,
-	userId,
-}: {
-	icon: string;
-	groupId?: string;
-	userId: string;
-}) {
-	try {
-		const res = await uploadImage({
-			image: icon,
-			imageName: groupId ? `${groupId}-icon` : `unknown-group-icon`,
-			folder: `${userId}/group-icons`,
-		});
-		return res;
-	} catch (error) {
-		return null;
-	}
-}
-
-/**
  * Function to upload and update group conversation icon.
  */
 const uploadAndUpdateGroupConversationIcon = async ({
@@ -245,7 +221,7 @@ const uploadAndUpdateGroupConversationIcon = async ({
 }): Promise<Media | null> => {
 	try {
 		// Upload the group conversation icon
-		const res = await uploadGroupConversationIcon({
+		const res = await uploadGroupIcon({
 			userId,
 			groupId: conversationId,
 			icon: groupIcon,
@@ -376,7 +352,6 @@ export {
 	createGroupConversation,
 	clearConversation,
 	addGroupConversationMembers,
-	uploadGroupConversationIcon,
 	uploadAndUpdateGroupConversationIcon,
 	updateConversationTimestamp,
 	broadcastConversation,

@@ -28,7 +28,7 @@ interface ChatInputProps {
 		emojiButtonClassName?: string;
 		submitButtonClassName?: string;
 	};
-	onSubmit?: (message: string) => void;
+	onTextSubmit?: (textMessage: string) => void;
 	onAttachmentUpload?: OnAttachmentUpload;
 }
 
@@ -39,7 +39,7 @@ const ChatInput = ({
 	emojiPicker = true,
 	className,
 	classNames,
-	onSubmit,
+	onTextSubmit,
 	onAttachmentUpload,
 }: ChatInputProps) => {
 	const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -81,7 +81,7 @@ const ChatInput = ({
 
 		// Reset textarea height and submit the message
 		resizeTextarea(true);
-		if (onSubmit) onSubmit(trimmedMessage);
+		if (onTextSubmit) onTextSubmit(trimmedMessage);
 		setMessage(""); // Clear message after submission
 	};
 

@@ -1,7 +1,7 @@
 // Enum to represent the type of a file.
 enum FileType {
     image
-    video
+    document
 }
 
 // The Media model represents a piece of media such as images, videos, or other files
@@ -16,7 +16,9 @@ model Media {
     height       Int?
     width        Int?
     thumbnailUrl String?
+    caption      String?
 
-    groupDetails GroupDetails?
-    imageMessage ImageMessage?
+    groupDetails    GroupDetails?
+    documentMessage DocumentMessage?
+    imageMessage    ImageMessage?
 }

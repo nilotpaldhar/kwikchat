@@ -1,12 +1,14 @@
 import "client-only";
 
-import type { MessageReaction, MessageReactionType } from "@prisma/client";
+import type { MessageReaction, MessageReactionType, MessageType } from "@prisma/client";
 import type {
 	APIResponse,
 	CompleteMessage,
 	PaginatedResponse,
 	MessageSeenMembers,
 	UserProfile,
+	ChatDocumentAttachment,
+	ChatImageAttachment,
 } from "@/types";
 
 import axios, { handleAxiosError } from "@/lib/axios";
@@ -68,16 +70,18 @@ const fetchStarredMessages = async ({
  */
 const sendMessage = async ({
 	conversationId,
-	message,
+	messageType,
+	data,
 }: {
 	conversationId: string;
-	message: string;
 	sender: UserProfile;
+	messageType: MessageType;
+	data: string | ChatDocumentAttachment | ChatImageAttachment[];
 }) => {
 	try {
 		const res = await axios.post<APIResponse<CompleteMessage>>(
 			`/conversations/${conversationId}/messages`,
-			{ message }
+			{ messageType, message: data }
 		);
 		return res.data;
 	} catch (error) {

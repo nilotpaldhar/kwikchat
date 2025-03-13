@@ -36,13 +36,13 @@ const EditMessageDialog = () => {
 	const isDialogOpen = isOpen && type === "EDIT_MESSAGE";
 	const message = data.messageToEdit;
 
-	const onSubmit = (updatedMsg: string) => {
+	const onSubmit = (updatedTxtMsg: string) => {
 		if (!message) return;
 
 		mutate({
 			conversationId: message.conversationId,
 			messageId: message.messageId,
-			message: updatedMsg,
+			message: updatedTxtMsg,
 		});
 		onClose();
 	};
@@ -66,7 +66,7 @@ const EditMessageDialog = () => {
 		<ChatInput
 			attachment={false}
 			emojiPicker={false}
-			onSubmit={(updatedMsg) => onSubmit(updatedMsg)}
+			onTextSubmit={(textMessage) => onSubmit(textMessage)}
 		/>
 	);
 

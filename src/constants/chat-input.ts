@@ -10,11 +10,14 @@ export const MAX_INPUT_SIZE = MAX_INPUT_CONTAINER_SIZE - INPUT_CONTAINER_SPACEY 
 // Maximum number of characters allowed per message
 export const MAX_MESSAGE_CHAR_LENGTH = 500;
 
+// Maximum number of characters allowed per message caption
+export const MAX_MESSAGE_CAPTION_CHAR_LENGTH = 200;
+
 // Supported file types for document uploads
-export const SUPPORTED_DOCUMENT_FILE_MESSAGE_TYPES = ["PDF", "TXT", "DOC", "DOCX"];
+export const SUPPORTED_DOCUMENT_FILE_MESSAGE_TYPES = ["PDF", "TXT", "DOC", "DOCX"] as const;
 
 // Supported image types for image uploads
-export const SUPPORTED_IMAGE_FILE_MESSAGE_TYPES = ["PNG", "JPG", "JPEG", "GIF"];
+export const SUPPORTED_IMAGE_FILE_MESSAGE_TYPES = ["PNG", "JPG", "JPEG", "GIF"] as const;
 
 // Maximum number of images a user can select in the chat input
 export const MAX_IMAGE_SELECTION_LIMIT = 10;

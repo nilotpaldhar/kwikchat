@@ -1,7 +1,7 @@
 import { type NextRequest, NextResponse } from "next/server";
 import type { CompleteMessage } from "@/types";
 
-import { TextMessageSchema } from "@/schemas";
+import { MessagePayloadSchema } from "@/schemas";
 
 import { prisma } from "@/lib/db";
 
@@ -88,21 +88,13 @@ export async function POST(req: NextRequest, { params }: { params: Params }) {
 	// Parse the request body to extract the message content
 	const body = await req.json();
 
-	// Validate the incoming message content against the TextMessageSchema
-	const validatedFields = TextMessageSchema.safeParse(body);
+	// Validate the incoming message content against the MessagePayloadSchema
+	const validatedFields = MessagePayloadSchema.safeParse(body);
 	if (!validatedFields.success) {
-		// If validation fails, return a 400 error with the first validation error or a default message
-		return NextResponse.json(
-			{
-				success: false,
-				// eslint-disable-next-line no-underscore-dangle
-				message: validatedFields.error.format().message?._errors[0] ?? "Invalid Fields",
-			},
-			{ status: 400 }
-		);
+		return NextResponse.json({ success: false, message: `Invalid Fields` }, { status: 400 });
 	}
 
-	// Retrieve the current user from the session (with authentication required)
+	// Retrieve the current user from the session
 	const currentUser = await getCurrentUser(true);
 
 	// Check if the current user is authenticated. If not, respond with an unauthorized status.
@@ -116,7 +108,7 @@ export async function POST(req: NextRequest, { params }: { params: Params }) {
 	// Set variables for the sender's ID, the conversation ID from params, and the validated message content
 	const senderId = currentUser.id;
 	const conversationId = params.conversationId;
-	const messageContent = validatedFields.data.message;
+	const messagePayload = validatedFields.data;
 
 	try {
 		// Attempt to find the conversation, ensuring that the current user is a member
@@ -137,12 +129,12 @@ export async function POST(req: NextRequest, { params }: { params: Params }) {
 			);
 		}
 
-		// Handle sending a group message if the conversation is marked as a group
+		// Attempt to send a group message if the conversation is marked as a group
 		if (conversation.isGroup) {
 			const { message, receiverIds, error } = await sendGroupMessage({
 				conversation,
-				messageContent,
 				senderId,
+				messagePayload,
 			});
 
 			// If there was an error while sending the message, handle it and respond accordingly
@@ -177,8 +169,8 @@ export async function POST(req: NextRequest, { params }: { params: Params }) {
 		// Attempt to send a private message in non-group conversations
 		const { message, receiverId, error } = await sendPrivateMessage({
 			conversation,
-			messageContent,
 			senderId,
+			messagePayload,
 		});
 
 		// Handle any errors that occurred while sending the private message
