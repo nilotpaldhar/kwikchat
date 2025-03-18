@@ -11,6 +11,8 @@ import {
 } from "@/constants/chat-input";
 import { MAX_CHAT_DOCUMENT_FILE_SIZE, MAX_CHAT_IMAGE_FILE_SIZE } from "@/constants/media";
 
+export type MessagePayloadSchemaType = z.infer<typeof MessagePayloadSchema>;
+
 export const DocumentFileSizeSchema = z.object({
 	raw: z.number().max(
 		MAX_CHAT_DOCUMENT_FILE_SIZE,

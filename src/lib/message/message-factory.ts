@@ -98,7 +98,6 @@ const createDocumentMessage = async ({
 				height: attachment.height,
 				width: attachment.width,
 				thumbnailUrl: attachment.thumbnailUrl,
-				caption: payload.caption,
 			},
 		});
 
@@ -112,7 +111,13 @@ const createDocumentMessage = async ({
 				senderId: userId,
 				type: "document",
 				documentMessage: {
-					create: { mediaId: media.id },
+					create: {
+						fileName: payload.document.fileName,
+						fileType: payload.document.fileType,
+						fileSizeBytes: payload.document.fileSize.raw,
+						caption: payload.caption,
+						mediaId: media.id,
+					},
 				},
 			},
 			include: MESSAGE_INCLUDE,

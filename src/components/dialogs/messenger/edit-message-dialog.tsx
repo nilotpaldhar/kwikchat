@@ -50,7 +50,7 @@ const EditMessageDialog = () => {
 	const renderMessageContent = () => (
 		<div className="flex justify-center">
 			<div className="flex flex-col space-y-2">
-				<div className="max-w-56 rounded-xl rounded-tr-none bg-primary-400 px-4 py-3 text-sm leading-6 text-neutral-50 shadow-md sm:max-w-xs lg:max-w-md xl:max-w-xl 3xl:max-w-3xl">
+				<div className="max-w-56 whitespace-pre-line rounded-xl rounded-tr-none bg-primary-400 px-4 py-3 text-sm leading-6 text-neutral-50 shadow-md sm:max-w-xs lg:max-w-md xl:max-w-xl 3xl:max-w-3xl">
 					{message?.content}
 				</div>
 				<div className="flex items-center justify-end px-1">

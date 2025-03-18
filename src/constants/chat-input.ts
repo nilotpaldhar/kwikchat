@@ -11,9 +11,10 @@ export const MAX_INPUT_SIZE = MAX_INPUT_CONTAINER_SIZE - INPUT_CONTAINER_SPACEY 
 export const MAX_MESSAGE_CHAR_LENGTH = 500;
 
 // Maximum number of characters allowed per message caption
-export const MAX_MESSAGE_CAPTION_CHAR_LENGTH = 200;
+export const MAX_MESSAGE_CAPTION_CHAR_LENGTH = 80;
 
 // Supported file types for document uploads
+// NOTE: If adding more file types, update the `DocumentIcon` component accordingly.
 export const SUPPORTED_DOCUMENT_FILE_MESSAGE_TYPES = ["PDF", "TXT", "DOC", "DOCX"] as const;
 
 // Supported image types for image uploads

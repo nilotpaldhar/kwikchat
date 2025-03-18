@@ -7,8 +7,8 @@
 import "server-only";
 
 import type { CompleteMessage, ConversationWithMembers } from "@/types";
+import type { MessagePayloadSchemaType } from "@/schemas";
 
-import * as z from "zod";
 import { pusherServer } from "@/lib/pusher/server";
 
 import { isBlocked } from "@/lib/block";
@@ -16,11 +16,8 @@ import { areUsersFriends } from "@/lib/friendship";
 import { createMessage } from "@/lib/message/message-factory";
 import { updateConversationTimestamp, restoreDeletedConversation } from "@/lib/conversation";
 
-import { MessagePayloadSchema } from "@/schemas";
 import generateChatMessagingChannel from "@/utils/pusher/generate-chat-messaging-channel";
 import transformMessageSeenAndStarStatus from "@/utils/messenger/transform-message-seen-and-star-status";
-
-export type MessagePayloadSchemaType = z.infer<typeof MessagePayloadSchema>;
 
 export enum SendPrivateMessageError {
 	ReceiverNotFound = "ReceiverNotFound",

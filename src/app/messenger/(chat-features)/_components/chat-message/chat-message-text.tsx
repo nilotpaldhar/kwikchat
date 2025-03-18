@@ -19,7 +19,7 @@ const ChatMessageText = ({ isSender, content, className }: ChatMessageTextProps)
 		)}
 	>
 		<div className={cn("flex items-center")}>
-			<div className="flex-1">{content}</div>
+			<div className="flex-1 whitespace-pre-line">{content}</div>
 		</div>
 	</div>
 );

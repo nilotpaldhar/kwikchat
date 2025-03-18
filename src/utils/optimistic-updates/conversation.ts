@@ -1,5 +1,6 @@
 import "client-only";
 
+import { MessageType } from "@prisma/client";
 import type { InfiniteData, QueryClient } from "@tanstack/react-query";
 import type {
 	APIResponse,
@@ -8,44 +9,88 @@ import type {
 	ConversationWithMetadata,
 	RecentMessage,
 } from "@/types";
-
-import { nanoid } from "nanoid";
+import type { MessagePayloadSchemaType } from "@/schemas";
 
 import { messageKeys, conversationKeys } from "@/constants/tanstack-query";
 
+import { generateTempId } from "@/utils/general/temp-id-generator";
+import { getInfiniteQueryData } from "@/utils/tanstack-query-cache/helpers";
 import { updateConversationRecentMessage } from "@/utils/tanstack-query-cache/conversation";
 
-import { getInfiniteQueryData } from "@/utils/tanstack-query-cache/helpers";
-
-const createRecentMessage = ({
+const generateTempRecentMessage = ({
 	conversationId,
 	senderId,
-	message,
+	messagePayload,
 }: {
 	conversationId: string;
 	senderId: string;
-	message: string;
-}) => {
-	const newRecentMessage: RecentMessage = {
-		id: nanoid(),
+	messagePayload: MessagePayloadSchemaType;
+}): RecentMessage => {
+	const tempRecentMsgId = generateTempId();
+	const messageType = messagePayload.messageType;
+
+	// Function to generate text message
+	const createTextMessage = () => {
+		if (messageType === MessageType.text) {
+			return {
+				id: generateTempId(),
+				messageId: tempRecentMsgId,
+				content: messagePayload.message,
+				createdAt: new Date(),
+				updatedAt: new Date(),
+			};
+		}
+
+		return null;
+	};
+
+	// Function to generate document message
+	const createDocumentMessage = () => {
+		if (messageType === MessageType.document) {
+			return {
+				id: generateTempId(),
+				fileName: messagePayload.message.document.fileName,
+				fileType: messagePayload.message.document.fileType,
+				fileSizeBytes: messagePayload.message.document.fileSize.raw,
+				caption: messagePayload.message.caption ?? null,
+				createdAt: new Date(),
+				updatedAt: new Date(),
+				messageId: tempRecentMsgId,
+				mediaId: generateTempId(),
+			};
+		}
+
+		return null;
+	};
+
+	// Function to generate image message
+	const createImageMessage = () => {
+		if (messageType === MessageType.image) {
+			return messagePayload.message.map(() => ({
+				id: generateTempId(),
+				createdAt: new Date(),
+				updatedAt: new Date(),
+				messageId: tempRecentMsgId,
+				mediaId: generateTempId(),
+			}));
+		}
+
+		return [];
+	};
+
+	return {
+		id: tempRecentMsgId,
 		conversationId,
-		type: "text",
+		type: messageType,
 		senderId,
 		createdAt: new Date(),
 		updatedAt: new Date(),
 		isDeleted: false,
-		imageMessage: [],
 		systemMessage: null,
-		textMessage: {
-			id: nanoid(),
-			messageId: nanoid(),
-			content: message,
-			createdAt: new Date(),
-			updatedAt: new Date(),
-		},
+		textMessage: createTextMessage(),
+		imageMessage: createImageMessage(),
+		documentMessage: createDocumentMessage(),
 	};
-
-	return newRecentMessage;
 };
 
 const optimisticClearConversation = async ({
@@ -88,17 +133,16 @@ const optimisticClearConversation = async ({
 
 const optimisticUpdateConversationRecentMsg = async ({
 	conversationId,
-	message,
 	senderId,
+	messagePayload,
 	queryClient,
 }: {
 	conversationId: string;
-	message: string;
 	senderId: string;
+	messagePayload?: MessagePayloadSchemaType;
+
 	queryClient: QueryClient;
 }) => {
-	const newRecentMessage = createRecentMessage({ conversationId, senderId, message });
-
 	await queryClient.cancelQueries({ queryKey: conversationKeys.filtered("all") });
 	await queryClient.cancelQueries({ queryKey: conversationKeys.filtered("group") });
 	await queryClient.cancelQueries({ queryKey: conversationKeys.filtered("unread") });
@@ -118,7 +162,10 @@ const optimisticUpdateConversationRecentMsg = async ({
 		queryClient,
 	});
 
-	updateConversationRecentMessage({ message: newRecentMessage, queryClient });
+	if (!messagePayload) return { conversationData, groupConversationData, unreadConversationData };
+
+	const tempRecentMessage = generateTempRecentMessage({ conversationId, senderId, messagePayload });
+	updateConversationRecentMessage({ message: tempRecentMessage, queryClient });
 
 	return { conversationData, groupConversationData, unreadConversationData };
 };

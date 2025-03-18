@@ -8,8 +8,6 @@ import { MessageCaptionSchema } from "@/schemas";
 import useMediaQuery from "@/hooks/use-media-query";
 import { type FileDetails, truncateFileName } from "@/utils/general/file";
 
-import { File, FileText } from "lucide-react";
-
 import {
 	Form,
 	FormControl,
@@ -40,6 +38,7 @@ import {
 } from "@/components/ui/drawer";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import DocumentIcon from "@/components/messenger/document-icon";
 
 interface DocumentUploadDialogProps {
 	open?: boolean;
@@ -78,7 +77,7 @@ const DocumentUploadDialog = ({
 		<div className="rounded-xl bg-surface-light-200 px-4 py-8 dark:bg-surface-dark-300">
 			<div className="flex w-full flex-col items-center space-y-6">
 				<div className="flex justify-center text-neutral-900 dark:text-neutral-200">
-					{documentDetails?.fileType === "TXT" ? <FileText size={80} /> : <File size={80} />}
+					<DocumentIcon fileType={documentDetails?.fileType} size={80} />
 				</div>
 
 				<div className="space-y-1 text-center">

@@ -102,7 +102,7 @@ export interface MessageWithUserID extends Message {
 export interface RecentMessage extends Message {
 	textMessage: TextMessage | null;
 	imageMessage: ImageMessage[];
-	// documentMessage: DocumentMessage | null;
+	documentMessage: DocumentMessage | null;
 	systemMessage: SystemMessage | null;
 }
 

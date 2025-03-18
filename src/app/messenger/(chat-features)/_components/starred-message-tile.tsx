@@ -6,6 +6,10 @@ import { useMemo } from "react";
 import { format } from "date-fns";
 
 import UserAvatar from "@/components/user/user-avatar";
+import {
+	ChatMessageText,
+	ChatMessageDocument,
+} from "@/app/messenger/(chat-features)/_components/chat-message";
 
 import useCurrentUser from "@/hooks/tanstack-query/use-current-user";
 
@@ -22,6 +26,7 @@ const StarredMessageTile = ({ message }: StarredMessageTileProps) => {
 
 	const { id: senderId, username, avatar, displayName } = message.sender;
 	const fallback = displayName ? displayName.charAt(0) : username?.charAt(0);
+	const isSender = currentUserId === senderId;
 
 	const formattedDate = useMemo(
 		() => formatDateBasedOnRecency(new Date(message.createdAt), false),
@@ -48,16 +53,21 @@ const StarredMessageTile = ({ message }: StarredMessageTileProps) => {
 			<div className="flex flex-col space-y-2">
 				<div className="pl-6">
 					{message.type === "text" && (
-						<div
+						<ChatMessageText
+							isSender={isSender}
+							content={message.textMessage?.content ?? ""}
+							className="!max-w-full !rounded-tl-none !rounded-tr-xl"
+						/>
+					)}
+					{message.type === "document" && (
+						<ChatMessageDocument
+							isSender={isSender}
+							content={message.documentMessage}
 							className={cn(
-								"message-pill !max-w-full !rounded-tl-none",
-								currentUserId === senderId
-									? "bg-primary-400 text-neutral-50"
-									: "bg-surface-light-100 dark:bg-surface-dark-300"
+								"!w-full !rounded-tl-none !rounded-tr-xl",
+								!isSender && "dark:bg-surface-dark-300"
 							)}
-						>
-							{message.textMessage?.content}
-						</div>
+						/>
 					)}
 				</div>
 

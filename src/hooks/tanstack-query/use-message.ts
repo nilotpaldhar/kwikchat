@@ -24,7 +24,7 @@ import {
 } from "@/services/message";
 
 import {
-	// optimisticSendPrivateMessage,
+	optimisticSendPrivateMessage,
 	optimisticUpdatePrivateTextMessage,
 	optimisticCreateMessageReaction,
 	optimisticUpdateMessageReaction,
@@ -35,11 +35,11 @@ import {
 	refetchOptimisticPrivateMessages,
 	optimisticStarredMessageError,
 } from "@/utils/optimistic-updates/message";
-// import {
-// 	optimisticUpdateConversationRecentMsg,
-// 	optimisticUpdateConversationRecentMsgError,
-// 	refetchOptimisticConversation,
-// } from "@/utils/optimistic-updates/conversation";
+import {
+	optimisticUpdateConversationRecentMsg,
+	optimisticUpdateConversationRecentMsgError,
+	refetchOptimisticConversation,
+} from "@/utils/optimistic-updates/conversation";
 import {
 	prependConversationMessage,
 	updateMessagesSeenMembers,
@@ -50,6 +50,7 @@ import {
 } from "@/utils/tanstack-query-cache/message";
 
 import generateChatMessagingChannel from "@/utils/pusher/generate-chat-messaging-channel";
+import { MessagePayloadSchema } from "@/schemas";
 
 /**
  * Custom hook for fetching private messages in a conversation using infinite scrolling.
@@ -152,7 +153,6 @@ const useStarredMessagesQuery = ({ conversationId }: { conversationId: string })
  * handling errors, and refetching data after the mutation settles.
  */
 const useSendMessage = () => {
-	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	const queryClient = useQueryClient();
 
 	return useMutation({
@@ -160,39 +160,46 @@ const useSendMessage = () => {
 		mutationFn: sendMessage,
 
 		// Optimistically updates the message list before the mutation occurs.
-		// onMutate: async ({ conversationId, sender, message }) => {
-		// 	const [messageData, conversationData] = await Promise.all([
-		// 		optimisticSendPrivateMessage({ conversationId, sender, message, queryClient }),
-		// 		optimisticUpdateConversationRecentMsg({
-		// 			conversationId,
-		// 			senderId: sender.id,
-		// 			message,
-		// 			queryClient,
-		// 		}),
-		// 	]);
+		onMutate: async ({ conversationId, sender, messageType, data }) => {
+			const { success, data: messagePayload } = MessagePayloadSchema.safeParse({
+				messageType,
+				message: data,
+			});
 
-		// 	return { ...messageData, ...conversationData };
-		// },
+			if (!success) return {};
+
+			const [messageData, conversationData] = await Promise.all([
+				optimisticSendPrivateMessage({ conversationId, sender, messagePayload, queryClient }),
+				optimisticUpdateConversationRecentMsg({
+					conversationId,
+					senderId: sender.id,
+					messagePayload,
+					queryClient,
+				}),
+			]);
+
+			return { ...messageData, ...conversationData };
+		},
 
 		// Handles any error that occurs during the message sending mutation.
-		// onError: (error, { conversationId }, context) => {
-		// 	optimisticPrivateMessageError({ conversationId, context, queryClient });
-		// 	optimisticUpdateConversationRecentMsgError({ context, queryClient });
-		// 	toast.error(error.message);
-		// },
+		onError: (error, { conversationId }, context) => {
+			optimisticPrivateMessageError({ conversationId, context, queryClient });
+			optimisticUpdateConversationRecentMsgError({ context, queryClient });
+			toast.error(error.message);
+		},
 
 		// Called once the mutation is either successful or fails.
-		// onSettled: (_data, _error, { conversationId }) => {
-		// 	refetchOptimisticPrivateMessages({
-		// 		conversationId,
-		// 		queryClient,
-		// 	});
-		// 	refetchOptimisticConversation({
-		// 		conversationId,
-		// 		opsType: "send_message",
-		// 		queryClient,
-		// 	});
-		// },
+		onSettled: (_data, _error, { conversationId }) => {
+			refetchOptimisticPrivateMessages({
+				conversationId,
+				queryClient,
+			});
+			refetchOptimisticConversation({
+				conversationId,
+				opsType: "send_message",
+				queryClient,
+			});
+		},
 	});
 };
 

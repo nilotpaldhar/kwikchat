@@ -1,15 +1,18 @@
 "use client";
 
+import { MessageType } from "@prisma/client";
 import type { CompleteMessage } from "@/types";
 import type { ReactionClickData } from "@/app/messenger/(chat-features)/_components/chat-message/chat-message-reaction-button";
 
 import { useMemo } from "react";
 import { format } from "date-fns";
+import { toast } from "sonner";
 
 import {
 	ChatMessage,
 	ChatMessageText,
 	ChatMessageImage,
+	ChatMessageDocument,
 	ChatMessageSystem,
 	ChatMessageDeleted,
 } from "@/app/messenger/(chat-features)/_components/chat-message";
@@ -100,6 +103,13 @@ const ChatMessageFactory = ({ message, currentUserId }: ChatMessageFactoryProps)
 	 * Opens the edit message dialog with the current message data.
 	 */
 	const handleEdit = () => {
+		if (message.type !== MessageType.text) {
+			toast.error("Unable to Edit", {
+				description: "You can only edit text messages. Other message types cannot be modified.",
+			});
+			return;
+		}
+
 		openMessageDialog("EDIT_MESSAGE", {
 			messageToEdit: {
 				messageId: message.id,
@@ -137,12 +147,17 @@ const ChatMessageFactory = ({ message, currentUserId }: ChatMessageFactoryProps)
 			onEdit={handleEdit}
 			onDelete={handleDelete}
 		>
-			{message.type === "text" && <ChatMessageText isSender={isSender} content={content} />}
-			{message.type === "image" && <ChatMessageImage isSender={isSender} />}
-			{message.type === "system" && (
+			{message.type === MessageType.text ? (
+				<ChatMessageText isSender={isSender} content={content} />
+			) : null}
+			{message.type === MessageType.image ? <ChatMessageImage isSender={isSender} /> : null}
+			{message.type === MessageType.document ? (
+				<ChatMessageDocument isSender={isSender} content={message.documentMessage} />
+			) : null}
+			{message.type === MessageType.system ? (
 				<ChatMessageSystem isSender={isSender} content={message.systemMessage?.content ?? ""} />
-			)}
-			{message.type === "deleted" && <ChatMessageDeleted isSender={isSender} />}
+			) : null}
+			{message.type === MessageType.deleted ? <ChatMessageDeleted isSender={isSender} /> : null}
 		</ChatMessage>
 	);
 };

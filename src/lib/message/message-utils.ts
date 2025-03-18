@@ -145,6 +145,11 @@ const deleteMessage = async ({
 					where: { messageId: message.id },
 				}),
 
+				// Delete the document content of the message.
+				prisma.documentMessage.deleteMany({
+					where: { messageId: message.id },
+				}),
+
 				// Remove the message from the user's starred messages.
 				prisma.starredMessage.deleteMany({
 					where: { messageId: message.id, userId },

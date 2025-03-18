@@ -177,7 +177,11 @@ model SystemMessage {
 
 // The DocumentMessage model represents an document message.
 model DocumentMessage {
-    id String @id @default(cuid())
+    id            String  @id @default(cuid())
+    fileName      String?
+    fileType      String?
+    fileSizeBytes Int?
+    caption       String?
 
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt

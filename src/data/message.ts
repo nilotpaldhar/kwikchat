@@ -58,6 +58,7 @@ export const RECENT_MESSAGE_INCLUDE = {
 	textMessage: true,
 	imageMessage: true,
 	systemMessage: true,
+	documentMessage: true,
 } satisfies Prisma.MessageInclude;
 
 /**
