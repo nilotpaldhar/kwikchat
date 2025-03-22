@@ -57,7 +57,7 @@ const ChatMessage = ({
 			role="button"
 			aria-label="Chat message with actions"
 			className={cn(
-				"flex focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neutral-500 dark:focus-visible:ring-neutral-600",
+				"flex cursor-default focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neutral-500 dark:focus-visible:ring-neutral-600",
 				isSender ? "justify-end" : "justify-start",
 				className
 			)}

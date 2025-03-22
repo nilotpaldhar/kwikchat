@@ -83,3 +83,19 @@ export const groupMemberKeys = {
 	base: ["group_members"] as const,
 	all: (conversationId: string) => [...groupMemberKeys.base, "all", conversationId] as const,
 };
+
+/**
+ * Message media query keys
+ *
+ * Contains keys used to uniquely identify queries related to media attachments in messages.
+ */
+export const messageMediaKeys = {
+	base: ["message_media"] as const,
+
+	// Key for fetching all media attachments in a conversation
+	all: (conversationId: string) => [...messageMediaKeys.base, "all", conversationId] as const,
+
+	// Key for fetching media attachments from a specific message
+	forMessage: (conversationId: string, messageId: string) =>
+		[...messageMediaKeys.base, "for_message", conversationId, messageId] as const,
+};

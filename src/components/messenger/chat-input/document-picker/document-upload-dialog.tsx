@@ -87,7 +87,7 @@ const DocumentUploadDialog = ({
 					>
 						{truncatedFileName}
 					</h4>
-					<p className="flex items-center space-x-1 text-sm font-medium uppercase text-neutral-500 dark:text-neutral-400">
+					<p className="flex items-center justify-center space-x-1 text-sm font-medium uppercase text-neutral-500 dark:text-neutral-400">
 						<span>{documentDetails?.fileSize.formatted ?? "Unknown"}</span>
 						<span>-</span>
 						<span>{documentDetails?.fileType ?? "Unknown"}</span>

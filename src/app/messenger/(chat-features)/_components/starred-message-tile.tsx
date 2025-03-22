@@ -1,5 +1,6 @@
 "use client";
 
+import { MessageType } from "@prisma/client";
 import type { CompleteMessage } from "@/types";
 
 import { useMemo } from "react";
@@ -9,6 +10,7 @@ import UserAvatar from "@/components/user/user-avatar";
 import {
 	ChatMessageText,
 	ChatMessageDocument,
+	ChatMessageImage,
 } from "@/app/messenger/(chat-features)/_components/chat-message";
 
 import useCurrentUser from "@/hooks/tanstack-query/use-current-user";
@@ -52,17 +54,31 @@ const StarredMessageTile = ({ message }: StarredMessageTileProps) => {
 			</div>
 			<div className="flex flex-col space-y-2">
 				<div className="pl-6">
-					{message.type === "text" && (
+					{message.type === MessageType.text && (
 						<ChatMessageText
 							isSender={isSender}
-							content={message.textMessage?.content ?? ""}
+							messageContent={message.textMessage?.content ?? ""}
 							className="!max-w-full !rounded-tl-none !rounded-tr-xl"
 						/>
 					)}
-					{message.type === "document" && (
+					{message.type === MessageType.document && (
 						<ChatMessageDocument
+							conversationId={message.conversationId}
+							messageId={message.id}
 							isSender={isSender}
-							content={message.documentMessage}
+							attachment={message.documentMessage}
+							className={cn(
+								"!w-full !rounded-tl-none !rounded-tr-xl",
+								!isSender && "dark:bg-surface-dark-300"
+							)}
+						/>
+					)}
+					{message.type === MessageType.image && (
+						<ChatMessageImage
+							conversationId={message.conversationId}
+							messageId={message.id}
+							isSender={isSender}
+							attachments={message.imageMessage}
 							className={cn(
 								"!w-full !rounded-tl-none !rounded-tr-xl",
 								!isSender && "dark:bg-surface-dark-300"

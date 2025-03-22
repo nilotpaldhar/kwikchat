@@ -114,7 +114,7 @@ const createDocumentMessage = async ({
 					create: {
 						fileName: payload.document.fileName,
 						fileType: payload.document.fileType,
-						fileSizeBytes: payload.document.fileSize.raw,
+						fileSize: payload.document.fileSize.raw,
 						caption: payload.caption,
 						mediaId: media.id,
 					},
@@ -200,7 +200,6 @@ const createImageMessage = async ({
 					height: attachment.height,
 					width: attachment.width,
 					thumbnailUrl: attachment.thumbnailUrl,
-					caption: attachment.caption,
 				}));
 
 				// Step 3: Insert media records in bulk
@@ -214,7 +213,12 @@ const createImageMessage = async ({
 
 				// Step 5: Create ImageMessage entries linking the message to the media
 				await tx.imageMessage.createMany({
-					data: createdMedia.map((media) => ({
+					data: createdMedia.map((media, idx) => ({
+						fileName: payload[idx].image.fileName,
+						fileType: payload[idx].image.fileType,
+						caption: payload[idx].caption,
+						fileSize: media.size,
+						tempDataUrl: null,
 						messageId: createdMessage.id,
 						mediaId: media.id,
 					})),

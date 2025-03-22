@@ -16,7 +16,6 @@ model Media {
     height       Int?
     width        Int?
     thumbnailUrl String?
-    caption      String?
 
     groupDetails    GroupDetails?
     documentMessage DocumentMessage?

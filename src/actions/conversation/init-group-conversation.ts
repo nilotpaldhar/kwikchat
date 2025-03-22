@@ -53,7 +53,6 @@ const initGroupConversation = async (values: z.infer<typeof NewGroupSchema>) => 
 				height: res.height ?? null,
 				width: res.width ?? null,
 				thumbnailUrl: res.thumbnailUrl ?? null,
-				caption: "",
 			};
 		}
 

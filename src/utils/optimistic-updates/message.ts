@@ -56,7 +56,7 @@ const generateTempMessage = ({
 				id: generateTempId(),
 				fileName: messagePayload.message.document.fileName,
 				fileType: messagePayload.message.document.fileType,
-				fileSizeBytes: messagePayload.message.document.fileSize.raw,
+				fileSize: messagePayload.message.document.fileSize.raw,
 				caption: messagePayload.message.caption ?? null,
 				createdAt: new Date(),
 				updatedAt: new Date(),
@@ -71,8 +71,13 @@ const generateTempMessage = ({
 	// Function to generate image message
 	const createImageMessage = () => {
 		if (messageType === MessageType.image) {
-			return messagePayload.message.map(() => ({
+			return messagePayload.message.map((message) => ({
 				id: generateTempId(),
+				fileName: message.image.fileName,
+				fileType: message.image.fileType,
+				fileSize: message.image.fileSize.raw,
+				caption: message.caption ?? null,
+				tempDataUrl: message.imageDataUrl,
 				createdAt: new Date(),
 				updatedAt: new Date(),
 				messageId: tempMessageId,

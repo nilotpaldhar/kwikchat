@@ -148,11 +148,23 @@ const ChatMessageFactory = ({ message, currentUserId }: ChatMessageFactoryProps)
 			onDelete={handleDelete}
 		>
 			{message.type === MessageType.text ? (
-				<ChatMessageText isSender={isSender} content={content} />
+				<ChatMessageText isSender={isSender} messageContent={content} />
 			) : null}
-			{message.type === MessageType.image ? <ChatMessageImage isSender={isSender} /> : null}
+			{message.type === MessageType.image ? (
+				<ChatMessageImage
+					conversationId={message.conversationId}
+					messageId={message.id}
+					isSender={isSender}
+					attachments={message.imageMessage}
+				/>
+			) : null}
 			{message.type === MessageType.document ? (
-				<ChatMessageDocument isSender={isSender} content={message.documentMessage} />
+				<ChatMessageDocument
+					conversationId={message.conversationId}
+					messageId={message.id}
+					isSender={isSender}
+					attachment={message.documentMessage}
+				/>
 			) : null}
 			{message.type === MessageType.system ? (
 				<ChatMessageSystem isSender={isSender} content={message.systemMessage?.content ?? ""} />

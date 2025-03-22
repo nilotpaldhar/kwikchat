@@ -152,6 +152,12 @@ model TextMessage {
 model ImageMessage {
     id String @id @default(cuid())
 
+    fileName    String?
+    fileType    String?
+    fileSize    Int?
+    caption     String?
+    tempDataUrl String?
+
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
 
@@ -177,11 +183,12 @@ model SystemMessage {
 
 // The DocumentMessage model represents an document message.
 model DocumentMessage {
-    id            String  @id @default(cuid())
-    fileName      String?
-    fileType      String?
-    fileSizeBytes Int?
-    caption       String?
+    id String @id @default(cuid())
+
+    fileName String?
+    fileType String?
+    fileSize Int?
+    caption  String?
 
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
