@@ -1,4 +1,9 @@
-import type { CompleteMessage, FriendWithFriendship, GroupOverview } from "@/types";
+import type {
+	CompleteMessage,
+	FriendWithFriendship,
+	GroupOverview,
+	ImageMessageWithMedia,
+} from "@/types";
 
 import { create } from "zustand";
 
@@ -16,7 +21,8 @@ export type ModalType =
 	| "EXIT_GROUP"
 	| "DELETE_GROUP"
 	| "BLOCK_FRIEND"
-	| "REMOVE_FRIEND";
+	| "REMOVE_FRIEND"
+	| "IMAGE_GALLERY";
 
 interface DialogData {
 	messageToEdit?: {
@@ -34,6 +40,10 @@ interface DialogData {
 	groupConversationToExit?: { conversationId?: string; name?: string };
 	friendToBlock?: FriendWithFriendship;
 	friendToRemove?: FriendWithFriendship;
+	imageGallery?: {
+		imageMessages: ImageMessageWithMedia[];
+		initialIndex?: number;
+	};
 }
 
 interface MessengerDialogStore {
@@ -45,23 +55,42 @@ interface MessengerDialogStore {
 	onClose: () => void;
 }
 
+/** Returns the initial state of DialogData */
+const getInitialDialogData = (): DialogData => ({
+	messageToEdit: undefined,
+	messageToDelete: undefined,
+	conversationToClear: undefined,
+	conversationToDelete: undefined,
+	conversationToAddMembers: undefined,
+	groupConversationToEdit: undefined,
+	groupConversationToDelete: undefined,
+	groupConversationToExit: undefined,
+	friendToBlock: undefined,
+	friendToRemove: undefined,
+	imageGallery: undefined,
+});
+
 const useMessengerDialogStore = create<MessengerDialogStore>((set) => ({
 	type: null,
 	isOpen: false,
-	data: {},
-	onOpen: (type, data = {}) => set({ isOpen: true, type, data }),
+	data: getInitialDialogData(),
+
+	onOpen: (type, data = {}) =>
+		set((state) => ({
+			...state,
+			isOpen: true,
+			type,
+			data: { ...state.data, ...data },
+		})),
+
 	setOpen: (isOpen) => set({ isOpen }),
+
 	onClose: () =>
-		set({
+		set(() => ({
 			isOpen: false,
-			data: {
-				messageToEdit: undefined,
-				messageToDelete: undefined,
-				conversationToClear: undefined,
-				conversationToAddMembers: undefined,
-				groupConversationToEdit: undefined,
-			},
-		}),
+			type: null,
+			data: getInitialDialogData(),
+		})),
 }));
 
 export default useMessengerDialogStore;

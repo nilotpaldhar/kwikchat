@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 
-import ImagekitProvider from "@/components/providers/imagekit-provider";
 import { Wrapper, WrapperSidePanel } from "@/app/messenger/_components/wrapper";
 import ChatSidePanel from "@/app/messenger/(chat-features)/_components/chat-side-panel";
 
@@ -20,14 +19,12 @@ interface ChatFeaturesLayoutProps {
 }
 
 const ChatFeaturesLayout = ({ children }: ChatFeaturesLayoutProps) => (
-	<ImagekitProvider>
-		<Wrapper className="overflow-hidden">
-			<WrapperSidePanel className="bg-surface-light-100 dark:bg-surface-dark-600">
-				<ChatSidePanel />
-			</WrapperSidePanel>
-			{children}
-		</Wrapper>
-	</ImagekitProvider>
+	<Wrapper className="overflow-hidden">
+		<WrapperSidePanel className="bg-surface-light-100 dark:bg-surface-dark-600">
+			<ChatSidePanel />
+		</WrapperSidePanel>
+		{children}
+	</Wrapper>
 );
 
 export default ChatFeaturesLayout;

@@ -106,6 +106,10 @@ export interface RecentMessage extends Message {
 	systemMessage: SystemMessage | null;
 }
 
+export interface ImageMessageWithMedia extends ImageMessage {
+	media?: Media;
+}
+
 export interface GroupOverview {
 	id: string;
 	name: string;

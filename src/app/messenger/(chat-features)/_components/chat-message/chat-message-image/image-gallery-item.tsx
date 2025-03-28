@@ -4,34 +4,35 @@ import { useState } from "react";
 import { toast } from "sonner";
 
 import Image from "next/image";
-import { IKImage } from "imagekitio-next";
 import { Download, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
+import { cn } from "@/utils/general/cn";
 import downloadFile from "@/utils/general/download-file";
 
 interface ImageGalleryItemProps {
-	imagePath?: string;
 	imageName: string;
 	imageUrl: string;
 	hiddenImageCount: number;
+	isSender: Boolean;
 	hasOverlay?: Boolean;
 	isDownloadable?: Boolean;
+	onClick?: () => void;
 }
 
 const ImageGalleryItem = ({
-	imagePath,
 	imageName,
 	imageUrl,
 	hiddenImageCount,
+	isSender,
 	hasOverlay,
 	isDownloadable = true,
+	onClick = () => {},
 }: ImageGalleryItemProps) => {
 	const [isDownloading, setIsDownloading] = useState(false);
 
 	const handleDownload = async () => {
 		setIsDownloading(true);
-
 		try {
 			await downloadFile({
 				url: imageUrl,
@@ -44,14 +45,48 @@ const ImageGalleryItem = ({
 		}
 	};
 
+	const handleRootKeyDown = (evt: React.KeyboardEvent<HTMLDivElement>) => {
+		if (evt.key === "Enter" || evt.key === " ") {
+			evt.preventDefault();
+			onClick();
+		}
+	};
+
+	const handleDownloadBtnClick = (evt: React.MouseEvent<HTMLButtonElement>) => {
+		evt.stopPropagation();
+		handleDownload();
+	};
+
+	const handleDownloadBtnKeyDown = (evt: React.KeyboardEvent<HTMLButtonElement>) => {
+		if (evt.key === "Enter" || evt.key === " ") {
+			evt.preventDefault();
+			evt.stopPropagation();
+			handleDownload();
+		}
+	};
+
 	return (
-		<div className="group relative aspect-square overflow-hidden rounded-xl">
+		<div
+			tabIndex={0}
+			role="button"
+			aria-label=""
+			onClick={onClick}
+			onKeyDown={handleRootKeyDown}
+			className={cn(
+				"group relative aspect-square overflow-hidden rounded-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2",
+				isSender
+					? "ring-offset-primary-400 focus-visible:ring-neutral-200"
+					: "ring-offset-white focus-visible:ring-neutral-500 dark:ring-offset-surface-dark-400 dark:focus-visible:ring-neutral-600"
+			)}
+		>
 			<div className="relative size-full">
-				{imagePath ? (
-					<IKImage path={imagePath} alt={imageName} fill className="object-cover" />
-				) : (
-					<Image src={imageUrl} alt={imageName} fill className="object-cover" />
-				)}
+				<Image
+					src={imageUrl}
+					alt={imageName}
+					fill
+					sizes="(max-width: 640px) 50vw, (max-width: 1024px) 25vw, (max-width: 1280px) 20vw, 15vw"
+					className="object-cover"
+				/>
 			</div>
 
 			{!hasOverlay && isDownloadable ? (
@@ -60,7 +95,8 @@ const ImageGalleryItem = ({
 						size="icon"
 						variant="outline"
 						disabled={false}
-						onClick={handleDownload}
+						onClick={handleDownloadBtnClick}
+						onKeyDown={handleDownloadBtnKeyDown}
 						className="absolute right-2 top-2 z-10 size-8 rounded-full border-transparent bg-transparent text-white ring-offset-neutral-900 hover:bg-white/10 dark:border-transparent dark:bg-transparent dark:text-white dark:ring-offset-neutral-900 dark:hover:bg-white/10"
 					>
 						{isDownloading ? (

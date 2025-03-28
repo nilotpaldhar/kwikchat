@@ -2,22 +2,27 @@
 
 import type { ImageMessage, Media } from "@prisma/client";
 
+import { useMemo } from "react";
+
 import ErrorAlert from "@/app/messenger/_components/error-alert";
 import ChatMessageImageGallery from "@/app/messenger/(chat-features)/_components/chat-message/chat-message-image/image-gallery";
 import ImageGallerySkeleton from "@/app/messenger/(chat-features)/_components/chat-message/chat-message-image/image-gallery-skeleton";
 
+import useMessengerDialogStore from "@/store/use-messenger-dialog-store";
 import { useMessageMediaAttachmentsQuery } from "@/hooks/tanstack-query/use-media";
+
 import { PLACEHOLDER_CHAT_IMAGE } from "@/constants/media";
 
 import { cn } from "@/utils/general/cn";
 import { isTempId } from "@/utils/general/temp-id-generator";
-import { useMemo } from "react";
+import mergeImageMessagesWithMedia from "@/utils/messenger/merge-image-messages-with-media";
 
 interface ChatMessageImageProps {
 	conversationId: string;
 	messageId: string;
 	isSender: boolean;
 	attachments: ImageMessage[];
+	maxVisibleImages?: number;
 	className?: string;
 }
 
@@ -44,7 +49,6 @@ const getMediaGallery = ({
 	if (isTemp) {
 		return attachments.map((media) => ({
 			id: media.id,
-			imagePath: undefined,
 			imageName: media.fileName ?? "Image",
 			imageUrl: media.tempDataUrl ?? PLACEHOLDER_CHAT_IMAGE,
 		}));
@@ -53,7 +57,6 @@ const getMediaGallery = ({
 	return (
 		fetchedData?.map((media) => ({
 			id: media.id,
-			imagePath: media.filePath,
 			imageName: media.name,
 			imageUrl: media.url,
 		})) ?? []
@@ -65,10 +68,10 @@ const ChatMessageImage = ({
 	messageId,
 	isSender,
 	attachments,
+	maxVisibleImages = 4,
 	className,
 }: ChatMessageImageProps) => {
-	// Maximum number of images displayed in the gallery preview
-	const maxVisibleImages = 4;
+	const openImageMessageViewerDialog = useMessengerDialogStore().onOpen;
 
 	// Check if the message is temporary (not yet persisted in the database)
 	const isTemp = isTempId(messageId);
@@ -86,6 +89,18 @@ const ChatMessageImage = ({
 		[attachments, isTemp, data]
 	);
 
+	const handleGalleryItemClick = (index: number) => {
+		const media = data?.data;
+		if (isTemp || !media) return;
+
+		openImageMessageViewerDialog("IMAGE_GALLERY", {
+			imageGallery: {
+				imageMessages: mergeImageMessagesWithMedia({ imageMessages: attachments, media }),
+				initialIndex: index,
+			},
+		});
+	};
+
 	// Determine the content to render based on query status
 	let content;
 	if (isLoading) {
@@ -98,8 +113,10 @@ const ChatMessageImage = ({
 		content = (
 			<ChatMessageImageGallery
 				mediaGallery={mediaGallery}
+				isSender={isSender}
 				maxVisibleImages={maxVisibleImages}
 				isDownloadable={!isTemp}
+				onGalleryItemClick={handleGalleryItemClick}
 			/>
 		);
 	}
