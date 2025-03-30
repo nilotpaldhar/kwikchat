@@ -12,6 +12,7 @@ import type {
 	Member,
 	Media,
 	GroupDetails,
+	FileType,
 } from "@prisma/client";
 import type { Area, Point } from "react-easy-crop";
 import type { FileDetails } from "@/utils/general/file";
@@ -39,6 +40,8 @@ export enum TokenValidationStatus {
 export type FriendsFilterType = "all" | "online" | "new";
 
 export type ConversationsFilterType = "all" | "group" | "unread";
+
+export type MediaAttachmentFilterType = "all" | FileType;
 
 export interface PaginatedResponse<T> {
 	pagination: PaginationMetadata;

@@ -46,7 +46,7 @@ const ImageCarousel = ({
 	// Function to handle image downloads
 	const handleDownload = useCallback(async () => {
 		const imageUrl = activeImage?.media?.url;
-		const imageName = activeImage?.fileName;
+		const imageName = activeImage?.media?.name;
 
 		if (!imageUrl) {
 			toast.error("Unable to download");
@@ -64,7 +64,7 @@ const ImageCarousel = ({
 		} finally {
 			setIsDownloading(false);
 		}
-	}, [activeImage?.fileName, activeImage?.media?.url]);
+	}, [activeImage?.media?.name, activeImage?.media?.url]);
 
 	// Handle carousel initialization and sync state when emblaApi becomes available
 	useEffect(() => {

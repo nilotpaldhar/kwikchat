@@ -97,6 +97,7 @@ const createDocumentMessage = async ({
 				fileType: FileType.document,
 				height: attachment.height,
 				width: attachment.width,
+				fileExtension: payload.document.fileType,
 				thumbnailUrl: attachment.thumbnailUrl,
 			},
 		});
@@ -196,7 +197,7 @@ const createImageMessage = async ({
 					size: attachment.size,
 					filePath: attachment.filePath,
 					url: attachment.url,
-					fileType: FileType.document,
+					fileType: FileType.image,
 					height: attachment.height,
 					width: attachment.width,
 					thumbnailUrl: attachment.thumbnailUrl,

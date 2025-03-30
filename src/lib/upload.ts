@@ -35,7 +35,7 @@ const uploadImage = async ({
 	try {
 		const res = await imagekitClient.upload({
 			file: image,
-			fileName: `${imageName}-${nanoid()}`,
+			fileName: imageName,
 			folder: folder ? `${ROOT_MEDIA_FOLDER}/${folder}` : `${ROOT_MEDIA_FOLDER}/images`,
 		});
 
@@ -62,7 +62,7 @@ const uploadFile = async ({
 	try {
 		const res = await imagekitClient.upload({
 			file: file,
-			fileName: `${fileName}-${nanoid()}`,
+			fileName,
 			folder: folder ? `${ROOT_MEDIA_FOLDER}/${folder}` : `${ROOT_MEDIA_FOLDER}/files`,
 		});
 
@@ -105,7 +105,7 @@ const uploadAvatar = async ({
 	try {
 		return await uploadImage({
 			image: avatar,
-			imageName: `${username}-avatar`,
+			imageName: `${username}-avatar-${nanoid()}`,
 			folder: `${userId}/avatars`,
 		});
 	} catch (error) {
@@ -128,7 +128,7 @@ const uploadGroupIcon = async ({
 	try {
 		return await uploadImage({
 			image: icon,
-			imageName: groupId ? `${groupId}-icon` : `unknown-group-icon`,
+			imageName: groupId ? `${groupId}-icon-${nanoid()}` : `unknown-group-icon-${nanoid()}`,
 			folder: `${userId}/group-icons`,
 		});
 	} catch (error) {

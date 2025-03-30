@@ -1,4 +1,4 @@
-import type { ConversationsFilterType } from "@/types";
+import type { ConversationsFilterType, MediaAttachmentFilterType } from "@/types";
 
 /**
  * Refetch interval for polling online friends data in milliseconds (30 seconds).
@@ -89,13 +89,11 @@ export const groupMemberKeys = {
  *
  * Contains keys used to uniquely identify queries related to media attachments in messages.
  */
-export const messageMediaKeys = {
-	base: ["message_media"] as const,
-
-	// Key for fetching all media attachments in a conversation
-	all: (conversationId: string) => [...messageMediaKeys.base, "all", conversationId] as const,
-
-	// Key for fetching media attachments from a specific message
+export const mediaAttachmentKeys = {
+	base: ["media_attachments"] as const,
+	all: (conversationId: string) => [...mediaAttachmentKeys.base, conversationId] as const,
+	filtered: (conversationId: string, filters: MediaAttachmentFilterType) =>
+		[...mediaAttachmentKeys.base, conversationId, filters] as const,
 	forMessage: (conversationId: string, messageId: string) =>
-		[...messageMediaKeys.base, "for_message", conversationId, messageId] as const,
+		[...mediaAttachmentKeys.base, conversationId, "for_message", messageId] as const,
 };

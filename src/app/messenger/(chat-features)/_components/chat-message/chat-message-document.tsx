@@ -51,6 +51,7 @@ const ChatMessageDocument = ({
 	// Handle document download
 	const handleDownload = async () => {
 		const documentUrl = data?.data?.[0].url;
+		const documentName = data?.data?.[0].name;
 		const canDownload = !isError && documentUrl;
 
 		if (isError && error) {
@@ -68,7 +69,7 @@ const ChatMessageDocument = ({
 		try {
 			await downloadFile({
 				url: documentUrl,
-				filename: attachment?.fileName ?? "document",
+				filename: documentName ?? "downloaded-document",
 			});
 		} catch (err) {
 			if (err instanceof Error) toast.error(err.message);

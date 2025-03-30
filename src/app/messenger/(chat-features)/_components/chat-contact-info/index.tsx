@@ -1,5 +1,7 @@
 "use client";
 
+import type { FriendWithFriendship } from "@/types";
+
 import { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 
@@ -12,18 +14,18 @@ import {
 } from "@/components/ui/sheet";
 
 import ContactPanel from "@/app/messenger/(chat-features)/_components/chat-contact-info/contact-panel";
+import SharedMediaPanel from "@/app/messenger/(chat-features)/_components/chat-contact-info/shared-media-panel";
 import StarredMessagesPanel from "@/app/messenger/(chat-features)/_components/chat-contact-info/starred-messages-panel";
 
 import useChatInfoStore from "@/store/use-chat-info-store";
 import useMessengerDialogStore from "@/store/use-messenger-dialog-store";
 import { useParticipantInConversationQuery } from "@/hooks/tanstack-query/use-conversation";
-import { FriendWithFriendship } from "@/types";
 
 interface ChatContactInfoProps {
 	conversationId: string;
 }
 
-type ViewMode = "default" | "starred_messages";
+type ViewMode = "default" | "shared_media" | "starred_messages";
 
 const ChatContactInfo = ({ conversationId }: ChatContactInfoProps) => {
 	const [viewMode, setViewMode] = useState<ViewMode>("default");
@@ -66,7 +68,7 @@ const ChatContactInfo = ({ conversationId }: ChatContactInfoProps) => {
 								error={error}
 								refetch={refetch}
 								onClose={onClose}
-								onSharedMedia={() => {}}
+								onSharedMedia={() => setViewMode("shared_media")}
 								onStarredMessage={() => setViewMode("starred_messages")}
 								onBlock={() => {
 									if (participant) {
@@ -80,6 +82,21 @@ const ChatContactInfo = ({ conversationId }: ChatContactInfoProps) => {
 										conversationToDelete: { conversationId },
 									})
 								}
+							/>
+						</motion.div>
+					)}
+
+					{viewMode === "shared_media" && (
+						<motion.div
+							key="shared_media_panel"
+							initial={{ opacity: 0, x: "100%" }}
+							animate={{ opacity: 1, x: 0 }}
+							exit={{ opacity: 0, x: "100%" }}
+							transition={{ duration: 0.3 }}
+						>
+							<SharedMediaPanel
+								conversationId={conversationId}
+								onBack={() => setViewMode("default")}
 							/>
 						</motion.div>
 					)}
