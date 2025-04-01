@@ -249,6 +249,13 @@ export async function DELETE(req: NextRequest, { params }: { params: Params }) {
 				);
 			}
 
+			case DeleteMessageError.ContentDeletionFailed: {
+				return NextResponse.json(
+					{ success: false, message: "ContentDeletionFailed." },
+					{ status: 500 }
+				);
+			}
+
 			default: {
 				return NextResponse.json(
 					{ success: false, message: "An unexpected error occurred. Please try again later" },

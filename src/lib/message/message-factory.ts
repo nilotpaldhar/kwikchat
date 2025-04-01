@@ -1,8 +1,3 @@
-/**
- * This file is responsible for creating different types of messages,
- * such as system, text, image, and document.
- */
-
 import "server-only";
 
 import { FileType, MessageType, type SystemMessageEvent } from "@prisma/client";

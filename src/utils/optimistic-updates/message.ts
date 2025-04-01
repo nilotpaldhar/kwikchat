@@ -141,7 +141,7 @@ const createMessageReaction = ({
 	return newMessageReaction;
 };
 
-const optimisticSendPrivateMessage = async ({
+const optimisticSendMessage = async ({
 	conversationId,
 	sender,
 	messagePayload,
@@ -166,7 +166,7 @@ const optimisticSendPrivateMessage = async ({
 	return { messagesData };
 };
 
-const optimisticUpdatePrivateTextMessage = async ({
+const optimisticUpdateTextMessage = async ({
 	conversationId,
 	messageId,
 	message,
@@ -343,7 +343,7 @@ const optimisticDeleteMessage = async ({
 	return { messagesData, starredMessagesData };
 };
 
-const optimisticPrivateMessageError = async ({
+const optimisticMessageError = async ({
 	conversationId,
 	context,
 	queryClient,
@@ -373,7 +373,7 @@ const optimisticStarredMessageError = async ({
 	queryClient.setQueryData(messageKeys.starred(conversationId), context.starredMessagesData);
 };
 
-const refetchOptimisticPrivateMessages = ({
+const refetchOptimisticMessages = ({
 	conversationId,
 	queryClient,
 }: {
@@ -385,14 +385,14 @@ const refetchOptimisticPrivateMessages = ({
 };
 
 export {
-	optimisticSendPrivateMessage,
-	optimisticUpdatePrivateTextMessage,
+	optimisticSendMessage,
+	optimisticUpdateTextMessage,
 	optimisticCreateMessageReaction,
 	optimisticUpdateMessageReaction,
 	optimisticDeleteMessageReaction,
 	optimisticToggleMessageStarStatus,
 	optimisticDeleteMessage,
-	optimisticPrivateMessageError,
+	optimisticMessageError,
 	optimisticStarredMessageError,
-	refetchOptimisticPrivateMessages,
+	refetchOptimisticMessages,
 };

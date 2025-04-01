@@ -59,9 +59,53 @@ const SharedMediaDirectory = ({ conversationId }: SharedMediaDirectoryProps) => 
 		if (value in TAB_LABELS) setCurrentTab(value as TabType);
 	}, []);
 
+	const renderTabContent = () => {
+		if (isLoading)
+			return (
+				<div className="flex w-full items-center justify-center pt-40">
+					<Loader />
+				</div>
+			);
+
+		if (isError)
+			return (
+				<ErrorAlert onClick={() => refetch()}>
+					{error ? error.message : "Something went wrong!"}
+				</ErrorAlert>
+			);
+
+		if (isEmpty)
+			return (
+				<div className="px-5 pt-24">
+					<Empty>
+						<EmptyTitle>{`No Shared ${TAB_LABELS[currentTab]}`}</EmptyTitle>
+						<EmptyDescription>
+							{`No ${TAB_LABELS[currentTab].toLowerCase()} have been shared in this conversation.`}
+						</EmptyDescription>
+					</Empty>
+				</div>
+			);
+
+		return (
+			<InfiniteScroll next={fetchNextPage} loading={isFetchingNextPage}>
+				<div className="flex flex-col space-y-4">
+					{groupedMedia.map(({ month, mediaList }) => (
+						<SharedMediaDateGroup
+							key={month}
+							month={month}
+							mediaList={mediaList}
+							isImageTab={currentTab === "image"}
+							isDocumentTab={currentTab === "document"}
+						/>
+					))}
+				</div>
+			</InfiniteScroll>
+		);
+	};
+
 	return (
 		<Tabs value={currentTab} className="w-full" onValueChange={handleFilterChange}>
-			<TabsList className="w-full">
+			<TabsList className="sticky top-0 z-10 w-full bg-surface-light-100 dark:bg-surface-dark-400">
 				{Object.entries(TAB_LABELS).map(([value, label]) => (
 					<TabsTrigger key={value} value={value}>
 						{label}
@@ -71,44 +115,7 @@ const SharedMediaDirectory = ({ conversationId }: SharedMediaDirectoryProps) => 
 
 			{Object.keys(TAB_LABELS).map((value) => (
 				<TabsContent key={value} value={value} className="p-5">
-					{isLoading && (
-						<div className="flex w-full items-center justify-center pt-40">
-							<Loader />
-						</div>
-					)}
-
-					{!isLoading && isError && (
-						<ErrorAlert onClick={() => refetch()}>
-							{error ? error.message : "Something went wrong!"}
-						</ErrorAlert>
-					)}
-
-					{!isLoading && !isError && isEmpty && (
-						<div className="px-5 pt-24">
-							<Empty>
-								<EmptyTitle>{`No Shared ${TAB_LABELS[currentTab]}`}</EmptyTitle>
-								<EmptyDescription>
-									{`No ${TAB_LABELS[currentTab].toLowerCase()} have been shared in this conversation.`}
-								</EmptyDescription>
-							</Empty>
-						</div>
-					)}
-
-					{!isLoading && !isError && !isEmpty && (
-						<InfiniteScroll next={fetchNextPage} loading={isFetchingNextPage}>
-							<div className="flex flex-col space-y-4">
-								{groupedMedia.map(({ month, mediaList }) => (
-									<SharedMediaDateGroup
-										key={month}
-										month={month}
-										mediaList={mediaList}
-										isImageTab={currentTab === "image"}
-										isDocumentTab={currentTab === "document"}
-									/>
-								))}
-							</div>
-						</InfiniteScroll>
-					)}
+					{renderTabContent()}
 				</TabsContent>
 			))}
 		</Tabs>

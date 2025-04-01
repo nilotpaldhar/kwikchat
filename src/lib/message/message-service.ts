@@ -1,9 +1,3 @@
-/**
- * This file handles sending and broadcasting messages.
- * It includes functions for private messaging, group messaging,
- * and broadcasting messages to multiple recipients.
- */
-
 import "server-only";
 
 import type { CompleteMessage, ConversationWithMembers } from "@/types";

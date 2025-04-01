@@ -38,7 +38,7 @@ const SharedMediaImageTile = ({ media }: SharedMediaImageTileProps) => {
 				src={media.url}
 				alt={media.name}
 				fill
-				sizes="(max-width: 640px) 10vw, (max-width: 1024px) 5vw, 48px"
+				sizes="(max-width: 640px) 50vw, (max-width: 1024px) 25vw, (max-width: 1280px) 20vw, 15vw"
 				className="object-cover"
 			/>
 			<div className="absolute inset-0 size-full opacity-0 transition-opacity duration-300 group-focus-within:opacity-100 group-hover:opacity-100">
