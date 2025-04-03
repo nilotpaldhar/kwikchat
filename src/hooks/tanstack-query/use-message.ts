@@ -7,7 +7,7 @@ import { useInfiniteQuery, useMutation, useQueryClient } from "@tanstack/react-q
 import usePusher from "@/hooks/use-pusher";
 import useCurrentUser from "@/hooks/tanstack-query/use-current-user";
 
-import { messageKeys } from "@/constants/tanstack-query";
+import { messageKeys, mediaAttachmentKeys } from "@/constants/tanstack-query";
 import { conversationEvents } from "@/constants/pusher-events";
 
 import {
@@ -24,15 +24,15 @@ import {
 } from "@/services/message";
 
 import {
-	optimisticSendPrivateMessage,
-	optimisticUpdatePrivateTextMessage,
+	optimisticSendMessage,
+	optimisticUpdateTextMessage,
 	optimisticCreateMessageReaction,
 	optimisticUpdateMessageReaction,
 	optimisticDeleteMessageReaction,
 	optimisticToggleMessageStarStatus,
-	optimisticPrivateMessageError,
+	optimisticMessageError,
 	optimisticDeleteMessage,
-	refetchOptimisticPrivateMessages,
+	refetchOptimisticMessages,
 	optimisticStarredMessageError,
 } from "@/utils/optimistic-updates/message";
 import {
@@ -50,9 +50,10 @@ import {
 } from "@/utils/tanstack-query-cache/message";
 
 import generateChatMessagingChannel from "@/utils/pusher/generate-chat-messaging-channel";
+import { MessagePayloadSchema } from "@/schemas";
 
 /**
- * Custom hook for fetching private messages in a conversation using infinite scrolling.
+ * Custom hook for fetching messages in a conversation using infinite scrolling.
  */
 const useMessagesQuery = ({
 	conversationId,
@@ -159,13 +160,20 @@ const useSendMessage = () => {
 		mutationFn: sendMessage,
 
 		// Optimistically updates the message list before the mutation occurs.
-		onMutate: async ({ conversationId, sender, message }) => {
+		onMutate: async ({ conversationId, sender, messageType, data }) => {
+			const { success, data: messagePayload } = MessagePayloadSchema.safeParse({
+				messageType,
+				message: data,
+			});
+
+			if (!success) return {};
+
 			const [messageData, conversationData] = await Promise.all([
-				optimisticSendPrivateMessage({ conversationId, sender, message, queryClient }),
+				optimisticSendMessage({ conversationId, sender, messagePayload, queryClient }),
 				optimisticUpdateConversationRecentMsg({
 					conversationId,
 					senderId: sender.id,
-					message,
+					messagePayload,
 					queryClient,
 				}),
 			]);
@@ -173,24 +181,43 @@ const useSendMessage = () => {
 			return { ...messageData, ...conversationData };
 		},
 
-		//  Handles any error that occurs during the message sending mutation.
+		// Handles any error that occurs during the message sending mutation.
 		onError: (error, { conversationId }, context) => {
-			optimisticPrivateMessageError({ conversationId, context, queryClient });
+			optimisticMessageError({ conversationId, context, queryClient });
 			optimisticUpdateConversationRecentMsgError({ context, queryClient });
 			toast.error(error.message);
 		},
 
 		// Called once the mutation is either successful or fails.
-		onSettled: (_data, _error, { conversationId }) => {
-			refetchOptimisticPrivateMessages({
+		onSettled: (_data, _error, { conversationId, messageType }) => {
+			// Refetches the messages for the given conversation.
+			refetchOptimisticMessages({
 				conversationId,
 				queryClient,
 			});
+
+			// Refetches the conversation details.
 			refetchOptimisticConversation({
 				conversationId,
 				opsType: "send_message",
 				queryClient,
 			});
+
+			// If the sent message is an image, reset the cached queries related to image attachments
+			// for the specific conversation to ensure the cache is updated with the latest images.
+			if (messageType === "image") {
+				queryClient.resetQueries({
+					queryKey: mediaAttachmentKeys.filtered(conversationId, "image"),
+				});
+			}
+
+			// If the sent message is a document, reset the cached queries related to document attachments
+			// for the specific conversation to ensure the cache is updated with the latest documents.
+			if (messageType === "document") {
+				queryClient.resetQueries({
+					queryKey: mediaAttachmentKeys.filtered(conversationId, "document"),
+				});
+			}
 		},
 	});
 };
@@ -211,19 +238,19 @@ const useUpdateMessage = () => {
 		// Optimistically updates the message in the cache before the mutation occurs on the server
 		// This ensures the UI is updated immediately, providing a faster response for the user
 		onMutate: ({ conversationId, messageId, message }) =>
-			optimisticUpdatePrivateTextMessage({ conversationId, messageId, message, queryClient }),
+			optimisticUpdateTextMessage({ conversationId, messageId, message, queryClient }),
 
 		// Handles any errors that occur during the mutation
 		// Rolls back the optimistic update if the mutation fails
 		onError: (error, { conversationId }, context) => {
-			optimisticPrivateMessageError({ conversationId, context, queryClient });
+			optimisticMessageError({ conversationId, context, queryClient });
 			toast.error(error.message);
 		},
 
 		// Called once the mutation is either successful or fails
 		// Ensures the cache is refetched and up to date after the mutation settles
 		onSettled: (_data, _error, { conversationId }) => {
-			refetchOptimisticPrivateMessages({
+			refetchOptimisticMessages({
 				conversationId,
 				queryClient,
 			});
@@ -283,14 +310,14 @@ const useCreateMessageReaction = () => {
 		// Handles any errors that occur during the mutation
 		// Rolls back the optimistic update if the mutation fails
 		onError: (error, { conversationId }, context) => {
-			optimisticPrivateMessageError({ conversationId, context, queryClient });
+			optimisticMessageError({ conversationId, context, queryClient });
 			toast.error(error.message);
 		},
 
 		// Called once the mutation is either successful or fails
 		// Ensures the cache is refetched and up to date after the mutation settles
 		onSettled: (_data, _error, { conversationId }) => {
-			refetchOptimisticPrivateMessages({
+			refetchOptimisticMessages({
 				conversationId,
 				queryClient,
 			});
@@ -318,14 +345,14 @@ const useUpdateMessageReaction = () => {
 		// Handles any errors that occur during the mutation
 		// Rolls back the optimistic update if the mutation fails
 		onError: (error, { conversationId }, context) => {
-			optimisticPrivateMessageError({ conversationId, context, queryClient });
+			optimisticMessageError({ conversationId, context, queryClient });
 			toast.error(error.message);
 		},
 
 		// Called once the mutation is either successful or fails
 		// Ensures the cache is refetched and up to date after the mutation settles
 		onSettled: (_data, _error, { conversationId }) => {
-			refetchOptimisticPrivateMessages({
+			refetchOptimisticMessages({
 				conversationId,
 				queryClient,
 			});
@@ -353,14 +380,14 @@ const useDeleteMessageReaction = () => {
 		// Handles any errors that occur during the mutation
 		// Rolls back the optimistic update if the mutation fails
 		onError: (error, { conversationId }, context) => {
-			optimisticPrivateMessageError({ conversationId, context, queryClient });
+			optimisticMessageError({ conversationId, context, queryClient });
 			toast.error(error.message);
 		},
 
 		// Called once the mutation is either successful or fails
 		// Ensures the cache is refetched and up to date after the mutation settles
 		onSettled: (_data, _error, { conversationId }) => {
-			refetchOptimisticPrivateMessages({
+			refetchOptimisticMessages({
 				conversationId,
 				queryClient,
 			});
@@ -387,7 +414,7 @@ const useToggleMessageStarStatus = () => {
 		// Handles any errors that occur during the mutation
 		// Rolls back the optimistic update if the mutation fails
 		onError: (error, { conversationId }, context) => {
-			optimisticPrivateMessageError({ conversationId, context, queryClient });
+			optimisticMessageError({ conversationId, context, queryClient });
 			optimisticStarredMessageError({ conversationId, context, queryClient });
 			toast.error(error.message);
 		},
@@ -395,7 +422,7 @@ const useToggleMessageStarStatus = () => {
 		// Called once the mutation is either successful or fails
 		// Ensures the cache is refetched and up to date after the mutation settles
 		onSettled: (_data, _error, { conversationId }) => {
-			refetchOptimisticPrivateMessages({
+			refetchOptimisticMessages({
 				conversationId,
 				queryClient,
 			});
@@ -421,17 +448,33 @@ const useDeleteMessage = () => {
 
 		// Called if the mutation fails, rolling back optimistic updates and showing an error message
 		onError: (error, { conversationId }, context) => {
-			optimisticPrivateMessageError({ conversationId, context, queryClient });
+			optimisticMessageError({ conversationId, context, queryClient });
 			optimisticStarredMessageError({ conversationId, context, queryClient });
 			toast.error(error.message);
 		},
 
 		// Called when the mutation either succeeds or fails, to refetch the conversation messages
-		onSettled: (_data, _error, { conversationId }) => {
-			refetchOptimisticPrivateMessages({
+		onSettled: (_data, _error, { conversationId, message }) => {
+			refetchOptimisticMessages({
 				conversationId,
 				queryClient,
 			});
+
+			// If the sent message is an image, reset the cached queries related to image attachments
+			// for the specific conversation to ensure the cache is updated with the latest images.
+			if (message.type === "image") {
+				queryClient.resetQueries({
+					queryKey: mediaAttachmentKeys.filtered(conversationId, "image"),
+				});
+			}
+
+			// If the sent message is a document, reset the cached queries related to document attachments
+			// for the specific conversation to ensure the cache is updated with the latest documents.
+			if (message.type === "document") {
+				queryClient.resetQueries({
+					queryKey: mediaAttachmentKeys.filtered(conversationId, "document"),
+				});
+			}
 		},
 	});
 };

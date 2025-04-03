@@ -73,6 +73,7 @@ const updateRecentMessage = ({
 				textMessage: message.textMessage,
 				imageMessage: message.imageMessage,
 				systemMessage: message.systemMessage,
+				documentMessage: message.documentMessage,
 			},
 		};
 	}

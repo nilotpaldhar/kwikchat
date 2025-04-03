@@ -1,10 +1,9 @@
 import "client-only";
 
-import type { MessageReaction, MessageReactionType } from "@prisma/client";
+import { MessageType, type MessageReaction, type MessageReactionType } from "@prisma/client";
 import type { InfiniteData, QueryClient } from "@tanstack/react-query";
 import type { APIResponse, CompleteMessage, PaginatedResponse, UserProfile } from "@/types";
-
-import { nanoid } from "nanoid";
+import type { MessagePayloadSchemaType } from "@/schemas";
 
 import { messageKeys } from "@/constants/tanstack-query";
 
@@ -20,21 +19,78 @@ import {
 	deleteMessage,
 } from "@/utils/tanstack-query-cache/message";
 
+import { generateTempId } from "@/utils/general/temp-id-generator";
 import { getInfiniteQueryData } from "@/utils/tanstack-query-cache/helpers";
 
-const createCompleteMessage = ({
+const generateTempMessage = ({
 	conversationId,
 	sender,
-	message,
+	messagePayload,
 }: {
 	conversationId: string;
 	sender: UserProfile;
-	message: string;
-}) => {
-	const newMessage: CompleteMessage = {
-		id: nanoid(),
+	messagePayload: MessagePayloadSchemaType;
+}): CompleteMessage => {
+	const tempMessageId = generateTempId();
+	const messageType = messagePayload.messageType;
+
+	// Function to generate text message
+	const createTextMessage = () => {
+		if (messageType === MessageType.text) {
+			return {
+				id: generateTempId(),
+				messageId: tempMessageId,
+				content: messagePayload.message,
+				createdAt: new Date(),
+				updatedAt: new Date(),
+			};
+		}
+
+		return null;
+	};
+
+	// Function to generate document message
+	const createDocumentMessage = () => {
+		if (messageType === MessageType.document) {
+			return {
+				id: generateTempId(),
+				fileName: messagePayload.message.document.fileName,
+				fileType: messagePayload.message.document.fileType,
+				fileSize: messagePayload.message.document.fileSize.raw,
+				caption: messagePayload.message.caption ?? null,
+				createdAt: new Date(),
+				updatedAt: new Date(),
+				messageId: tempMessageId,
+				mediaId: generateTempId(),
+			};
+		}
+
+		return null;
+	};
+
+	// Function to generate image message
+	const createImageMessage = () => {
+		if (messageType === MessageType.image) {
+			return messagePayload.message.map((message) => ({
+				id: generateTempId(),
+				fileName: message.image.fileName,
+				fileType: message.image.fileType,
+				fileSize: message.image.fileSize.raw,
+				caption: message.caption ?? null,
+				tempDataUrl: message.imageDataUrl,
+				createdAt: new Date(),
+				updatedAt: new Date(),
+				messageId: tempMessageId,
+				mediaId: generateTempId(),
+			}));
+		}
+
+		return [];
+	};
+
+	return {
+		id: tempMessageId,
 		conversationId,
-		// Temp
 		conversation: {
 			id: conversationId,
 			isGroup: false,
@@ -46,23 +102,16 @@ const createCompleteMessage = ({
 		senderId: sender.id,
 		createdAt: new Date(),
 		updatedAt: new Date(),
-		type: "text",
+		type: messageType,
 		seenByMembers: [],
-		textMessage: {
-			id: nanoid(),
-			messageId: nanoid(),
-			content: message,
-			createdAt: new Date(),
-			updatedAt: new Date(),
-		},
-		imageMessage: null,
+		textMessage: createTextMessage(),
+		imageMessage: createImageMessage(),
+		documentMessage: createDocumentMessage(),
 		systemMessage: null,
 		reactions: [],
 		isStarred: false,
 		isDeleted: false,
 	};
-
-	return newMessage;
 };
 
 const createMessageReaction = ({
@@ -79,7 +128,7 @@ const createMessageReaction = ({
 	emojiImageUrl: string;
 }) => {
 	const newMessageReaction: MessageReaction = {
-		id: nanoid(),
+		id: generateTempId(),
 		type: reactionType,
 		emoji,
 		emojiImageUrl,
@@ -92,33 +141,32 @@ const createMessageReaction = ({
 	return newMessageReaction;
 };
 
-const optimisticSendPrivateMessage = async ({
+const optimisticSendMessage = async ({
 	conversationId,
 	sender,
-	message,
+	messagePayload,
 	queryClient,
 }: {
 	conversationId: string;
 	sender: UserProfile;
-	message: string;
+	messagePayload?: MessagePayloadSchemaType;
 	queryClient: QueryClient;
 }) => {
-	const newMessage = createCompleteMessage({ conversationId, sender, message });
-
-	// Cancel ongoing queries related to messages to ensure cache consistency
 	await queryClient.cancelQueries({ queryKey: messageKeys.all(conversationId) });
-
 	const messagesData = getInfiniteQueryData<CompleteMessage>({
 		keys: messageKeys.all(conversationId),
 		queryClient,
 	});
 
-	prependConversationMessage({ conversationId, message: newMessage, queryClient });
+	if (!messagePayload) return { messagesData };
+
+	const tempMessage = generateTempMessage({ conversationId, sender, messagePayload });
+	prependConversationMessage({ conversationId, message: tempMessage, queryClient });
 
 	return { messagesData };
 };
 
-const optimisticUpdatePrivateTextMessage = async ({
+const optimisticUpdateTextMessage = async ({
 	conversationId,
 	messageId,
 	message,
@@ -295,7 +343,7 @@ const optimisticDeleteMessage = async ({
 	return { messagesData, starredMessagesData };
 };
 
-const optimisticPrivateMessageError = async ({
+const optimisticMessageError = async ({
 	conversationId,
 	context,
 	queryClient,
@@ -325,7 +373,7 @@ const optimisticStarredMessageError = async ({
 	queryClient.setQueryData(messageKeys.starred(conversationId), context.starredMessagesData);
 };
 
-const refetchOptimisticPrivateMessages = ({
+const refetchOptimisticMessages = ({
 	conversationId,
 	queryClient,
 }: {
@@ -337,14 +385,14 @@ const refetchOptimisticPrivateMessages = ({
 };
 
 export {
-	optimisticSendPrivateMessage,
-	optimisticUpdatePrivateTextMessage,
+	optimisticSendMessage,
+	optimisticUpdateTextMessage,
 	optimisticCreateMessageReaction,
 	optimisticUpdateMessageReaction,
 	optimisticDeleteMessageReaction,
 	optimisticToggleMessageStarStatus,
 	optimisticDeleteMessage,
-	optimisticPrivateMessageError,
+	optimisticMessageError,
 	optimisticStarredMessageError,
-	refetchOptimisticPrivateMessages,
+	refetchOptimisticMessages,
 };

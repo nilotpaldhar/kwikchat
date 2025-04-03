@@ -5,13 +5,14 @@ import { Empty, EmptyDescription, EmptyTitle } from "@/components/ui/empty";
 import InfiniteScroll from "@/components/infinite-scroll";
 
 import ErrorAlert from "@/app/messenger/_components/error-alert";
-import StarredMessageTile from "@/app/messenger/(chat-features)/_components/starred-message-tile";
+import StarredMessageTile from "@/app/messenger/(chat-features)/_components/starred-message-directory/starred-message-tile";
 
 import { useStarredMessagesQuery } from "@/hooks/tanstack-query/use-message";
 
 interface StarredMessageDirectoryProps {
 	conversationId: string;
 }
+
 const StarredMessageDirectory = ({ conversationId }: StarredMessageDirectoryProps) => {
 	const { data, isSuccess, isLoading, isError, error, refetch, fetchNextPage, isFetchingNextPage } =
 		useStarredMessagesQuery({ conversationId });

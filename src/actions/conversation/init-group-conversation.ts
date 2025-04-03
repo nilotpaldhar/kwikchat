@@ -6,12 +6,9 @@ import * as z from "zod";
 import { NewGroupSchema } from "@/schemas";
 
 import { getCurrentUser } from "@/data/auth/session";
+import { uploadGroupIcon } from "@/lib/upload";
 import { hasAnyFriendshipWithUser } from "@/lib/friendship";
-import {
-	createGroupConversation,
-	uploadGroupConversationIcon,
-	broadcastConversation,
-} from "@/lib/conversation";
+import { createGroupConversation, broadcastConversation } from "@/lib/conversation";
 
 import { conversationEvents } from "@/constants/pusher-events";
 import { INIT_GROUP_CONVERSATION_MESSAGE as MESSAGE } from "@/constants/conversation";
@@ -39,7 +36,7 @@ const initGroupConversation = async (values: z.infer<typeof NewGroupSchema>) => 
 
 		// Upload group icon
 		if (groupIcon) {
-			const res = await uploadGroupConversationIcon({
+			const res = await uploadGroupIcon({
 				icon: groupIcon,
 				userId: currentUser.id,
 			});
@@ -56,6 +53,9 @@ const initGroupConversation = async (values: z.infer<typeof NewGroupSchema>) => 
 				height: res.height ?? null,
 				width: res.width ?? null,
 				thumbnailUrl: res.thumbnailUrl ?? null,
+				createdAt: new Date(),
+				updatedAt: new Date(),
+				fileExtension: null,
 			};
 		}
 

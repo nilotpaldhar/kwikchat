@@ -35,7 +35,7 @@ jobs:
         
       - name: Bundle and Output
         env:
-          IMAGE_KIT_PUBLIC_KEY: ${{ secrets.IMAGE_KIT_PUBLIC_KEY }}
           IMAGE_KIT_PRIVATE_KEY: ${{ secrets.IMAGE_KIT_PRIVATE_KEY }}
-          IMAGE_KIT_URL_ENDPOINT: ${{ secrets.IMAGE_KIT_URL_ENDPOINT }}
+          NEXT_PUBLIC_IMAGE_KIT_PUBLIC_KEY: ${{ secrets.NEXT_PUBLIC_IMAGE_KIT_PUBLIC_KEY }}
+          NEXT_PUBLIC_IMAGE_KIT_URL_ENDPOINT: ${{ secrets.NEXT_PUBLIC_IMAGE_KIT_URL_ENDPOINT }}
         run: npm run build

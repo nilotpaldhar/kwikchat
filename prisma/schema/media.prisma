@@ -1,22 +1,27 @@
 // Enum to represent the type of a file.
 enum FileType {
     image
-    video
+    document
 }
 
 // The Media model represents a piece of media such as images, videos, or other files
 model Media {
-    id           String   @id @default(cuid())
-    externalId   String
-    name         String
-    size         Int
-    filePath     String
-    url          String
-    fileType     FileType
-    height       Int?
-    width        Int?
-    thumbnailUrl String?
+    id            String   @id @default(cuid())
+    externalId    String
+    name          String
+    size          Int
+    filePath      String
+    url           String
+    fileType      FileType
+    fileExtension String?
+    height        Int?
+    width         Int?
+    thumbnailUrl  String?
 
-    groupDetails GroupDetails?
-    imageMessage ImageMessage?
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    groupDetails    GroupDetails?
+    documentMessage DocumentMessage?
+    imageMessage    ImageMessage?
 }

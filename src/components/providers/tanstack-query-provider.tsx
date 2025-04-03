@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { QueryCache, QueryClient, QueryClientProvider } from "@tanstack/react-query";
-// import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
+import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { toast } from "sonner";
 
 const TanstackQueryProvider = ({ children }: { children: React.ReactNode }) => {
@@ -20,7 +20,7 @@ const TanstackQueryProvider = ({ children }: { children: React.ReactNode }) => {
 
 	return (
 		<QueryClientProvider client={queryClient}>
-			{/* <ReactQueryDevtools buttonPosition="top-right" /> */}
+			<ReactQueryDevtools buttonPosition="top-right" />
 			{children}
 		</QueryClientProvider>
 	);

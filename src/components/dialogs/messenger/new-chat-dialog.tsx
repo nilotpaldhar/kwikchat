@@ -74,7 +74,7 @@ const NewChatDialog = () => {
 					<DrawerDescription className="hidden">{description}</DrawerDescription>
 				</DrawerHeader>
 				<DrawerBody className="!px-0">
-					<ChatFriendSelector onSelect={(friendId) => handleInitChat(friendId)} />{" "}
+					<ChatFriendSelector onSelect={(friendId) => handleInitChat(friendId)} />
 				</DrawerBody>
 			</DrawerContent>
 		</Drawer>

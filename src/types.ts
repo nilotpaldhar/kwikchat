@@ -7,12 +7,16 @@ import type {
 	TextMessage,
 	ImageMessage,
 	SystemMessage,
+	DocumentMessage,
 	MessageReaction,
 	Member,
 	Media,
 	GroupDetails,
+	FileType,
 } from "@prisma/client";
-import { PaginationMetadata } from "@/utils/general/calculate-pagination";
+import type { Area, Point } from "react-easy-crop";
+import type { FileDetails } from "@/utils/general/file";
+import type { PaginationMetadata } from "@/utils/general/calculate-pagination";
 
 export interface UserProfile extends Omit<User, "password" | "image"> {}
 export interface UserWithoutPassword extends Omit<User, "password"> {}
@@ -36,6 +40,8 @@ export enum TokenValidationStatus {
 export type FriendsFilterType = "all" | "online" | "new";
 
 export type ConversationsFilterType = "all" | "group" | "unread";
+
+export type MediaAttachmentFilterType = "all" | FileType;
 
 export interface PaginatedResponse<T> {
 	pagination: PaginationMetadata;
@@ -76,8 +82,9 @@ export interface ConversationWithMembers extends Conversation {
 export interface CompleteMessage extends Message {
 	conversation: Conversation;
 	textMessage: TextMessage | null;
-	imageMessage: ImageMessage | null;
+	imageMessage: ImageMessage[];
 	systemMessage: SystemMessage | null;
+	documentMessage: DocumentMessage | null;
 	seenByMembers: string[];
 	sender: UserProfile;
 	reactions: MessageReaction[];
@@ -97,8 +104,13 @@ export interface MessageWithUserID extends Message {
 
 export interface RecentMessage extends Message {
 	textMessage: TextMessage | null;
-	imageMessage: ImageMessage | null;
+	imageMessage: ImageMessage[];
+	documentMessage: DocumentMessage | null;
 	systemMessage: SystemMessage | null;
+}
+
+export interface ImageMessageWithMedia extends ImageMessage {
+	media?: Media;
 }
 
 export interface GroupOverview {
@@ -135,8 +147,36 @@ export interface ConversationWithMetadata extends Conversation {
 }
 
 export type SocialPlatform = "twitter" | "instagram" | "github";
+
 export interface SocialLink {
 	id: SocialPlatform;
 	label: string;
 	url: string | null;
+}
+
+export interface ImageUpload {
+	id: string;
+	image: File;
+	imageUrl: string | null;
+	caption?: string;
+	crop: Point;
+	zoom: number;
+	cropPixels: Area | null;
+}
+
+export enum ChatAttachmentTypes {
+	Image = "Image",
+	Document = "Document",
+}
+
+export interface ChatDocumentAttachment {
+	caption?: string;
+	document: FileDetails;
+	documentDataUrl: string | null;
+}
+
+export interface ChatImageAttachment {
+	caption?: string;
+	image: FileDetails;
+	imageDataUrl: string | null;
 }

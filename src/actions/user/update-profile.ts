@@ -7,32 +7,10 @@ import { ProfileSchema } from "@/schemas";
 
 import { prisma } from "@/lib/db";
 
-import { uploadImage } from "@/lib/upload";
+import { uploadAvatar } from "@/lib/upload";
 import { getCurrentUser } from "@/data/auth/session";
 
 import { AVATAR_UPLOAD_MESSAGE, PROFILE_UPDATE_MESSAGE } from "@/constants/user";
-
-// Uploads an avatar image to the server.
-async function uploadAvatar({
-	avatar,
-	username,
-	userId,
-}: {
-	avatar: string;
-	username: string;
-	userId: string;
-}) {
-	try {
-		const res = await uploadImage({
-			image: avatar,
-			imageName: `${username}-avatar`,
-			folder: `${userId}/avatars`,
-		});
-		return res.url;
-	} catch (error) {
-		return null;
-	}
-}
 
 // Updates the user's profile with new data.
 async function updateProfile(values: z.infer<typeof ProfileSchema>) {
@@ -54,11 +32,12 @@ async function updateProfile(values: z.infer<typeof ProfileSchema>) {
 
 	// Upload the new avatar if it has changed
 	if (avatar && currentUser.avatar !== avatar) {
-		avatarUrl = await uploadAvatar({
+		const uploadRes = await uploadAvatar({
 			avatar,
 			username: currentUser?.username as string,
 			userId: currentUser?.id,
 		});
+		avatarUrl = uploadRes?.url;
 		if (!avatarUrl) return { error: AVATAR_UPLOAD_MESSAGE.error.failedToUpload };
 	}
 

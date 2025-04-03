@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/sheet";
 
 import DetailsPanel from "@/app/messenger/(chat-features)/_components/group-chat-details/details-panel";
+import SharedMediaPanel from "@/app/messenger/(chat-features)/_components/chat-contact-info/shared-media-panel";
 import StarredMessagesPanel from "@/app/messenger/(chat-features)/_components/group-chat-details/starred-messages-panel";
 
 import useChatInfoStore from "@/store/use-chat-info-store";
@@ -24,7 +25,7 @@ interface GroupChatDetailsProps {
 	conversationId: string;
 }
 
-type ViewMode = "default" | "starred_messages";
+type ViewMode = "default" | "shared_media" | "starred_messages";
 
 const GroupChatDetails = ({ conversationId }: GroupChatDetailsProps) => {
 	const [viewMode, setViewMode] = useState<ViewMode>("default");
@@ -86,8 +87,23 @@ const GroupChatDetails = ({ conversationId }: GroupChatDetailsProps) => {
 										},
 									})
 								}
-								onSharedMedia={() => {}}
+								onSharedMedia={() => setViewMode("shared_media")}
 								onStarredMessage={() => setViewMode("starred_messages")}
+							/>
+						</motion.div>
+					)}
+
+					{viewMode === "shared_media" && (
+						<motion.div
+							key="shared_media_panel"
+							initial={{ opacity: 0, x: "100%" }}
+							animate={{ opacity: 1, x: 0 }}
+							exit={{ opacity: 0, x: "100%" }}
+							transition={{ duration: 0.3 }}
+						>
+							<SharedMediaPanel
+								conversationId={conversationId}
+								onBack={() => setViewMode("default")}
 							/>
 						</motion.div>
 					)}

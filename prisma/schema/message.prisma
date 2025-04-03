@@ -2,6 +2,7 @@
 enum MessageType {
     text
     image
+    document
     system
     deleted
 }
@@ -56,7 +57,10 @@ model Message {
     textMessage TextMessage?
 
     // Optional relation to an image message, if the message type is 'image'.
-    imageMessage ImageMessage?
+    imageMessage ImageMessage[]
+
+    // Optional relation to a document message, if the message type is 'document'.
+    documentMessage DocumentMessage?
 
     // Optional relation to a system message, if the message type is 'system'.
     systemMessage SystemMessage?
@@ -148,10 +152,16 @@ model TextMessage {
 model ImageMessage {
     id String @id @default(cuid())
 
+    fileName    String?
+    fileType    String?
+    fileSize    Int?
+    caption     String?
+    tempDataUrl String?
+
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
 
-    messageId String  @unique
+    messageId String
     message   Message @relation(fields: [messageId], references: [id], onDelete: Cascade)
 
     mediaId String @unique
@@ -169,4 +179,23 @@ model SystemMessage {
 
     messageId String  @unique
     message   Message @relation(fields: [messageId], references: [id], onDelete: Cascade)
+}
+
+// The DocumentMessage model represents an document message.
+model DocumentMessage {
+    id String @id @default(cuid())
+
+    fileName String?
+    fileType String?
+    fileSize Int?
+    caption  String?
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    messageId String  @unique
+    message   Message @relation(fields: [messageId], references: [id], onDelete: Cascade)
+
+    mediaId String @unique
+    media   Media  @relation(fields: [mediaId], references: [id])
 }

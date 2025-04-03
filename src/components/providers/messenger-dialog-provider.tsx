@@ -42,6 +42,10 @@ const RemoveFriendDialog = dynamic(
 	() => import("@/components/dialogs/messenger/remove-friend-dialog")
 );
 
+const ImageGalleryDialog = dynamic(
+	() => import("@/components/dialogs/messenger/image-gallery-dialog")
+);
+
 const MessengerDialogProvider = () => {
 	const [isMounted, setIsMounted] = useState(false);
 
@@ -69,6 +73,8 @@ const MessengerDialogProvider = () => {
 
 			<BlockFriendDialog />
 			<RemoveFriendDialog />
+
+			<ImageGalleryDialog />
 		</>
 	);
 };

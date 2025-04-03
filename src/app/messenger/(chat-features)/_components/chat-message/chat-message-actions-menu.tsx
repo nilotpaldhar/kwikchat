@@ -30,7 +30,7 @@ const ChatMessageActionsMenu = ({
 	onDelete = () => {},
 }: ChatMessageActionsMenuProps) => {
 	const isGroupAdmin = useGroupMembershipStore().membership?.role === MemberRole.admin;
-	const editable = (isSender || isGroupAdmin) && !isDeleted;
+	const isEditable = (isSender || isGroupAdmin) && !isDeleted;
 
 	const triggerClassNames =
 		"size-6 rounded-full bg-surface-light-100 text-neutral-500 shadow-md dark:bg-neutral-800 dark:text-neutral-400";
@@ -57,7 +57,7 @@ const ChatMessageActionsMenu = ({
 						<span className="font-semibold capitalize">{!isStarred ? "Star" : "Unstar"}</span>
 					</Button>
 				)}
-				{editable && (
+				{isEditable && (
 					<Button variant="outline" className={actionsClassNames} onClick={onEdit}>
 						<span className="font-semibold capitalize">Edit</span>
 					</Button>

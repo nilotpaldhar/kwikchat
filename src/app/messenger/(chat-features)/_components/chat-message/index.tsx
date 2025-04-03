@@ -7,6 +7,7 @@ import { useState } from "react";
 
 import ChatMessageText from "@/app/messenger/(chat-features)/_components/chat-message/chat-message-text";
 import ChatMessageImage from "@/app/messenger/(chat-features)/_components/chat-message/chat-message-image";
+import ChatMessageDocument from "@/app/messenger/(chat-features)/_components/chat-message/chat-message-document";
 import ChatMessageSystem from "@/app/messenger/(chat-features)/_components/chat-message/chat-message-system";
 import ChatMessageDeleted from "@/app/messenger/(chat-features)/_components/chat-message/chat-message-deleted";
 
@@ -56,7 +57,7 @@ const ChatMessage = ({
 			role="button"
 			aria-label="Chat message with actions"
 			className={cn(
-				"flex focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neutral-500 dark:focus-visible:ring-neutral-600",
+				"flex cursor-default focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neutral-500 dark:focus-visible:ring-neutral-600",
 				isSender ? "justify-end" : "justify-start",
 				className
 			)}
@@ -94,4 +95,11 @@ const ChatMessage = ({
 	);
 };
 
-export { ChatMessage, ChatMessageText, ChatMessageImage, ChatMessageSystem, ChatMessageDeleted };
+export {
+	ChatMessage,
+	ChatMessageText,
+	ChatMessageImage,
+	ChatMessageDocument,
+	ChatMessageSystem,
+	ChatMessageDeleted,
+};

@@ -4,11 +4,11 @@ import { cn } from "@/utils/general/cn";
 
 interface ChatMessageTextProps {
 	isSender: boolean;
-	content: string;
+	messageContent: string;
 	className?: string;
 }
 
-const ChatMessageText = ({ isSender, content, className }: ChatMessageTextProps) => (
+const ChatMessageText = ({ isSender, messageContent, className }: ChatMessageTextProps) => (
 	<div
 		className={cn(
 			"message-pill",
@@ -19,7 +19,7 @@ const ChatMessageText = ({ isSender, content, className }: ChatMessageTextProps)
 		)}
 	>
 		<div className={cn("flex items-center")}>
-			<div className="flex-1">{content}</div>
+			<div className="flex-1 whitespace-pre-line">{messageContent}</div>
 		</div>
 	</div>
 );
