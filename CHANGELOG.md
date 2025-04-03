@@ -1,3 +1,19 @@
+# [0.11.0](https://github.com/nilotpaldhar/storekeeper/compare/v0.10.0...v0.11.0) (2025-04-03)
+
+
+### Features
+
+* **api:** update message route to support images and documents upload ([cdce344](https://github.com/nilotpaldhar/storekeeper/commit/cdce344115fcf5bc13bf306ae21b37053ad7f4fe))
+* **messenger-chat:** add DocumentPicker & DocumentPreviewDialog components (frontend only) ([667e701](https://github.com/nilotpaldhar/storekeeper/commit/667e701fa6cb58c68f9e1059763adf56a49860ff))
+* **messenger-chat:** add ImagePicker component for image selection ([7afc0b7](https://github.com/nilotpaldhar/storekeeper/commit/7afc0b7433229d6cf748985a43b15c6162c997c9))
+* **messenger:** add ImageGalleryDialog component to display ImageMessages ([c32c66b](https://github.com/nilotpaldhar/storekeeper/commit/c32c66b446d0dfeba163366e93c4358ebacbfddb))
+* **messenger:** add SharedMediaDirectory to display shared images and documents ([499c360](https://github.com/nilotpaldhar/storekeeper/commit/499c3607595a1e5055615045be61b528ca3006f2))
+* **messenger:** add support for DocumentMessage type in ChatMessageFactory ([6bc48f2](https://github.com/nilotpaldhar/storekeeper/commit/6bc48f2ab327025a840f1fb71aa3e530a376083d))
+* **messenger:** add support for ImageMessage type in ChatMessageFactory ([52927a4](https://github.com/nilotpaldhar/storekeeper/commit/52927a4d91ca79faff249bf9f4d48725822738fa))
+* **messenger:** enhance deleteMessage function to remove message content and associated media ([e389b42](https://github.com/nilotpaldhar/storekeeper/commit/e389b42aa330376ea3000d43f25d99f5005feb11))
+
+
+
 # [0.10.0](https://github.com/nilotpaldhar/storekeeper/compare/v0.9.0...v0.10.0) (2025-02-25)
 
 
@@ -51,17 +67,6 @@
 ### Bug Fixes
 
 * **auth:** replace bcryptjs with bcrypt-edge for auth compatibility in edge runtime ([c681d01](https://github.com/nilotpaldhar/storekeeper/commit/c681d01eca0d3d39d15ae7cffe86b3f9cfe6f010))
-
-
-
-# [0.7.0](https://github.com/nilotpaldhar/storekeeper/compare/v0.6.0...v0.7.0) (2024-12-04)
-
-
-### Features
-
-* **group-chat:** add functionality to update group member roles and remove members ([7e3eae1](https://github.com/nilotpaldhar/storekeeper/commit/7e3eae19cf1d4545558c86655dd835ffba934a6a))
-* **group-chat:** add group chat support, allowing users to create and join group conversations ([17a3e35](https://github.com/nilotpaldhar/storekeeper/commit/17a3e3520edc30ab43411ee2a32005770a88317c))
-* **group-chat:** add group creation dialog with server-side handling ([13d3752](https://github.com/nilotpaldhar/storekeeper/commit/13d3752593c2dd84081109fd9e0faa0e7d8483e5))
 
 
 
