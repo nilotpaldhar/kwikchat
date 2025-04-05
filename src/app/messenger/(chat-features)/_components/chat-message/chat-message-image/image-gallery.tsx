@@ -9,9 +9,9 @@ interface ImageGalleryProps {
 		imageName: string;
 		imageUrl: string;
 	}[];
-	isSender: Boolean;
+	isSender: boolean;
 	maxVisibleImages?: number;
-	isDownloadable?: Boolean;
+	isDownloadable?: boolean;
 	onGalleryItemClick?: (index: number) => void;
 }
 

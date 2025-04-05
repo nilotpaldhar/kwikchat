@@ -15,7 +15,9 @@ import { getCurrentUser } from "@/data/auth/session";
 
 import { conversationEvents } from "@/constants/pusher-events";
 
-type Params = { conversationId: string };
+interface Params {
+	conversationId: string;
+}
 
 /**
  * Handler function for processing seen message status updates.

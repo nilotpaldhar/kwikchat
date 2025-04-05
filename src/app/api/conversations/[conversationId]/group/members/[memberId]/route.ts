@@ -13,10 +13,10 @@ import { UpdateMemberRoleSchema } from "@/schemas";
 import isGroupAdmin from "@/utils/messenger/is-group-admin";
 import { conversationEvents, memberEvents } from "@/constants/pusher-events";
 
-type Params = {
+interface Params {
 	conversationId: string;
 	memberId: string;
-};
+}
 
 /**
  * Handler function for updating the role of a group member.

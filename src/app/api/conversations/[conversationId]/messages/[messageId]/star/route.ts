@@ -8,10 +8,10 @@ import { getUserMessage, MESSAGE_INCLUDE } from "@/data/message";
 import handleUserMessageError from "@/utils/api/handle-user-message-error";
 import transformMessageSeenAndStarStatus from "@/utils/messenger/transform-message-seen-and-star-status";
 
-type Params = {
+interface Params {
 	conversationId: string;
 	messageId: string;
-};
+}
 
 /**
  * Handler function for starring a message.

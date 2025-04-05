@@ -94,8 +94,8 @@ const useMessagesQuery = ({
 		(completeMessage) => {
 			updateTextMessageContent({
 				conversationId,
-				messageId: completeMessage?.id!,
-				messageContent: completeMessage?.textMessage?.content!,
+				messageId: completeMessage?.id ?? "",
+				messageContent: completeMessage?.textMessage?.content ?? "",
 				queryClient,
 			});
 		}

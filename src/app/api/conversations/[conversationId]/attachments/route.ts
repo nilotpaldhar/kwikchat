@@ -7,7 +7,9 @@ import { getCurrentUser } from "@/data/auth/session";
 import { getConversationMedia } from "@/data/media";
 import { getUserConversation } from "@/data/conversation";
 
-type Params = { conversationId: string };
+interface Params {
+	conversationId: string;
+}
 
 // Function to map a media type string to the corresponding FileType enum
 const getMediaType = (mediaType: string) => {

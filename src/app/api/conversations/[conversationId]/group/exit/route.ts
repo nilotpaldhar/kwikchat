@@ -13,7 +13,9 @@ import { createSystemMessage, broadcastGroupMessage } from "@/lib/message";
 
 import { conversationEvents, memberEvents } from "@/constants/pusher-events";
 
-type Params = { conversationId: string };
+interface Params {
+	conversationId: string;
+}
 
 /**
  * Handler function for removing a member from a group chat.

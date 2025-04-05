@@ -4,7 +4,9 @@ import { prisma } from "@/lib/db";
 import { getCurrentUser } from "@/data/auth/session";
 import { getUserConversationWithMetadata } from "@/data/conversation";
 
-type Params = { conversationId: string };
+interface Params {
+	conversationId: string;
+}
 
 /**
  * Handler function for retrieving user conversation with metadata.

@@ -5,7 +5,9 @@ import { type NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { getCurrentUser } from "@/data/auth/session";
 
-type Params = { conversationId: string };
+interface Params {
+	conversationId: string;
+}
 
 /**
  * Handler function for retrieving unread messages count in a conversation.

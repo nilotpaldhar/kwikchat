@@ -26,7 +26,7 @@ const ProfileBanner = ({ color = "#27ae80", className, ...props }: ProfileBanner
 );
 ProfileBanner.displayName = "ProfileBanner";
 
-interface ProfileAvatarProps extends UserAvatarProps {}
+type ProfileAvatarProps = UserAvatarProps;
 const ProfileAvatar = ({
 	className,
 	wrapperClassName,

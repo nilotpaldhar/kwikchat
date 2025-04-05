@@ -3,7 +3,7 @@
 import type { ChatDocumentAttachment, ChatImageAttachment } from "@/types";
 import { ChatAttachmentTypes } from "@/types";
 
-import { Plus, File, Image } from "lucide-react";
+import { Plus, File, ImageIcon } from "lucide-react";
 
 import { Button, buttonVariants } from "@/components/ui/button";
 import { Popover, PopoverTrigger, PopoverContent } from "@/components/ui/popover";
@@ -68,7 +68,7 @@ const AttachmentPopover = ({ className, onAttachmentUpload }: AttachmentPopoverP
 						if (onAttachmentUpload) onAttachmentUpload({ type: ChatAttachmentTypes.Image, data });
 					}}
 				>
-					<Image size={16} />
+					<ImageIcon size={16} />
 					<span className="font-semibold">Photos</span>
 				</ImagePicker>
 			</PopoverContent>

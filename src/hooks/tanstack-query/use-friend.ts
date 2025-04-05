@@ -71,7 +71,7 @@ const useFriendsQuery = ({
 	});
 
 	// Handle when a friend is removed
-	const handleFriendRemove = (friendId?: string, onlyOnline: boolean = false) => {
+	const handleFriendRemove = (friendId?: string, onlyOnline = false) => {
 		removeFromFriendsList({ friendId, onlyOnline, queryClient });
 		removeFromFilteredFriendsList({ friendId, onlyOnline, queryClient });
 	};
@@ -119,7 +119,7 @@ const useFilteredFriends = ({ filter = "all" }: { filter?: FriendsFilterType }) 
 	});
 
 	// Handle when a friend is removed
-	const handleFriendRemove = (friendId?: string, onlyOnline: boolean = false) => {
+	const handleFriendRemove = (friendId?: string, onlyOnline = false) => {
 		removeFromFilteredFriendsList({ friendId, onlyOnline, queryClient });
 		removeFromFriendsList({ friendId, onlyOnline, queryClient });
 	};

@@ -12,10 +12,10 @@ import { getCurrentUser } from "@/data/auth/session";
 import { conversationEvents } from "@/constants/pusher-events";
 import handleUserMessageError from "@/utils/api/handle-user-message-error";
 
-type Params = {
+interface Params {
 	conversationId: string;
 	messageId: string;
-};
+}
 
 /**
  * Broadcasts a message reaction event to the appropriate recipients, handling both

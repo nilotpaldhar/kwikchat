@@ -10,10 +10,10 @@ import { getMediaFromMessage } from "@/data/media";
 
 import handleUserMessageError from "@/utils/api/handle-user-message-error";
 
-type Params = {
+interface Params {
 	conversationId: string;
 	messageId: string;
-};
+}
 
 /**
  * Determines the attachment type based on the message type.

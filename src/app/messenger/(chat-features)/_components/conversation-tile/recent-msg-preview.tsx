@@ -3,7 +3,7 @@
 import type { RecentMessage } from "@/types";
 
 import { MessageType } from "@prisma/client";
-import { Image, FileText, MessageSquareOff } from "lucide-react";
+import { ImageIcon, FileText, MessageSquareOff } from "lucide-react";
 
 interface RecentMsgPreviewProps {
 	message: RecentMessage | null;
@@ -42,7 +42,7 @@ const RecentMsgPreview = ({ message }: RecentMsgPreviewProps) => {
 
 	return (
 		<div className="flex h-5 items-center space-x-1 overflow-hidden text-neutral-500 dark:text-neutral-400">
-			{preview.msgType === MessageType.image && <Image size={14} />}
+			{preview.msgType === MessageType.image && <ImageIcon size={14} />}
 			{preview.msgType === MessageType.document && <FileText size={14} />}
 			{preview.msgType === MessageType.deleted && <MessageSquareOff size={14} />}
 			<div title={preview.content} className="text-xs font-semibold leading-5">

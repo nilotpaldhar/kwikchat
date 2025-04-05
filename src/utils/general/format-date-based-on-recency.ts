@@ -1,6 +1,6 @@
 import { format, differenceInHours, differenceInDays, isYesterday } from "date-fns";
 
-const formatDateBasedOnRecency = (date: Date, useTimeFormat: boolean = true): string => {
+const formatDateBasedOnRecency = (date: Date, useTimeFormat = true): string => {
 	const now = new Date();
 
 	const hoursDifference = differenceInHours(now, date);

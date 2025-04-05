@@ -23,7 +23,9 @@ import {
 	handleSendGroupMessageError,
 } from "@/utils/api/handle-send-message-error";
 
-type Params = { conversationId: string };
+interface Params {
+	conversationId: string;
+}
 
 /**
  * Handler function for retrieving messages from a conversation.

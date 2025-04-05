@@ -9,7 +9,9 @@ import { getCurrentUser } from "@/data/auth/session";
 
 import { UpdateGroupSchema } from "@/schemas";
 
-type Params = { conversationId: string };
+interface Params {
+	conversationId: string;
+}
 
 /**
  * Handler function for retrieving group conversation details.

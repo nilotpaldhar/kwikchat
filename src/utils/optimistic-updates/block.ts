@@ -58,6 +58,7 @@ const optimisticBlock = async ({
 			updateInfinitePaginatedData<BlockedUser>({
 				existingData,
 				updateFn: (data, pagination) => {
+					// eslint-disable-next-line @typescript-eslint/no-unused-vars
 					const { friendship, ...user } = friend;
 					const newBlockedUser: BlockedUser = { user, blockedAt: new Date() };
 					const currentBlockedUsers = data?.items ?? [];

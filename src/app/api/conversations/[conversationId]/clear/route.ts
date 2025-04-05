@@ -5,7 +5,9 @@ import { type NextRequest, NextResponse } from "next/server";
 import { getCurrentUser } from "@/data/auth/session";
 import { clearConversation } from "@/lib/conversation";
 
-type Params = { conversationId: string };
+interface Params {
+	conversationId: string;
+}
 
 /**
  * Handler function for the DELETE request to clear a conversation.

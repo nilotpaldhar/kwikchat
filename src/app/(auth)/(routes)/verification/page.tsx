@@ -16,7 +16,7 @@ export const metadata: Metadata = {
 };
 
 interface VerificationPageProps {
-	searchParams?: { [key: string]: string | string[] | undefined };
+	searchParams?: Record<string, string | string[] | undefined>;
 }
 
 const VerificationFeedbackInvalid = () => (

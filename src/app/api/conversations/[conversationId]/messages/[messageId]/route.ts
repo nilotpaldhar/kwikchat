@@ -19,10 +19,10 @@ import { conversationEvents } from "@/constants/pusher-events";
 import isGroupAdmin from "@/utils/messenger/is-group-admin";
 import transformMessageSeenAndStarStatus from "@/utils/messenger/transform-message-seen-and-star-status";
 
-type Params = {
+interface Params {
 	conversationId: string;
 	messageId: string;
-};
+}
 
 /**
  * Broadcasts a message to members of a conversation.

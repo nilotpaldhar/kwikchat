@@ -46,7 +46,7 @@ const ChatInput = ({
 	const [message, setMessage] = useState("");
 
 	// Function to resize the textarea based on its content
-	const resizeTextarea = useCallback((reset: boolean = false) => {
+	const resizeTextarea = useCallback((reset = false) => {
 		const textarea = textareaRef.current;
 
 		if (!textarea) return;

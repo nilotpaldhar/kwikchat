@@ -10,7 +10,9 @@ import { getUserConversation } from "@/data/conversation";
 import { AddGroupMemberSchema } from "@/schemas";
 import isGroupAdmin from "@/utils/messenger/is-group-admin";
 
-type Params = { conversationId: string };
+interface Params {
+	conversationId: string;
+}
 
 /**
  * Handler function to fetch members of a group conversation.

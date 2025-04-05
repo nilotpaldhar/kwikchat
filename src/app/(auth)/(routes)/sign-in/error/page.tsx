@@ -13,7 +13,7 @@ export const metadata: Metadata = {
 };
 
 interface SignInErrorPageProps {
-	searchParams?: { [key: string]: string | string[] | undefined };
+	searchParams?: Record<string, string | string[] | undefined>;
 }
 
 const SignInErrorPage = ({ searchParams }: SignInErrorPageProps) => {

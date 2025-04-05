@@ -5,7 +5,9 @@ import { type NextRequest, NextResponse } from "next/server";
 import { getCurrentUser } from "@/data/auth/session";
 import { getMembershipDetails } from "@/data/member";
 
-type Params = { conversationId: string };
+interface Params {
+	conversationId: string;
+}
 
 /**
  * Handler function for retrieving membership details of the current user in a specific conversation.

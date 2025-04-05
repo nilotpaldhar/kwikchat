@@ -1,45 +1,27 @@
 {
-	"extends": ["next/core-web-vitals", "airbnb", "airbnb-typescript", "prettier"],
+	"extends": [
+		"next/core-web-vitals", // Includes React + Next best practices
+		"eslint:recommended", // Base JS linting rules
+		"plugin:@typescript-eslint/recommended", // Core TypeScript rules
+		"plugin:@typescript-eslint/stylistic", // TypeScript code style rules
+		"prettier" // Disables ESLint rules that conflict with Prettier
+	],
+	"parser": "@typescript-eslint/parser", // TypeScript-aware parser
 	"parserOptions": {
-		"project": "./tsconfig.json"
+		"project": "./tsconfig.json", // Enables rules requiring full type info
+		"sourceType": "module" // Allows using `import/export`
 	},
+	"plugins": ["@typescript-eslint"],
 	"rules": {
-		"react/jsx-uses-react": "off",
-		"react/react-in-jsx-scope": "off",
-		"react/jsx-props-no-spreading": "off",
-		"react/prop-types": "off",
-		"react/function-component-definition": "off",
-		"camelcase": [1],
-		"no-trailing-spaces": [1],
-		"spaced-comment": [0],
-		"padded-blocks": [0],
-		"prefer-template": [0],
-		"max-len": [0],
-		"no-else-return": [0],
-		"func-names": [0],
-		"object-shorthand": [0],
-		"space-before-function-paren": 0,
-		"no-tabs": 0,
-		"prefer-destructuring": 0,
-		"no-undef": 0,
-		"no-param-reassign": 0,
-		"comma-dangle": 0,
-		"lines-around-comment": 0,
-		"template-curly-spacing": "off",
-		"arrow-body-style": ["error", "as-needed"],
-		"import/no-unresolved": [0],
-		"react/require-default-props": [0],
-		"import/no-anonymous-default-export": [
-			"error",
-			{
-				"allowArray": false,
-				"allowArrowFunction": false,
-				"allowAnonymousClass": false,
-				"allowAnonymousFunction": false,
-				"allowCallExpression": true, // The true value here is for backward compatibility
-				"allowLiteral": false,
-				"allowObject": true
-			}
-		]
+		"no-console": ["warn", { "allow": ["warn", "error"] }], // Avoid accidental `console.log`s
+		"no-unused-vars": "off", // Disable base rule in favor of TS version
+		"@typescript-eslint/no-unused-vars": [
+			"warn",
+			{ "argsIgnorePattern": "^_", "caughtErrors": "none" }
+		],
+		"@typescript-eslint/explicit-module-boundary-types": "off",
+		"@typescript-eslint/no-explicit-any": "off",
+		"react-hooks/exhaustive-deps": "warn", // This rule is still available through `core-web-vitals`
+		"@typescript-eslint/no-empty-function": ["warn", { "allow": ["arrowFunctions"] }]
 	}
 }

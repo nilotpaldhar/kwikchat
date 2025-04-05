@@ -6,9 +6,9 @@ import { getCurrentUser } from "@/data/auth/session";
 import { getUserConversation } from "@/data/conversation";
 import { getStarredMessages } from "@/data/starred-message";
 
-type Params = {
+interface Params {
 	conversationId: string;
-};
+}
 
 export async function GET(req: NextRequest, { params }: { params: Params }) {
 	// Extract query parameters from the URL for pagination

@@ -8,7 +8,7 @@ async function getSession() {
 	return session;
 }
 
-async function getCurrentUser(cached: boolean = false) {
+async function getCurrentUser(cached = false) {
 	const session = await auth();
 	const id = session?.user.id as string;
 

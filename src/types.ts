@@ -18,9 +18,9 @@ import type { Area, Point } from "react-easy-crop";
 import type { FileDetails } from "@/utils/general/file";
 import type { PaginationMetadata } from "@/utils/general/calculate-pagination";
 
-export interface UserProfile extends Omit<User, "password" | "image"> {}
-export interface UserWithoutPassword extends Omit<User, "password"> {}
-export interface MediaWithoutId extends Omit<Media, "id"> {}
+export type UserProfile = Omit<User, "password" | "image">;
+export type UserWithoutPassword = Omit<User, "password">;
+export type MediaWithoutId = Omit<Media, "id">;
 
 export enum AuthError {
 	Configuration = "Configuration",

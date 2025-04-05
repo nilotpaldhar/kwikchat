@@ -34,6 +34,7 @@ export async function GET() {
 	}
 
 	// Destructure the user object and omit the password field from the response.
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	const { password, ...currentUserWithoutPassword } = currentUser;
 
 	return NextResponse.json({

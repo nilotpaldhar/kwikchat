@@ -9,7 +9,9 @@ import { deleteFriendship } from "@/lib/friendship";
 import { friendEvents } from "@/constants/pusher-events";
 import generateFriendChannel from "@/utils/pusher/generate-friend-channel";
 
-type Params = { friendId: string };
+interface Params {
+	friendId: string;
+}
 
 /**
  * Handler function to retrieve friend details.
