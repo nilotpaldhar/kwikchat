@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { use, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 
@@ -10,15 +10,16 @@ import { WrapperContentZone, WrapperContent } from "@/app/messenger/_components/
 import findOrCreateConversationPath from "@/actions/conversation/find-or-create-conversation-path";
 
 interface OpenChatPageProps {
-	searchParams: {
+	searchParams: Promise<{
 		friend_id?: string;
 		fallback_path?: string;
-	};
+	}>;
 }
 
-const OpenChatPage = ({ searchParams }: OpenChatPageProps) => {
+const OpenChatPage = (props: OpenChatPageProps) => {
 	const router = useRouter();
 
+	const searchParams = use(props.searchParams);
 	const friendId = searchParams.friend_id;
 	const fallbackPath = searchParams.fallback_path;
 

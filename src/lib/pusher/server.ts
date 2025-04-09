@@ -1,5 +1,3 @@
-/* eslint-disable import/prefer-default-export */
-
 import "server-only";
 
 import PusherServer from "pusher";

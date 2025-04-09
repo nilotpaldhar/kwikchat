@@ -1,20 +1,18 @@
-/* eslint-disable import/prefer-default-export */
-
 import { type NextRequest, NextResponse } from "next/server";
 
 import { getCurrentUser } from "@/data/auth/session";
 import { getMembershipDetails } from "@/data/member";
 
-interface Params {
-	conversationId: string;
-}
+type Params = Promise<{ conversationId: string }>;
 
 /**
  * Handler function for retrieving membership details of the current user in a specific conversation.
  *
  * @returns A JSON response indicating the success or failure of the request, along with the relevant data or error message.
  */
-export async function GET(req: NextRequest, { params }: { params: Params }) {
+export async function GET(req: NextRequest, segmentData: { params: Params }) {
+	const params = await segmentData.params;
+
 	// Retrieve the current user from the session
 	const currentUser = await getCurrentUser();
 

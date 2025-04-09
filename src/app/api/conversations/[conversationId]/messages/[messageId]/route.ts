@@ -19,10 +19,10 @@ import { conversationEvents } from "@/constants/pusher-events";
 import isGroupAdmin from "@/utils/messenger/is-group-admin";
 import transformMessageSeenAndStarStatus from "@/utils/messenger/transform-message-seen-and-star-status";
 
-interface Params {
+type Params = Promise<{
 	conversationId: string;
 	messageId: string;
-}
+}>;
 
 /**
  * Broadcasts a message to members of a conversation.
@@ -70,7 +70,9 @@ const broadcastMessage = async ({
  *
  * @returns A JSON response indicating the success or failure of the update.
  */
-export async function PATCH(req: NextRequest, { params }: { params: Params }) {
+export async function PATCH(req: NextRequest, segmentData: { params: Params }) {
+	const params = await segmentData.params;
+
 	// Parse the request body to extract the message content
 	const body = await req.json();
 
@@ -80,7 +82,7 @@ export async function PATCH(req: NextRequest, { params }: { params: Params }) {
 		return NextResponse.json(
 			{
 				success: false,
-				// eslint-disable-next-line no-underscore-dangle
+
 				message: validatedFields.error.format().message?._errors[0] ?? "Invalid Fields",
 			},
 			{ status: 400 }
@@ -195,7 +197,9 @@ export async function PATCH(req: NextRequest, { params }: { params: Params }) {
  *
  * @returns A JSON response indicating the result of the message deletion operation.
  */
-export async function DELETE(req: NextRequest, { params }: { params: Params }) {
+export async function DELETE(req: NextRequest, segmentData: { params: Params }) {
+	const params = await segmentData.params;
+
 	// Extract query parameters from the request URL.
 	const searchParams = req.nextUrl.searchParams;
 

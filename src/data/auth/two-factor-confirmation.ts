@@ -14,5 +14,4 @@ async function getTwoFactorConfirmationByUserId(userId: string) {
 	}
 }
 
-// eslint-disable-next-line import/prefer-default-export
 export { getTwoFactorConfirmationByUserId };

@@ -1,5 +1,3 @@
-/* eslint-disable import/prefer-default-export */
-
 import { type NextRequest, NextResponse } from "next/server";
 import { FileType } from "@prisma/client";
 
@@ -7,9 +5,7 @@ import { getCurrentUser } from "@/data/auth/session";
 import { getConversationMedia } from "@/data/media";
 import { getUserConversation } from "@/data/conversation";
 
-interface Params {
-	conversationId: string;
-}
+type Params = Promise<{ conversationId: string }>;
 
 // Function to map a media type string to the corresponding FileType enum
 const getMediaType = (mediaType: string) => {
@@ -23,7 +19,9 @@ const getMediaType = (mediaType: string) => {
  *
  * @returns A JSON response containing the requested media data.
  */
-export async function GET(req: NextRequest, { params }: { params: Params }) {
+export async function GET(req: NextRequest, segmentData: { params: Params }) {
+	const params = await segmentData.params;
+
 	// Extract search parameters from the request URL
 	const searchParams = req.nextUrl.searchParams;
 	const page = searchParams.get("page");

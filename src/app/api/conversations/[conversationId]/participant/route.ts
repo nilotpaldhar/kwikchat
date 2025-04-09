@@ -1,20 +1,18 @@
-/* eslint-disable import/prefer-default-export */
-
 import { type NextRequest, NextResponse } from "next/server";
 
 import { prisma } from "@/lib/db";
 import { getCurrentUser } from "@/data/auth/session";
 
-interface Params {
-	conversationId: string;
-}
+type Params = Promise<{ conversationId: string }>;
 
 /**
  * Handler function for retrieving conversation participant details.
  *
  * @returns A JSON response containing the status, message, and data of participant.
  */
-export async function GET(req: NextRequest, { params }: { params: Params }) {
+export async function GET(req: NextRequest, segmentData: { params: Params }) {
+	const params = await segmentData.params;
+
 	// Extract the conversation ID from the request parameters.
 	const conversationId = params.conversationId;
 

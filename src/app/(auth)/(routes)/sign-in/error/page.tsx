@@ -13,10 +13,11 @@ export const metadata: Metadata = {
 };
 
 interface SignInErrorPageProps {
-	searchParams?: Record<string, string | string[] | undefined>;
+	searchParams?: Promise<Record<string, string | string[] | undefined>>;
 }
 
-const SignInErrorPage = ({ searchParams }: SignInErrorPageProps) => {
+const SignInErrorPage = async (props: SignInErrorPageProps) => {
+	const searchParams = await props.searchParams;
 	const error = searchParams?.error as AuthError;
 
 	if (error === AuthError.Configuration) {

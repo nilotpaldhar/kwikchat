@@ -1,16 +1,14 @@
-/* eslint-disable import/prefer-default-export */
-
 import { type NextRequest, NextResponse } from "next/server";
 
 import { getCurrentUser } from "@/data/auth/session";
 import { getUserConversation } from "@/data/conversation";
 import { getStarredMessages } from "@/data/starred-message";
 
-interface Params {
-	conversationId: string;
-}
+type Params = Promise<{ conversationId: string }>;
 
-export async function GET(req: NextRequest, { params }: { params: Params }) {
+export async function GET(req: NextRequest, segmentData: { params: Params }) {
+	const params = await segmentData.params;
+
 	// Extract query parameters from the URL for pagination
 	const searchParams = req.nextUrl.searchParams;
 	const conversationId = params.conversationId;

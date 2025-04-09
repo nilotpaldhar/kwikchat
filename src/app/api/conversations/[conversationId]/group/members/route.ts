@@ -10,16 +10,16 @@ import { getUserConversation } from "@/data/conversation";
 import { AddGroupMemberSchema } from "@/schemas";
 import isGroupAdmin from "@/utils/messenger/is-group-admin";
 
-interface Params {
-	conversationId: string;
-}
+type Params = Promise<{ conversationId: string }>;
 
 /**
  * Handler function to fetch members of a group conversation.
  *
  * @returns A JSON response containing the list of group members or an error message.
  */
-export async function GET(req: NextRequest, { params }: { params: Params }) {
+export async function GET(req: NextRequest, segmentData: { params: Params }) {
+	const params = await segmentData.params;
+
 	// Extract the conversation ID from route parameters
 	const conversationId = params.conversationId;
 
@@ -72,7 +72,9 @@ export async function GET(req: NextRequest, { params }: { params: Params }) {
  *
  * @returns A JSON response indicating success or failure of the operation.
  */
-export async function POST(req: NextRequest, { params }: { params: Params }) {
+export async function POST(req: NextRequest, segmentData: { params: Params }) {
+	const params = await segmentData.params;
+
 	// Parse the incoming request body
 	const body = await req.json();
 
@@ -80,7 +82,6 @@ export async function POST(req: NextRequest, { params }: { params: Params }) {
 	const validatedFields = AddGroupMemberSchema.safeParse(body);
 	if (!validatedFields.success) {
 		const errorMessage =
-			// eslint-disable-next-line no-underscore-dangle
 			validatedFields.error.format().userIdsToAdd?._errors[0] ?? "Invalid Fields";
 		return NextResponse.json({ success: false, message: errorMessage }, { status: 400 });
 	}

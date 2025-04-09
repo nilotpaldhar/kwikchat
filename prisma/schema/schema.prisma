@@ -1,6 +1,7 @@
 generator client {
   provider        = "prisma-client-js"
   previewFeatures = ["prismaSchemaFolder"]
+  output          = "../../node_modules/.prisma/client"
 }
 
 // The datasource configuration, defining the database connection.

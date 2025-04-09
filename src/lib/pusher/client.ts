@@ -1,5 +1,3 @@
-/* eslint-disable import/prefer-default-export */
-
 import "client-only";
 
 import PusherClient from "pusher-js";

@@ -8,17 +8,19 @@ import { getUserMessage, MESSAGE_INCLUDE } from "@/data/message";
 import handleUserMessageError from "@/utils/api/handle-user-message-error";
 import transformMessageSeenAndStarStatus from "@/utils/messenger/transform-message-seen-and-star-status";
 
-interface Params {
+type Params = Promise<{
 	conversationId: string;
 	messageId: string;
-}
+}>;
 
 /**
  * Handler function for starring a message.
  *
  * @returns A JSON response indicating success or failure of the operation
  */
-export async function POST(req: NextRequest, { params }: { params: Params }) {
+export async function POST(req: NextRequest, segmentData: { params: Params }) {
+	const params = await segmentData.params;
+
 	// Retrieve the current user from the session (with authentication required)
 	const currentUser = await getCurrentUser(true);
 
@@ -78,7 +80,9 @@ export async function POST(req: NextRequest, { params }: { params: Params }) {
  *
  * @returns A JSON response indicating success or failure of the operation
  */
-export async function DELETE(req: NextRequest, { params }: { params: Params }) {
+export async function DELETE(req: NextRequest, segmentData: { params: Params }) {
+	const params = await segmentData.params;
+
 	// Retrieve the current user from the session (with authentication required)
 	const currentUser = await getCurrentUser(true);
 

@@ -80,7 +80,7 @@ const getImageUrl = async (image: File): Promise<string | null> => {
 export const isValidImageFileType = (
 	fileType: string
 ): fileType is (typeof SUPPORTED_IMAGE_FILE_MESSAGE_TYPES)[number] =>
-	[...SUPPORTED_IMAGE_FILE_MESSAGE_TYPES].includes(fileType as any);
+	[...SUPPORTED_IMAGE_FILE_MESSAGE_TYPES].includes(fileType as never);
 
 const ImagePicker = ({ className, children, onConfirmUpload }: ImagePickerProps) => {
 	const [state, dispatch] = useReducer(reducer, initialState);

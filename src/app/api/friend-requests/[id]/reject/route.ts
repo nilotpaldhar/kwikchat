@@ -1,5 +1,3 @@
-/* eslint-disable import/prefer-default-export */
-
 import { type NextRequest, NextResponse } from "next/server";
 
 import { prisma } from "@/lib/db";
@@ -8,12 +6,16 @@ import { broadcastFriendRequest, classifyFriendRequest } from "@/lib/friend-requ
 
 import { friendRequestEvents } from "@/constants/pusher-events";
 
+type Params = Promise<{ id: string }>;
+
 /**
  * Handler function to reject a pending friend request by its ID.
  *
  * @returns A JSON response containing the status, message, and data of friend request.
  */
-export async function POST(req: NextRequest, { params }: { params: { id: string } }) {
+export async function POST(req: NextRequest, segmentData: { params: Params }) {
+	const params = await segmentData.params;
+
 	const friendReqId = params.id;
 	const currentUser = await getCurrentUser();
 

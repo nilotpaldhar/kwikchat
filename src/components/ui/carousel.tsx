@@ -1,5 +1,3 @@
-/* eslint-disable react/jsx-no-constructed-context-values */
-
 "use client";
 
 import * as React from "react";
@@ -98,7 +96,6 @@ const Carousel = React.forwardRef<
 		api.on("reInit", onSelect);
 		api.on("select", onSelect);
 
-		// eslint-disable-next-line consistent-return
 		return () => {
 			api?.off("select", onSelect);
 		};

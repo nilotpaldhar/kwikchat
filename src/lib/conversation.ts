@@ -294,7 +294,6 @@ const broadcastConversation = async <ConversationPayload>({
 	try {
 		await pusherServer.trigger(channelName, eventName, payload);
 	} catch (error) {
-		// eslint-disable-next-line no-console
 		console.error("Failed to broadcast conversation update.");
 	}
 };

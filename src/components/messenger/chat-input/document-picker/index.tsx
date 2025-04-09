@@ -24,7 +24,7 @@ interface DocumentPickerProps {
 const isValidDocumentFileType = (
 	fileType: string
 ): fileType is (typeof SUPPORTED_DOCUMENT_FILE_MESSAGE_TYPES)[number] =>
-	[...SUPPORTED_DOCUMENT_FILE_MESSAGE_TYPES].includes(fileType as any);
+	[...SUPPORTED_DOCUMENT_FILE_MESSAGE_TYPES].includes(fileType as never);
 
 const DocumentPicker = ({ className, children, onConfirmUpload }: DocumentPickerProps) => {
 	const [isPreviewOpen, setIsPreviewOpen] = useState(false);

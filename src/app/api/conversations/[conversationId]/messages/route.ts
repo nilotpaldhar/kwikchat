@@ -23,16 +23,16 @@ import {
 	handleSendGroupMessageError,
 } from "@/utils/api/handle-send-message-error";
 
-interface Params {
-	conversationId: string;
-}
+type Params = Promise<{ conversationId: string }>;
 
 /**
  * Handler function for retrieving messages from a conversation.
  *
  * @returns A JSON response containing the status, message, and data (if successful).
  */
-export async function GET(req: NextRequest, { params }: { params: Params }) {
+export async function GET(req: NextRequest, segmentData: { params: Params }) {
+	const params = await segmentData.params;
+
 	// Extract query parameters from the URL for pagination
 	const searchParams = req.nextUrl.searchParams;
 	const conversationId = params.conversationId;
@@ -86,7 +86,9 @@ export async function GET(req: NextRequest, { params }: { params: Params }) {
  *
  * @returns A JSON response indicating the success or failure of the message posting.
  */
-export async function POST(req: NextRequest, { params }: { params: Params }) {
+export async function POST(req: NextRequest, segmentData: { params: Params }) {
+	const params = await segmentData.params;
+
 	// Parse the request body to extract the message content
 	const body = await req.json();
 

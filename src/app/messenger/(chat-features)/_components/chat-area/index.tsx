@@ -3,7 +3,7 @@
 import type { InfiniteData } from "@tanstack/react-query";
 import type { APIResponse, CompleteMessage, PaginatedResponse } from "@/types";
 
-import { ElementRef, useMemo, useRef } from "react";
+import { useMemo, useRef, ComponentRef } from "react";
 
 import { Inbox } from "lucide-react";
 
@@ -38,8 +38,8 @@ const combineMessages = (data?: InfiniteData<APIResponse<PaginatedResponse<Compl
 };
 
 const ChatArea = ({ conversationId, currentUserId, isGroupConversation }: ChatAreaProps) => {
-	const chatAreaRef = useRef<ElementRef<"div">>(null);
-	const chatAreaEndRef = useRef<ElementRef<"div">>(null);
+	const chatAreaRef = useRef<ComponentRef<"div">>(null);
+	const chatAreaEndRef = useRef<ComponentRef<"div">>(null);
 
 	const {
 		data,

@@ -1,5 +1,3 @@
-/* eslint-disable import/prefer-default-export */
-
 import { NextResponse } from "next/server";
 
 import { prisma } from "@/lib/db";

@@ -1,5 +1,3 @@
-/* eslint-disable import/prefer-default-export */
-
 import { type NextRequest, NextResponse } from "next/server";
 import { MessageType } from "@prisma/client";
 import { ChatAttachmentTypes } from "@/types";
@@ -10,10 +8,10 @@ import { getMediaFromMessage } from "@/data/media";
 
 import handleUserMessageError from "@/utils/api/handle-user-message-error";
 
-interface Params {
+type Params = Promise<{
 	conversationId: string;
 	messageId: string;
-}
+}>;
 
 /**
  * Determines the attachment type based on the message type.
@@ -36,7 +34,9 @@ const getAttachmentType = (messageType: MessageType): ChatAttachmentTypes | null
  *
  * @returns A JSON response containing the status, message, and data (if successful).
  */
-export async function GET(req: NextRequest, { params }: { params: Params }) {
+export async function GET(req: NextRequest, segmentData: { params: Params }) {
+	const params = await segmentData.params;
+
 	// Retrieve the current user from the session (with authentication required)
 	const currentUser = await getCurrentUser(true);
 

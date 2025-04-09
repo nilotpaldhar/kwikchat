@@ -1,5 +1,3 @@
-/* eslint-disable import/prefer-default-export */
-
 import { type NextRequest, NextResponse } from "next/server";
 
 import { prisma } from "@/lib/db";
@@ -8,12 +6,16 @@ import { broadcastFriendRequest } from "@/lib/friend-request";
 
 import { friendRequestEvents } from "@/constants/pusher-events";
 
+type Params = Promise<{ id: string }>;
+
 /**
  * Handler function to remove a pending friend request by its ID.
  *
  * @returns A JSON response containing the status and message.
  */
-export async function DELETE(req: NextRequest, { params }: { params: { id: string } }) {
+export async function DELETE(req: NextRequest, segmentData: { params: Params }) {
+	const params = await segmentData.params;
+
 	// Extract the friend request ID from the request parameters.
 	const friendReqId = params.id;
 	const currentUser = await getCurrentUser();

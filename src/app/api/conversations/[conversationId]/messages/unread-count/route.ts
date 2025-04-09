@@ -1,20 +1,18 @@
-/* eslint-disable import/prefer-default-export */
-
 import { type NextRequest, NextResponse } from "next/server";
 
 import { prisma } from "@/lib/db";
 import { getCurrentUser } from "@/data/auth/session";
 
-interface Params {
-	conversationId: string;
-}
+type Params = Promise<{ conversationId: string }>;
 
 /**
  * Handler function for retrieving unread messages count in a conversation.
  *
  * @returns A JSON response containing the status, message, and data (if successful).
  */
-export async function GET(req: NextRequest, { params }: { params: Params }) {
+export async function GET(req: NextRequest, segmentData: { params: Params }) {
+	const params = await segmentData.params;
+
 	// Retrieve the current user from the session (with authentication required)
 	const currentUser = await getCurrentUser(true);
 

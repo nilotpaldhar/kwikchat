@@ -4,16 +4,16 @@ import { prisma } from "@/lib/db";
 import { getCurrentUser } from "@/data/auth/session";
 import { getUserConversationWithMetadata } from "@/data/conversation";
 
-interface Params {
-	conversationId: string;
-}
+type Params = Promise<{ conversationId: string }>;
 
 /**
  * Handler function for retrieving user conversation with metadata.
  *
  * @returns A JSON response containing the status, message, and data (if successful).
  */
-export async function GET(req: NextRequest, { params }: { params: Params }) {
+export async function GET(req: NextRequest, segmentData: { params: Params }) {
+	const params = await segmentData.params;
+
 	// Retrieve the current user from the session
 	const currentUser = await getCurrentUser();
 
@@ -56,7 +56,9 @@ export async function GET(req: NextRequest, { params }: { params: Params }) {
  *
  * @returns A JSON response indicating the result of the conversation deletion operation.
  */
-export async function DELETE(req: NextRequest, { params }: { params: Params }) {
+export async function DELETE(req: NextRequest, segmentData: { params: Params }) {
+	const params = await segmentData.params;
+
 	// Retrieve the current user from the session (with authentication required)
 	const currentUser = await getCurrentUser(true);
 

@@ -3,13 +3,14 @@ import debounce from "@/utils/general/debounce";
 
 // Interface defining the params for the useChatAreaScroll hook
 interface ChatAreaScrollParams {
-	chatAreaRef: React.RefObject<HTMLDivElement>; // Reference to the chat container
-	chatAreaEndRef: React.RefObject<HTMLDivElement>; // Reference to the end of the chat area (for auto-scroll)
+	chatAreaRef: React.RefObject<HTMLDivElement | null>; // Reference to the chat container
+	chatAreaEndRef: React.RefObject<HTMLDivElement | null>; // Reference to the end of the chat area (for auto-scroll)
 	count: number; // Number of messages (triggers re-render when messages change)
 	shouldLoadMore?: boolean; // Flag to determine if more messages should be loaded on scroll to top
 	autoScrollThreshold?: number; // Optional threshold (in px) for triggering auto-scroll, default is 500px
 	loadMore: () => void; // Function to load more messages when the user scrolls to the top
 }
+
 /**
  * Custom hook to handle chat area scrolling behavior
  */
