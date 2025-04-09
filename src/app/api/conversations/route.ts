@@ -1,5 +1,3 @@
-/* eslint-disable import/prefer-default-export */
-
 import { type NextRequest, NextResponse } from "next/server";
 
 import { getCurrentUser } from "@/data/auth/session";

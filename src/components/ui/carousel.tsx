@@ -1,5 +1,3 @@
-/* eslint-disable react/jsx-no-constructed-context-values */
-
 "use client";
 
 import * as React from "react";
@@ -14,12 +12,12 @@ type UseCarouselParameters = Parameters<typeof useEmblaCarousel>;
 export type CarouselOptions = UseCarouselParameters[0];
 type CarouselPlugin = UseCarouselParameters[1];
 
-type CarouselProps = {
+interface CarouselProps {
 	opts?: CarouselOptions;
 	plugins?: CarouselPlugin;
 	orientation?: "horizontal" | "vertical";
 	setApi?: (api: CarouselApi) => void;
-};
+}
 
 type CarouselContextProps = {
 	carouselRef: ReturnType<typeof useEmblaCarousel>[0];
@@ -98,7 +96,6 @@ const Carousel = React.forwardRef<
 		api.on("reInit", onSelect);
 		api.on("select", onSelect);
 
-		// eslint-disable-next-line consistent-return
 		return () => {
 			api?.off("select", onSelect);
 		};

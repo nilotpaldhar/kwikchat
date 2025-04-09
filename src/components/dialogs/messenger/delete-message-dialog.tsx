@@ -56,7 +56,7 @@ const DeleteMessageDialog = () => {
 										checked={deleteForEveryone}
 										onCheckedChange={(val) => setDeleteForEveryone(Boolean(val))}
 									/>
-									{/* eslint-disable-next-line jsx-a11y/label-has-associated-control */}
+									{}
 									<label
 										htmlFor="deleteForEveryone"
 										className="select-none text-sm font-medium leading-none"

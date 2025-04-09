@@ -51,5 +51,4 @@ const updateMessageSeenStatus = async ({
 	}
 };
 
-// eslint-disable-next-line import/prefer-default-export
 export { updateMessageSeenStatus };

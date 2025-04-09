@@ -24,5 +24,4 @@ const saveMedia = async ({
 	return newMedia;
 };
 
-// eslint-disable-next-line import/prefer-default-export
 export { saveMedia };

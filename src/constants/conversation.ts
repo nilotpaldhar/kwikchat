@@ -1,5 +1,3 @@
-/* eslint-disable import/prefer-default-export */
-
 export const INIT_GROUP_CONVERSATION_MESSAGE = {
 	error: {
 		invalidFields: "Invalid input detected",

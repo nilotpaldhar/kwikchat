@@ -46,7 +46,7 @@ function rotateSize(width: number, height: number, rotation: number) {
 async function getCroppedImg(
 	imageSrc: string,
 	pixelCrop: Area = { x: 0, y: 0, width: 0, height: 0 },
-	rotation: number = 0,
+	rotation = 0,
 	flip = { horizontal: false, vertical: false }
 ): Promise<string | null> {
 	// Load the image from the provided URL

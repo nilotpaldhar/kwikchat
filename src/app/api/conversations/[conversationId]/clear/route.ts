@@ -1,18 +1,18 @@
-/* eslint-disable import/prefer-default-export */
-
 import { type NextRequest, NextResponse } from "next/server";
 
 import { getCurrentUser } from "@/data/auth/session";
 import { clearConversation } from "@/lib/conversation";
 
-type Params = { conversationId: string };
+type Params = Promise<{ conversationId: string }>;
 
 /**
  * Handler function for the DELETE request to clear a conversation.
  *
  * @returns A JSON response indicating the success or failure of the operation.
  */
-export async function DELETE(req: NextRequest, { params }: { params: Params }) {
+export async function DELETE(req: NextRequest, segmentData: { params: Params }) {
+	const params = await segmentData.params;
+
 	// Retrieve the current user from the session
 	const currentUser = await getCurrentUser();
 

@@ -58,6 +58,7 @@ const updateRecentMessage = ({
 	let updatedConversation = null;
 
 	if (itemToUpdate) {
+		// eslint-disable-next-line @typescript-eslint/no-unused-vars
 		const { recentMessage, updatedAt, ...rest } = itemToUpdate;
 		updatedConversation = {
 			...rest,

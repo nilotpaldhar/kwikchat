@@ -9,14 +9,16 @@ import { getCurrentUser } from "@/data/auth/session";
 
 import { UpdateGroupSchema } from "@/schemas";
 
-type Params = { conversationId: string };
+type Params = Promise<{ conversationId: string }>;
 
 /**
  * Handler function for retrieving group conversation details.
  *
  * @returns A JSON response containing the group conversation details.
  */
-export async function GET(req: NextRequest, { params }: { params: Params }) {
+export async function GET(req: NextRequest, segmentData: { params: Params }) {
+	const params = await segmentData.params;
+
 	// Extract the conversation ID from the request parameters.
 	const conversationId = params.conversationId;
 
@@ -114,7 +116,9 @@ export async function GET(req: NextRequest, { params }: { params: Params }) {
  *
  * @returns A JSON response indicating success or failure of the operation.
  */
-export async function PATCH(req: NextRequest, { params }: { params: Params }) {
+export async function PATCH(req: NextRequest, segmentData: { params: Params }) {
+	const params = await segmentData.params;
+
 	// Parse the incoming request body
 	const body = await req.json();
 
@@ -241,7 +245,9 @@ export async function PATCH(req: NextRequest, { params }: { params: Params }) {
  *
  * @returns A JSON response indicating success or failure of the operation.
  */
-export async function DELETE(req: NextRequest, { params }: { params: Params }) {
+export async function DELETE(req: NextRequest, segmentData: { params: Params }) {
+	const params = await segmentData.params;
+
 	// Retrieve the current user from the session
 	const currentUser = await getCurrentUser();
 

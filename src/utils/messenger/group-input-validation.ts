@@ -1,12 +1,10 @@
-/* eslint-disable no-underscore-dangle */
-
 import { NewGroupSchema } from "@/schemas";
 import { MAX_GROUP_ICON_SIZE } from "@/constants/media";
 
-type ValidationResult = {
+interface ValidationResult {
 	isValid: boolean;
 	error: string | null;
-};
+}
 
 /**
  * Validates the provided group name against the NewGroupSchema.

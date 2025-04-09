@@ -184,7 +184,6 @@ const broadcastPrivateMessage = async <MessagePayload>({
 		// Trigger the specified event on the generated channel with the payload
 		await pusherServer.trigger(channelId, eventName, payload);
 	} catch (error) {
-		// eslint-disable-next-line no-console
 		console.error("Failed to broadcast private message.");
 	}
 };
@@ -216,7 +215,6 @@ const broadcastGroupMessage = async <MessagePayload>({
 		// Trigger the event on all channels with the message as payload
 		await pusherServer.trigger(groupChatChannelIds, eventName, payload);
 	} catch (error) {
-		// eslint-disable-next-line no-console
 		console.error("Failed to broadcast group message.");
 	}
 };

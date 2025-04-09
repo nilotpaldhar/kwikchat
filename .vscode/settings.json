@@ -6,5 +6,8 @@
 	"editor.codeActionsOnSave": {
 		"source.fixAll": "explicit"
 	},
-	"prettier.configPath": ".prettierrc.json"
+	"prettier.configPath": ".prettierrc.json",
+	"eslint.useFlatConfig": true,
+	"eslint.validate": ["javascript", "typescript", "typescriptreact", "javascriptreact"],
+	"eslint.enable": true
 }

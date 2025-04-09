@@ -34,10 +34,8 @@ const broadcastMemberAction = async <MemberPayload>({
 		// Trigger the event on the Pusher server for the specified channels
 		await pusherServer.trigger(channelIds, eventName, payload);
 	} catch (error) {
-		// eslint-disable-next-line no-console
 		console.error("Failed to broadcast group message.");
 	}
 };
 
-// eslint-disable-next-line import/prefer-default-export
 export { broadcastMemberAction };

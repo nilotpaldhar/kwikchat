@@ -16,12 +16,12 @@ import { cn } from "@/utils/general/cn";
 
 const Form = FormProvider;
 
-type FormFieldContextValue<
+interface FormFieldContextValue<
 	TFieldValues extends FieldValues = FieldValues,
 	TName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>,
-> = {
+> {
 	name: TName;
-};
+}
 
 const FormFieldContext = React.createContext<FormFieldContextValue>({} as FormFieldContextValue);
 
@@ -31,15 +31,14 @@ const FormField = <
 >({
 	...props
 }: ControllerProps<TFieldValues, TName>) => (
-	// eslint-disable-next-line react/jsx-no-constructed-context-values
 	<FormFieldContext.Provider value={{ name: props.name }}>
 		<Controller {...props} />
 	</FormFieldContext.Provider>
 );
 
-type FormItemContextValue = {
+interface FormItemContextValue {
 	id: string;
-};
+}
 
 const FormItemContext = React.createContext<FormItemContextValue>({} as FormItemContextValue);
 
@@ -71,7 +70,6 @@ const FormItem = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivEl
 		const id = React.useId();
 
 		return (
-			// eslint-disable-next-line react/jsx-no-constructed-context-values
 			<FormItemContext.Provider value={{ id }}>
 				<div ref={ref} className={cn("space-y-1.5", className)} {...props} />
 			</FormItemContext.Provider>

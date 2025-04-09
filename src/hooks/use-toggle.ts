@@ -10,7 +10,7 @@ import { useState, useCallback } from "react";
  *   - `value`: The current boolean state.
  *   - `toggle`: A function to toggle the value between `true` and `false`.
  */
-const useToggle = (initialValue: boolean = true): [boolean, () => void] => {
+const useToggle = (initialValue = true): [boolean, () => void] => {
 	// State to store the current boolean value
 	const [value, setValue] = useState<boolean>(initialValue);
 

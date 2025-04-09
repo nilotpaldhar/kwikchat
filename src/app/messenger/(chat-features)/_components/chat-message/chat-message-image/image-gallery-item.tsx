@@ -14,9 +14,9 @@ interface ImageGalleryItemProps {
 	imageName: string;
 	imageUrl: string;
 	hiddenImageCount: number;
-	isSender: Boolean;
-	hasOverlay?: Boolean;
-	isDownloadable?: Boolean;
+	isSender: boolean;
+	hasOverlay?: boolean;
+	isDownloadable?: boolean;
 	onClick?: () => void;
 }
 

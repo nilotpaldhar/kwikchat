@@ -1,5 +1,3 @@
-/* eslint-disable import/prefer-default-export */
-
 import type { CompleteMessage } from "@/types";
 
 import { type NextRequest, NextResponse } from "next/server";
@@ -13,7 +11,7 @@ import { createSystemMessage, broadcastGroupMessage } from "@/lib/message";
 
 import { conversationEvents, memberEvents } from "@/constants/pusher-events";
 
-type Params = { conversationId: string };
+type Params = Promise<{ conversationId: string }>;
 
 /**
  * Handler function for removing a member from a group chat.
@@ -23,7 +21,9 @@ type Params = { conversationId: string };
  *
  * @returns A JSON response indicating success or failure of the operation.
  */
-export async function DELETE(req: NextRequest, { params }: { params: Params }) {
+export async function DELETE(req: NextRequest, segmentData: { params: Params }) {
+	const params = await segmentData.params;
+
 	// Retrieve the current user from the session
 	const currentUser = await getCurrentUser();
 

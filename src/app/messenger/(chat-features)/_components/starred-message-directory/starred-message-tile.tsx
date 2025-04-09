@@ -17,6 +17,7 @@ import useCurrentUser from "@/hooks/tanstack-query/use-current-user";
 
 import { cn } from "@/utils/general/cn";
 import formatDateBasedOnRecency from "@/utils/general/format-date-based-on-recency";
+import generateUserAvatarFallback from "@/utils/user/generate-user-avatar-fallback";
 
 interface StarredMessageTileProps {
 	message: CompleteMessage;
@@ -24,11 +25,11 @@ interface StarredMessageTileProps {
 
 const StarredMessageTile = ({ message }: StarredMessageTileProps) => {
 	const { data } = useCurrentUser();
-	const currentUserId = data?.data?.id;
+	const currentUser = data?.data;
 
 	const { id: senderId, username, avatar, displayName } = message.sender;
-	const fallback = displayName ? displayName.charAt(0) : username?.charAt(0);
-	const isSender = currentUserId === senderId;
+	const fallback = currentUser ? generateUserAvatarFallback({ user: currentUser }) : "?";
+	const isSender = currentUser?.id === senderId;
 
 	const formattedDate = useMemo(
 		() => formatDateBasedOnRecency(new Date(message.createdAt), false),
@@ -44,7 +45,7 @@ const StarredMessageTile = ({ message }: StarredMessageTileProps) => {
 						wrapperClassName="size-7"
 						className="size-7"
 						src={avatar}
-						fallback={fallback?.toUpperCase()!}
+						fallback={fallback}
 					/>
 					<div className="max-w-32 truncate text-sm font-medium">{displayName || username}</div>
 				</div>

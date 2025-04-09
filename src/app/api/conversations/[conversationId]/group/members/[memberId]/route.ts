@@ -13,24 +13,25 @@ import { UpdateMemberRoleSchema } from "@/schemas";
 import isGroupAdmin from "@/utils/messenger/is-group-admin";
 import { conversationEvents, memberEvents } from "@/constants/pusher-events";
 
-type Params = {
+type Params = Promise<{
 	conversationId: string;
 	memberId: string;
-};
+}>;
 
 /**
  * Handler function for updating the role of a group member.
  *
  * @returns A JSON response indicating success or failure of the operation.
  */
-export async function PATCH(req: NextRequest, { params }: { params: Params }) {
+export async function PATCH(req: NextRequest, segmentData: { params: Params }) {
+	const params = await segmentData.params;
+
 	// Parse the incoming request body
 	const body = await req.json();
 
 	// Validate the body against the UpdateMemberRoleSchema
 	const validatedFields = UpdateMemberRoleSchema.safeParse(body);
 	if (!validatedFields.success) {
-		// eslint-disable-next-line no-underscore-dangle
 		const errorMessage = validatedFields.error.format().memberRole?._errors[0] ?? "Invalid Fields";
 		return NextResponse.json({ success: false, message: errorMessage }, { status: 400 });
 	}
@@ -132,7 +133,9 @@ export async function PATCH(req: NextRequest, { params }: { params: Params }) {
  *
  * @returns A JSON response indicating success or failure of the operation.
  */
-export async function DELETE(req: NextRequest, { params }: { params: Params }) {
+export async function DELETE(req: NextRequest, segmentData: { params: Params }) {
+	const params = await segmentData.params;
+
 	// Retrieve the current user from the session (with authentication required)
 	const currentUser = await getCurrentUser(true);
 

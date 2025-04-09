@@ -16,7 +16,7 @@ export const metadata: Metadata = {
 };
 
 interface VerificationPageProps {
-	searchParams?: { [key: string]: string | string[] | undefined };
+	searchParams?: Promise<Record<string, string | string[] | undefined>>;
 }
 
 const VerificationFeedbackInvalid = () => (
@@ -33,7 +33,8 @@ const VerificationFeedbackInvalid = () => (
 	</div>
 );
 
-const VerificationPage = async ({ searchParams }: VerificationPageProps) => {
+const VerificationPage = async (props: VerificationPageProps) => {
+	const searchParams = await props.searchParams;
 	const token = searchParams?.token;
 
 	/** Token doesn't exist */

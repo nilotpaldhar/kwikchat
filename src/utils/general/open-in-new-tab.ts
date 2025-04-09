@@ -13,7 +13,6 @@ const openInNewTab = (url: string | null) => {
 		const newTab = window.open(validUrl.toString(), "_blank", "noopener,noreferrer");
 		if (newTab) newTab.opener = null; // Security best practice
 	} catch (error) {
-		// eslint-disable-next-line no-console
 		console.error("Invalid URL:", url);
 	}
 };

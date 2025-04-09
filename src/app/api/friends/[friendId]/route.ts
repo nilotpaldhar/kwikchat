@@ -9,14 +9,16 @@ import { deleteFriendship } from "@/lib/friendship";
 import { friendEvents } from "@/constants/pusher-events";
 import generateFriendChannel from "@/utils/pusher/generate-friend-channel";
 
-type Params = { friendId: string };
+type Params = Promise<{ friendId: string }>;
 
 /**
  * Handler function to retrieve friend details.
  *
  * @returns A JSON response containing the status, message, and friend.
  */
-export async function GET(req: NextRequest, { params }: { params: Params }) {
+export async function GET(req: NextRequest, segmentData: { params: Params }) {
+	const params = await segmentData.params;
+
 	// Extract the friend ID from the request parameters.
 	const friendId = params.friendId;
 
@@ -77,7 +79,9 @@ export async function GET(req: NextRequest, { params }: { params: Params }) {
  *
  * @returns A JSON response containing the status and message.
  */
-export async function DELETE(req: NextRequest, { params }: { params: Params }) {
+export async function DELETE(req: NextRequest, segmentData: { params: Params }) {
+	const params = await segmentData.params;
+
 	// Extract the friend ID from the request parameters.
 	const friendId = params.friendId;
 

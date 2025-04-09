@@ -4,7 +4,7 @@ import Slider from "@/components/ui/slider";
 import { Button } from "@/components/ui/button";
 import EasyCropper, { Area, Point } from "react-easy-crop";
 
-import { Image } from "lucide-react";
+import { ImageIcon } from "lucide-react";
 
 interface ImageCropperProps {
 	image: string;
@@ -64,7 +64,7 @@ const ImageCropper = ({
 						if (zoom > minZoom) onZoomChange(zoom - zoomStep * 2);
 					}}
 				>
-					<Image size={18} />
+					<ImageIcon size={18} />
 				</Button>
 				<div className="flex-1">
 					<Slider
@@ -83,7 +83,7 @@ const ImageCropper = ({
 						if (zoom < maxZoom) onZoomChange(zoom + zoomStep * 2);
 					}}
 				>
-					<Image size={32} />
+					<ImageIcon size={32} />
 				</Button>
 			</div>
 		</div>

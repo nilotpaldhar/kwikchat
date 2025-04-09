@@ -1,5 +1,3 @@
-/* eslint-disable consistent-return */
-
 import { useCallback, useEffect } from "react";
 import { pusherClient } from "@/lib/pusher/client";
 

@@ -1,4 +1,3 @@
-/* eslint-disable import/prefer-default-export */
 import { MAX_AVATAR_SIZE } from "@/constants/media";
 
 const MESSAGE_NOT_KNOWN = "We apologize, but an error has occurred with the server";

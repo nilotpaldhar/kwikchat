@@ -1,5 +1,3 @@
-/* eslint-disable import/prefer-default-export */
-
 import { type NextRequest, NextResponse } from "next/server";
 
 import { SeenMessageSchema } from "@/schemas";
@@ -15,14 +13,16 @@ import { getCurrentUser } from "@/data/auth/session";
 
 import { conversationEvents } from "@/constants/pusher-events";
 
-type Params = { conversationId: string };
+type Params = Promise<{ conversationId: string }>;
 
 /**
  * Handler function for processing seen message status updates.
  *
  * @returns A JSON response indicating the success or failure of the operation.
  */
-export async function POST(req: NextRequest, { params }: { params: Params }) {
+export async function POST(req: NextRequest, segmentData: { params: Params }) {
+	const params = await segmentData.params;
+
 	const body = await req.json();
 
 	// Validate the incoming data against the SeenMessageSchema

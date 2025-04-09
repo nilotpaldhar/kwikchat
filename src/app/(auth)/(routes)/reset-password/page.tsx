@@ -19,7 +19,7 @@ export const metadata: Metadata = {
 };
 
 interface ResetPasswordPageProps {
-	searchParams?: { [key: string]: string | string[] | undefined };
+	searchParams?: Promise<Record<string, string | string[] | undefined>>;
 }
 
 const ValidationFeedbackInvalid = () => (
@@ -33,7 +33,8 @@ const ValidationFeedbackInvalid = () => (
 	</div>
 );
 
-const ResetPasswordPage = async ({ searchParams }: ResetPasswordPageProps) => {
+const ResetPasswordPage = async (props: ResetPasswordPageProps) => {
+	const searchParams = await props.searchParams;
 	const token = searchParams?.token;
 
 	/** Token doesn't exist */

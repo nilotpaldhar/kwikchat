@@ -20,6 +20,7 @@ const AccountProfile = async () => {
 	const user = await getCachedUserById(session?.user.id);
 
 	if (!user) return null;
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	const { password, image, ...rest } = user;
 
 	return (

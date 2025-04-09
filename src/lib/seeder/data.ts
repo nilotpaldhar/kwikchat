@@ -1,5 +1,3 @@
-/* eslint-disable import/prefer-default-export */
-
 const users = [
 	{
 		name: null,

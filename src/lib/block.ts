@@ -12,5 +12,4 @@ const isBlocked = async ({ blockerId, blockedId }: { blockerId: string; blockedI
 	return block !== null;
 };
 
-// eslint-disable-next-line import/prefer-default-export
 export { isBlocked };

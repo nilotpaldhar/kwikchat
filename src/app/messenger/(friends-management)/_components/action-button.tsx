@@ -36,6 +36,7 @@ const ActionButton = React.forwardRef<HTMLButtonElement, ActionButtonProps>(
 		</Button>
 	)
 );
+ActionButton.displayName = "ActionButton";
 
 const ActionButtonWithTooltip = ({
 	icon: Icon,

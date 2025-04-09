@@ -12,10 +12,10 @@ import { getCurrentUser } from "@/data/auth/session";
 import { conversationEvents } from "@/constants/pusher-events";
 import handleUserMessageError from "@/utils/api/handle-user-message-error";
 
-type Params = {
+type Params = Promise<{
 	conversationId: string;
 	messageId: string;
-};
+}>;
 
 /**
  * Broadcasts a message reaction event to the appropriate recipients, handling both
@@ -57,7 +57,9 @@ const broadcastMessageReaction = async ({
  *
  * @returns A JSON response with the result of the reaction creation process.
  */
-export async function POST(req: NextRequest, { params }: { params: Params }) {
+export async function POST(req: NextRequest, segmentData: { params: Params }) {
+	const params = await segmentData.params;
+
 	// Parse the request body to extract the message reaction details
 	const body = await req.json();
 
@@ -129,7 +131,9 @@ export async function POST(req: NextRequest, { params }: { params: Params }) {
  *
  * @returns A JSON response with the result of the reaction update process.
  */
-export async function PATCH(req: NextRequest, { params }: { params: Params }) {
+export async function PATCH(req: NextRequest, segmentData: { params: Params }) {
+	const params = await segmentData.params;
+
 	// Parse the request body to extract the message reaction details
 	const body = await req.json();
 
@@ -215,7 +219,9 @@ export async function PATCH(req: NextRequest, { params }: { params: Params }) {
  *
  * @returns A JSON response with the result of the reaction removal process.
  */
-export async function DELETE(req: NextRequest, { params }: { params: Params }) {
+export async function DELETE(req: NextRequest, segmentData: { params: Params }) {
+	const params = await segmentData.params;
+
 	// Retrieve the current user from the session (with authentication required)
 	const currentUser = await getCurrentUser(true);
 

@@ -19,7 +19,7 @@ import ChatMessageInput from "@/app/messenger/(chat-features)/_components/chat-m
 import GroupMembershipSync from "@/app/messenger/(chat-features)/_components/group-membership-sync";
 
 interface ChatPageProps {
-	params: { id: string };
+	params: Promise<{ id: string }>;
 }
 
 export const metadata: Metadata = {
@@ -28,7 +28,9 @@ export const metadata: Metadata = {
 		"Dive into lively one-on-one or group chats with an intuitive, feature-packed experience designed for meaningful connections",
 };
 
-const ChatPage = async ({ params: { id } }: ChatPageProps) => {
+const ChatPage = async (props: ChatPageProps) => {
+	const params = await props.params;
+
 	const session = await getSession();
 	if (!session?.user.id) notFound();
 
@@ -36,7 +38,7 @@ const ChatPage = async ({ params: { id } }: ChatPageProps) => {
 	if (!user) notFound();
 
 	const conversation = await getConversationByIdAndUserId({
-		id,
+		id: params.id,
 		userId: user.id,
 		excludeDeleted: true,
 	});

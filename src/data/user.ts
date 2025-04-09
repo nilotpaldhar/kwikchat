@@ -3,7 +3,7 @@ import "server-only";
 import { unstable_cache as cache } from "next/cache";
 import { prisma } from "@/lib/db";
 
-async function getUserById(id: string, withSettings: boolean = false) {
+async function getUserById(id: string, withSettings = false) {
 	try {
 		const user = await prisma.user.findUnique({
 			where: { id },
@@ -15,7 +15,7 @@ async function getUserById(id: string, withSettings: boolean = false) {
 	}
 }
 
-async function getUserByEmail(email: string, withSettings: boolean = false) {
+async function getUserByEmail(email: string, withSettings = false) {
 	try {
 		const user = await prisma.user.findUnique({
 			where: { email },
@@ -27,7 +27,7 @@ async function getUserByEmail(email: string, withSettings: boolean = false) {
 	}
 }
 
-async function getUserByUsername(username: string, withSettings: boolean = false) {
+async function getUserByUsername(username: string, withSettings = false) {
 	try {
 		const user = await prisma.user.findUnique({
 			where: { username },

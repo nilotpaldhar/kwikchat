@@ -1,8 +1,8 @@
 import type { Config } from "tailwindcss";
 
-const { fontFamily } = require("tailwindcss/defaultTheme");
-const tailwindcssAnimate = require("tailwindcss-animate");
-const tailwindScrollbar = require("tailwind-scrollbar");
+import defaultTheme from "tailwindcss/defaultTheme";
+import tailwindcssAnimate from "tailwindcss-animate";
+import tailwindScrollbar from "tailwind-scrollbar";
 
 const config = {
 	darkMode: ["class"],
@@ -70,7 +70,7 @@ const config = {
 				"mobile-nav": "0 -4px 12px rgba(0, 0, 0, 0.06)",
 			},
 			fontFamily: {
-				sans: ["var(--font-sans)", ...fontFamily.sans],
+				sans: ["var(--font-sans)", ...defaultTheme.fontFamily.sans],
 			},
 			keyframes: {
 				"accordion-down": {
