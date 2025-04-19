@@ -31,19 +31,19 @@ export const CHAT_PREVIEW_GRID_IMAGE = "/images/marketing/chat-preview-grid.webp
 export const APP_FEATURE_IMAGES = {
 	realTimeChat: {
 		src: "/images/marketing/features/real-time-chat.webp",
-		alt: "Real-time chat interface with instant message delivery",
-		width: 550,
-		height: 600,
-	},
-	richChatExperience: {
-		src: "/images/marketing/features/real-time-chat.webp",
-		alt: "Feature-rich chat with multimedia sharing and message reactions",
+		alt: "Screenshot of the real-time chat interface in the app",
 		width: 550,
 		height: 600,
 	},
 	secureMessaging: {
-		src: "/images/marketing/features/real-time-chat.webp",
-		alt: "Private and secure chat ensuring message confidentiality",
+		src: "/images/marketing/features/account-security.webp",
+		alt: "Screenshot of the account security and secure messaging settings",
+		width: 550,
+		height: 600,
+	},
+	richChatExperience: {
+		src: "/images/marketing/features/chat-preview-dark-light-mode.webp",
+		alt: "Screenshot of the chat interface in both dark and light modes",
 		width: 550,
 		height: 600,
 	},
