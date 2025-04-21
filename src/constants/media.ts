@@ -22,7 +22,7 @@ export const LOGO_ICON_LIGHT = "/images/logos/logo-icon-light.svg";
 export const CHAT_WELCOME_IMAGE = "/images/messenger/chat-welcome.webp"; // Shown on the messenger welcome screen
 
 // Marketing Images - Used in promotional sections
-export const APP_OVERVIEW_IMAGE = "/images/marketing/app-overview.webp";
+export const APP_PREVIEW_IMAGE = "/images/marketing/app-preview.webp";
 export const HEADER_BG_IMAGE = "/images/marketing/header-bg.webp";
 export const CTA_BG_IMAGE = "/images/marketing/cta-bg.webp";
 export const CHAT_PREVIEW_GRID_IMAGE = "/images/marketing/chat-preview-grid.webp";
