@@ -53,16 +53,10 @@ export const DEVELOPER_LINKS = {
 // Frequently Asked Questions (FAQs) for the app
 export const FAQS = [
 	{
-		id: "faq-tech",
-		question: "What technologies power this app?",
+		id: "faq-demo-account",
+		question: "Is there a demo account I can use?",
 		answer:
-			"Built with Next.js, React, Tailwind CSS, and Shadcn, it uses PostgreSQL, Prisma, Pusher, and ImageKit. It's deployed on Vercel for modern, edge-first performance.",
-	},
-	{
-		id: "faq-pusher",
-		question: "Why are you using Pusher instead of raw WebSockets?",
-		answer:
-			"Because Vercel doesn't support native WebSocket connections. Pusher offers real-time capabilities that work seamlessly in a serverless deployment.",
+			"Yes! A demo account is available for quick access — no signup required. The demo credentials are displayed directly on the login page, so you can easily try the app right away.",
 	},
 	{
 		id: "faq-realtime",
@@ -81,6 +75,18 @@ export const FAQS = [
 		question: "Can I create group chats?",
 		answer:
 			"Absolutely. You can create group chats, manage participants dynamically, react to messages, and star important ones for later.",
+	},
+	{
+		id: "faq-tech",
+		question: "What technologies power this app?",
+		answer:
+			"Built with Next.js, React, Tailwind CSS, and Shadcn, it uses PostgreSQL, Prisma, Pusher, and ImageKit. It's deployed on Vercel for modern, edge-first performance.",
+	},
+	{
+		id: "faq-pusher",
+		question: "Why are you using Pusher instead of raw WebSockets?",
+		answer:
+			"Because Vercel doesn't support native WebSocket connections. Pusher offers real-time capabilities that work seamlessly in a serverless deployment.",
 	},
 	{
 		id: "faq-darkmode",
