@@ -1,4 +1,4 @@
-import { Smile, CloudLightning, Users, ShieldCheck, MessagesSquare } from "lucide-react";
+import { Smile, CloudLightning, Users, ShieldCheck, ImagePlus } from "lucide-react";
 
 import {
 	SectionHeader,
@@ -25,10 +25,30 @@ import FeatureList from "@/app/(marketing)/_sections/features/feature-list";
 
 import { APP_FEATURE_IMAGES } from "@/constants/media";
 
-const ADVANCED_MESSAGING_FEATURES = [
-	{ id: "group_chat", content: "Connect with multiple people in a single conversation." },
-	{ id: "editable_messages", content: "Edit messages and express yourself with reactions." },
-	{ id: "media_sharing", content: "Share media and documents effortlessly." },
+const SECURITY_FEATURES = [
+	{
+		id: "two-factor-authentication-toggle",
+		content: "Two-Factor Authentication (2FA) toggle from your dashboard",
+	},
+	{
+		id: "secure-session-password-management",
+		content: "Secure session handling and password management",
+	},
+];
+
+const UI_ENHANCEMENT_FEATURES = [
+	{
+		id: "instant-media-previews",
+		content: "Instant media previews before upload",
+	},
+	{
+		id: "accessible-ui-tailwind-shadcn",
+		content: "Clean, accessible UI with Tailwind CSS and Shadcn UI",
+	},
+	{
+		id: "dark-light-mode-support",
+		content: "Full dark/light mode support for any environment",
+	},
 ];
 
 const FeaturesSection = () => (
@@ -122,34 +142,10 @@ const FeaturesSection = () => (
 									Real-Time Messaging with Zero Delay & Instant Delivery
 								</SectionTitle>
 								<SectionDescription className="max-w-full text-left font-normal text-neutral-700">
-									Integer a aliquam massa. Nunc dapibus dolor eu felis aliquet ullamcorper. Vivamus
-									elementum purus id augue auctor, eu finibus nunc fermentum.
+									Experience seamless conversations with instant message delivery using Pusher and
+									TanStack Query. Group chats, emoji reactions, starred messages, and live delivery
+									indicators make every chat dynamic and responsive.
 								</SectionDescription>
-							</SectionHeader>
-						</FeatureBlockContent>
-					</FeatureBlock>
-
-					<FeatureBlock>
-						<FeatureBlockImage
-							src={APP_FEATURE_IMAGES.richChatExperience.src}
-							alt={APP_FEATURE_IMAGES.richChatExperience.alt}
-							width={APP_FEATURE_IMAGES.richChatExperience.width}
-							height={APP_FEATURE_IMAGES.richChatExperience.height}
-						/>
-						<FeatureBlockContent>
-							<SectionHeader className="items-start">
-								<SectionBadge className="space-x-1.5">
-									<MessagesSquare size={16} />
-									<span>RICH CHAT EXPERIENCE</span>
-								</SectionBadge>
-								<SectionTitle className="text-left">
-									Advanced Messaging Features for a Rich Chat Experience
-								</SectionTitle>
-								<SectionDescription className="max-w-full text-left font-normal text-neutral-700">
-									Integer a aliquam massa. Nunc dapibus dolor eu felis aliquet ullamcorper vivamus
-									elementum.
-								</SectionDescription>
-								<FeatureList items={ADVANCED_MESSAGING_FEATURES} />
 							</SectionHeader>
 						</FeatureBlockContent>
 					</FeatureBlock>
@@ -160,6 +156,29 @@ const FeaturesSection = () => (
 							alt={APP_FEATURE_IMAGES.secureMessaging.alt}
 							width={APP_FEATURE_IMAGES.secureMessaging.width}
 							height={APP_FEATURE_IMAGES.secureMessaging.height}
+						/>
+						<FeatureBlockContent>
+							<SectionHeader className="items-start">
+								<SectionBadge className="space-x-1.5">
+									<ShieldCheck size={16} />
+									<span>SAFETY & SECURITY</span>
+								</SectionBadge>
+								<SectionTitle className="text-left">Built-In Security That Just Works</SectionTitle>
+								<SectionDescription className="max-w-full text-left font-normal text-neutral-700">
+									Your privacy is backed by enterprise-grade authentication and smart security
+									controls:
+								</SectionDescription>
+								<FeatureList items={SECURITY_FEATURES} />
+							</SectionHeader>
+						</FeatureBlockContent>
+					</FeatureBlock>
+
+					<FeatureBlock>
+						<FeatureBlockImage
+							src={APP_FEATURE_IMAGES.richChatExperience.src}
+							alt={APP_FEATURE_IMAGES.richChatExperience.alt}
+							width={APP_FEATURE_IMAGES.richChatExperience.width}
+							height={APP_FEATURE_IMAGES.richChatExperience.height}
 							className="lg:order-1 lg:justify-end"
 							classNames={{
 								imageBackground: "lg:pl-10 lg:pr-0",
@@ -169,16 +188,17 @@ const FeaturesSection = () => (
 						<FeatureBlockContent>
 							<SectionHeader className="items-start">
 								<SectionBadge className="space-x-1.5">
-									<ShieldCheck size={16} />
-									<span>SAFETY AND SECURITY</span>
+									<ImagePlus size={16} />
+									<span>UX + MEDIA</span>
 								</SectionBadge>
 								<SectionTitle className="text-left">
-									Strengthen Your Account Security & Customize Your Chat Experience
+									Media-Rich Chats in a Beautiful Interface
 								</SectionTitle>
 								<SectionDescription className="max-w-full text-left font-normal text-neutral-700">
-									Integer a aliquam massa. Nunc dapibus dolor eu felis aliquet ullamcorper. Vivamus
-									elementum purus id augue auctor, eu finibus nunc fermentum.
+									Share and preview media without leaving the chat. The interface is mobile-first,
+									lightweight, and sharp — powered by:
 								</SectionDescription>
+								<FeatureList items={UI_ENHANCEMENT_FEATURES} />
 							</SectionHeader>
 						</FeatureBlockContent>
 					</FeatureBlock>

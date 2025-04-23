@@ -40,13 +40,13 @@ const FeatureBlockImage = ({
 	>
 		<div
 			className={cn(
-				"rounded-xl bg-neutral-100 px-5 pt-5 md:px-10 md:pt-10 lg:pl-0",
+				"w-full overflow-hidden rounded-xl bg-neutral-100 px-5 pt-5 md:px-10 md:pt-10 lg:w-auto lg:pl-0",
 				classNames?.imageBackground
 			)}
 		>
 			<div
 				className={cn(
-					"overflow-hidden rounded-xl rounded-b-none lg:rounded-l-none",
+					"flex justify-center overflow-hidden rounded-xl rounded-b-none lg:block lg:rounded-l-none",
 					classNames?.imageContainer
 				)}
 			>

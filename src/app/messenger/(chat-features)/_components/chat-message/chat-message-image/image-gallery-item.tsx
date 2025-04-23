@@ -79,7 +79,7 @@ const ImageGalleryItem = ({
 					: "ring-offset-white focus-visible:ring-neutral-500 dark:ring-offset-surface-dark-400 dark:focus-visible:ring-neutral-600"
 			)}
 		>
-			<div className="relative size-full">
+			<div className="relative size-full bg-neutral-200 dark:bg-neutral-900">
 				<Image
 					src={imageUrl}
 					alt={imageName}
