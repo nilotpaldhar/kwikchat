@@ -9,9 +9,34 @@
   <strong>KwikChat – Real-Time Messaging Made Simple</strong>
 </h3>
 
-<p align="center">
-  KwikChat is a modern real-time chat application built with Next.js, Pusher, Prisma, and PostgreSQL. Designed for speed, scalability, and a polished user experience, it's perfect for teams, communities, or anyone who needs a reliable messaging tool.
-</p>
+---
+
+## About This Project 📌
+
+**Purpose:**  
+KwikChat is a modern, real-time chat application created to showcase **scalable, secure, and highly interactive messaging systems** for the web. It’s designed to deliver a smooth and responsive communication experience for teams, communities, or any group that needs reliable messaging.
+
+**Why I Created It:**  
+I wanted to build a **full‑stack portfolio project** that demonstrates my skills in **real-time communication, secure authentication, state management, and responsive UI design** — all implemented in a production‑ready architecture.  
+KwikChat was an opportunity to explore how to handle high‑frequency data updates, complex user interactions, and media handling in a serverless environment.
+
+**My Role:**  
+This project was **built entirely by me** from the ground up:
+
+- Designed the UI/UX (including mobile‑first layouts, dark/light modes)
+- Built the frontend with Next.js, Tailwind CSS, Shadcn UI, and TanStack Query
+- Designed database schema and implemented backend logic (PostgreSQL + Prisma)
+- Integrated real‑time messaging with Pusher
+- Implemented authentication with 2FA and session handling
+- Added media storage and optimization using ImageKit
+- Deployed and configured the application on Vercel
+
+**Design Choice – Why Pusher Over Raw WebSockets:**  
+Vercel’s serverless platform **does not support native persistent WebSocket connections**.  
+Using raw WebSockets would require hosting a separate dedicated server, which adds infrastructure complexity and operational overhead.  
+Pusher offers **fully managed, scalable real-time messaging** that integrates cleanly with Next.js in a serverless setup, allowing me to focus on app features rather than socket infrastructure.
+
+---
 
 <p align="center">
   <a href="https://kwikchat.vercel.app">Live Demo</a> |
@@ -37,6 +62,8 @@
 <p align="center">
   <img src="https://raw.githubusercontent.com/nilotpaldhar/kwikchat/refs/heads/main/.github/assets/images/app-overview.png" alt="App Overview" />
 </p>
+
+---
 
 ## Features ✨
 
@@ -196,15 +223,34 @@ Run the following command in your project root:
 npm run db:seed
 ```
 
+---
+
 ## Deployment 🚀
 
 KwikChat is ready to deploy on [Vercel](https://vercel.com). Just connect your GitHub repo and add the required environment variables.
 
 > For more info, refer to the [Next.js deployment docs](https://nextjs.org/docs/deployment).
 
+---
+
 ## Contribution 🤝
 
 KwikChat is open source and contributions are welcome. Check out our [Code of Conduct](https://github.com/nilotpaldhar/kwikchat/blob/main/CODE_OF_CONDUCT.md) and [Issues](https://github.com/nilotpaldhar/kwikchat/issues) page to get started.
+
+---
+
+## Attribution Notice 🛡️
+
+This project is licensed under the [MIT License](LICENSE), which allows reuse with attribution.  
+**However:**
+
+- You are **not permitted** to claim this project, its design, or its codebase as your own work for job applications, portfolios, or academic submissions.
+- If you use or modify this project, you **must retain** the original attribution to [Nilotpal Dhar](https://linkedin.com/in/nilotpaldhar) in your README and license file.
+- Violations may be reported to relevant academic institutions, hiring managers, or platform administrators.
+
+This clause is meant to protect the integrity of my work while allowing others to learn from and build upon it.
+
+---
 
 ## Support 💗
 
@@ -213,6 +259,8 @@ If you found this project helpful:
 - ⭐ Star this repo on GitHub
 - 💬 Share it with your network
 - 📢 Give a shoutout on social media
+
+---
 
 ## License 📄
 
