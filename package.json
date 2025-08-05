@@ -19,9 +19,9 @@
     "check:all": "npm run lint && npm run format  && npm run build",
     "fix:all": "npm run lint:fix && npm run format:fix",
     "db:generate": "prisma generate --schema=prisma/schema",
-    "db:migrate": "dotenv -e .env prisma migrate dev --schema=prisma/schema",
-    "db:push": "dotenv -e .env prisma db push --schema=prisma/schema",
-    "db:studio": "dotenv -e .env prisma studio --schema=prisma/schema",
+    "db:migrate": "prisma migrate dev --schema=prisma/schema",
+    "db:push": "prisma db push --schema=prisma/schema",
+    "db:studio": "prisma studio --schema=prisma/schema",
     "db:seed": "tsx src/lib/seeder/seed.ts",
     "prepare": "husky",
     "commit": "git-cz"

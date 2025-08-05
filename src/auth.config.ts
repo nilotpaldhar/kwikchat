@@ -2,7 +2,6 @@ import type { NextAuthConfig } from "next-auth";
 
 // Providers
 import Google from "next-auth/providers/google";
-import FaceBook from "next-auth/providers/facebook";
 import Credentials from "next-auth/providers/credentials";
 
 import { SigninSchema } from "@/schemas";
@@ -13,10 +12,6 @@ export default {
 		Google({
 			clientId: process.env.AUTH_GOOGLE_ID,
 			clientSecret: process.env.AUTH_GOOGLE_SECRET,
-		}),
-		FaceBook({
-			clientId: process.env.AUTH_FACEBOOK_ID,
-			clientSecret: process.env.AUTH_FACEBOOK_SECRET,
 		}),
 		Credentials({
 			credentials: {
